@@ -57,7 +57,7 @@ export function Footer() {
 
         <div className="mt-14 hairline" />
         <div className="mt-6 flex flex-col items-center justify-between gap-3 text-xs text-muted/60 sm:flex-row">
-          <p>© 2026 BIZBUYUK Real Estate LLC. {t.footer.rights}</p>
+          <p>© 2020 BIZBUYUK Real Estate LLC. {t.footer.rights}</p>
           <p className="tracking-wide">United Arab Emirates</p>
         </div>
       </div>

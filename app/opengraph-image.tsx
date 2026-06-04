@@ -50,11 +50,11 @@ export default function OG() {
 
         <div style={{ display: "flex", flexDirection: "column", maxWidth: 900 }}>
           <span style={{ color: "#c8a15a", fontSize: 22, letterSpacing: 8, marginBottom: 24 }}>
-            DUBAI · EST. 2023
+            UAE · EST. 2020
           </span>
           <span style={{ color: "#f3ede1", fontSize: 72, lineHeight: 1.05 }}>
             Your trusted partner in the
-            <span style={{ color: "#ecd49b" }}> Dubai property</span> market.
+            <span style={{ color: "#ecd49b" }}> UAE property</span> market.
           </span>
         </div>
 
