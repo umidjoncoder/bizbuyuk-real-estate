@@ -32,7 +32,12 @@ export type Dict = {
   marqueeIntro: string;
   services: { eyebrow: string; title: string; items: Service[] };
   stats: { eyebrow: string; title: string; items: Stat[] };
-  why: { eyebrow: string; title: string; lead: string; steps: Step[] };
+  why: {
+    about: { eyebrow: string; title: string; body: string };
+    eyebrow: string;
+    title: string;
+    cards: Step[];
+  };
   partners: { eyebrow: string; title: string };
   lead: {
     eyebrow: string;
@@ -104,14 +109,18 @@ export const dictionary: Record<Locale, Dict> = {
       ],
     },
     why: {
-      eyebrow: "Why BIZBUYUK",
+      about: {
+        eyebrow: "About us",
+        title: "Welcome to BIZBUYUK Real Estate",
+        body: "Established in 2020, our mission is to deliver world-class real estate brokerage services with the highest standards of professionalism, ethics and quality. Founded on deep mutual trust and dedication, we aim to become the region's most valuable brokerage.",
+      },
+      eyebrow: "Why choose us",
       title: "Discretion, data, and the right doors",
-      lead: "We are hardworking analysts who watch market trends, know every neighbourhood, and source the best opportunities in prime locations — directly from sellers. Off-plan solutions for every budget, with excellent return on investment.",
-      steps: [
-        { title: "Prime access", body: "Direct lines to Emaar, Nakheel, Meraas, Damac, Sobha and beyond — including launches before they go public." },
-        { title: "Maximum qualified buyers", body: "A sizeable marketing budget and a broad investor network put your property in front of the right people, fast." },
-        { title: "Trouble-free acquisition", body: "Seamless, transparent transactions with legal guidance from first viewing to handover." },
-        { title: "Personal approach", body: "Approachable, honest and discreet — every client is advised as if their goals were our own." },
+      cards: [
+        { title: "Market experts", body: "Hardworking analysts who watch market trends and know the neighbourhoods — identifying the best opportunities for our clients." },
+        { title: "Prime access", body: "Access to properties in prime locations directly from sellers, plus a wide selection of off-plan solutions for every budget." },
+        { title: "Trouble-free acquisition", body: "An excellent return on investment through a seamless, transparent and trouble-free acquisition process." },
+        { title: "Comprehensive services", body: "An ambitious, creative agency handling the buying, selling and leasing of residential and commercial property across the UAE's top focus areas." },
       ],
     },
     partners: { eyebrow: "Our developers", title: "We work with all developments across the UAE" },
@@ -183,14 +192,18 @@ export const dictionary: Record<Locale, Dict> = {
       ],
     },
     why: {
-      eyebrow: "Почему BIZBUYUK",
+      about: {
+        eyebrow: "О нас",
+        title: "Добро пожаловать в BIZBUYUK Real Estate",
+        body: "Основанное в 2020 году, наше агентство ставит миссией предоставлять брокерские услуги мирового класса с высочайшими стандартами профессионализма, этики и качества. Опираясь на глубокое взаимное доверие, мы стремимся стать самым ценным агентством недвижимости в регионе.",
+      },
+      eyebrow: "Почему мы",
       title: "Конфиденциальность, данные и нужные двери",
-      lead: "Мы — команда аналитиков, которые следят за трендами рынка, знают каждый район и находят лучшие возможности в премиальных локациях напрямую от продавцов. Off-plan решения под любой бюджет с отличной доходностью.",
-      steps: [
-        { title: "Прямой доступ", body: "Прямые связи с Emaar, Nakheel, Meraas, Damac, Sobha и другими — включая старты до публичного запуска." },
-        { title: "Максимум покупателей", body: "Большой маркетинговый бюджет и широкая сеть инвесторов быстро находят нужного покупателя для вашего объекта." },
-        { title: "Сделка без хлопот", body: "Прозрачные сделки с юридическим сопровождением — от первого показа до передачи ключей." },
-        { title: "Личный подход", body: "Открыто, честно и конфиденциально — каждого клиента ведём как если бы его цели были нашими." },
+      cards: [
+        { title: "Эксперты рынка", body: "Команда аналитиков, которые следят за трендами рынка и знают районы — находят лучшие возможности для клиентов." },
+        { title: "Прямой доступ", body: "Доступ к объектам в премиальных локациях напрямую от продавцов и широкий выбор off-plan решений под любой бюджет." },
+        { title: "Сделка без хлопот", body: "Отличная доходность инвестиций благодаря прозрачному и беспроблемному процессу приобретения." },
+        { title: "Полный спектр услуг", body: "Амбициозное креативное агентство: покупка, продажа и аренда жилой и коммерческой недвижимости в ключевых районах ОАЭ." },
       ],
     },
     partners: { eyebrow: "Наши застройщики", title: "Работаем со всеми проектами ОАЭ" },
