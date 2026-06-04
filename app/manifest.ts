@@ -13,8 +13,7 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "en",
     categories: ["business", "real estate", "finance"],
     icons: [
-      { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
-      { src: "/apple-icon", sizes: "180x180", type: "image/png" },
+      { src: "/bizbuyuk-logo.png", sizes: "440x465", type: "image/png", purpose: "any" },
     ],
   };
 }

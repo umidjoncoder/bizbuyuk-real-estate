@@ -23,8 +23,8 @@ export function Stats() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-ink/70 to-transparent" />
             <div className="absolute bottom-5 left-5 rounded-2xl border border-white/10 bg-ink/70 px-5 py-4 backdrop-blur-md">
-              <p className="text-2xl font-extrabold text-gold-foil">Est. 2023</p>
-              <p className="text-xs tracking-wide text-cream/70">Dubai, UAE</p>
+              <p className="text-2xl font-extrabold text-gold-foil">Est. 2020</p>
+              <p className="text-xs tracking-wide text-cream/70">United Arab Emirates</p>
             </div>
           </div>
         </Reveal>

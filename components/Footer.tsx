@@ -1,7 +1,7 @@
 "use client";
 
 import { useLang } from "./LanguageProvider";
-import { Mark, Wordmark } from "./Logo";
+import { LogoImage } from "./Logo";
 import { CONTACT } from "@/lib/i18n";
 
 export function Footer() {
@@ -19,9 +19,8 @@ export function Footer() {
       <div className="mx-auto max-w-[1280px] px-5 py-16 sm:px-8">
         <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>
-            <a href="#top" className="flex items-center gap-3">
-              <Mark size={32} />
-              <Wordmark />
+            <a href="#top" className="inline-flex">
+              <LogoImage height={72} className="rounded-lg" />
             </a>
             <p className="mt-5 max-w-[40ch] text-sm leading-relaxed text-muted">{t.footer.blurb}</p>
           </div>
@@ -46,7 +45,7 @@ export function Footer() {
           </FooterCol>
 
           <FooterCol title={t.footer.follow}>
-            <Social href={CONTACT.instagram} label={`Instagram ${CONTACT.instagramHandle}`} />
+            <Social href={CONTACT.instagram} label="Instagram" />
             <Social href={CONTACT.facebook} label="Facebook" />
             <Social href={CONTACT.youtube} label="YouTube" />
             <Social href={CONTACT.whatsapp} label="WhatsApp" />
@@ -56,7 +55,7 @@ export function Footer() {
         <div className="mt-14 hairline" />
         <div className="mt-6 flex flex-col items-center justify-between gap-3 text-xs text-muted/60 sm:flex-row">
           <p>© 2026 BIZBUYUK Real Estate LLC. {t.footer.rights}</p>
-          <p className="tracking-wide">Dubai · United Arab Emirates</p>
+          <p className="tracking-wide">United Arab Emirates</p>
         </div>
       </div>
     </footer>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { Mark, Wordmark } from "./Logo";
+import { LogoImage } from "./Logo";
 import { useLang } from "./LanguageProvider";
 import { localeNames, locales } from "@/lib/i18n";
 
@@ -36,8 +36,11 @@ export function Nav() {
     >
       <nav className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-5 sm:px-8">
         <a href="#top" className="flex items-center gap-3 group">
-          <Mark size={34} className="transition-transform duration-700 group-hover:rotate-180" />
-          <Wordmark />
+          <LogoImage
+            height={48}
+            priority
+            className="rounded-md transition-transform duration-500 group-hover:scale-105"
+          />
         </a>
 
         <div className="hidden items-center gap-9 md:flex">

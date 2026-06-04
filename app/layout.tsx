@@ -11,9 +11,9 @@ const manrope = Manrope({
 });
 
 const SITE = "https://bizbuyuk.com";
-const TITLE = "BIZBUYUK Real Estate — Your trusted partner in the Dubai property market";
+const TITLE = "BIZBUYUK Real Estate — Your trusted partner in the UAE property market";
 const DESCRIPTION =
-  "Off-plan launches from Dubai's leading developers, protected investments, and full relocation support. 0% commission to buyers. Get a free consultation.";
+  "Off-plan launches from the UAE's leading developers across Dubai, Abu Dhabi and the Emirates, protected investments, and full relocation support. 0% commission to buyers. Get a free consultation.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
@@ -25,21 +25,29 @@ export const metadata: Metadata = {
   applicationName: "BIZBUYUK Real Estate",
   category: "real estate",
   keywords: [
+    "UAE real estate",
+    "real estate UAE",
+    "real estate Emirates",
+    "property UAE",
     "Dubai real estate",
+    "real estate Dubai",
     "Dubai property",
+    "Abu Dhabi real estate",
+    "off-plan UAE",
     "off-plan Dubai",
-    "buy property Dubai",
-    "Dubai investment",
-    "property for sale Dubai",
+    "buy property UAE",
+    "UAE investment",
     "Emaar",
     "Damac",
     "Sobha",
     "Nakheel",
-    "Dubai relocation",
-    "Dubai residence visa",
+    "Danube",
+    "UAE relocation",
+    "UAE residence visa",
     "BIZBUYUK",
+    "недвижимость ОАЭ",
     "недвижимость Дубай",
-    "купить квартиру в Дубае",
+    "купить квартиру в ОАЭ",
   ],
   authors: [{ name: "BIZBUYUK Real Estate LLC", url: SITE }],
   creator: "BIZBUYUK Real Estate LLC",
@@ -107,8 +115,11 @@ const jsonLd = {
       telephone: "+971554791313",
       email: "info@bizbuyuk.com",
       priceRange: "$$$",
-      foundingDate: "2023",
-      areaServed: { "@type": "City", name: "Dubai" },
+      foundingDate: "2020",
+      areaServed: [
+        { "@type": "Country", name: "United Arab Emirates" },
+        { "@type": "City", name: "Dubai" },
+      ],
       address: {
         "@type": "PostalAddress",
         addressLocality: "Dubai",
