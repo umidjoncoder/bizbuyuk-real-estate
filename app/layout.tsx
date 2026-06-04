@@ -122,6 +122,7 @@ const jsonLd = {
       ],
       address: {
         "@type": "PostalAddress",
+        streetAddress: "Prime Business Center, Jumeirah Village Circle, Al Barsha South 4",
         addressLocality: "Dubai",
         addressCountry: "AE",
       },

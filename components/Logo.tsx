@@ -16,7 +16,7 @@ export function LogoImage({
       src="/bizbuyuk-logo.png"
       alt="BIZBUYUK Real Estate"
       style={{ height }}
-      width={(height * 440) / 465}
+      width={(height * 320) / 337}
       height={height}
       fetchPriority={priority ? "high" : "auto"}
       className={className}

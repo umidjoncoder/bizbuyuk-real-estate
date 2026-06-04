@@ -132,7 +132,7 @@ export const dictionary: Record<Locale, Dict> = {
     footer: {
       blurb: "An ambitious, creative UAE real estate agency — buying, selling and leasing residential and commercial property across the Emirates.",
       address: "Address",
-      addressValue: "United Arab Emirates",
+      addressValue: "Al Barsha South 4, Jumeirah Village Circle, Prime Business Center, Dubai, United Arab Emirates.",
       contact: "Contact",
       follow: "Follow",
       rights: "All rights reserved.",
@@ -211,7 +211,7 @@ export const dictionary: Record<Locale, Dict> = {
     footer: {
       blurb: "Амбициозное и креативное агентство недвижимости в ОАЭ — покупка, продажа и аренда жилой и коммерческой недвижимости по всем Эмиратам.",
       address: "Адрес",
-      addressValue: "Объединённые Арабские Эмираты",
+      addressValue: "Al Barsha South 4, Jumeirah Village Circle, Prime Business Center, Дубай, ОАЭ.",
       contact: "Контакты",
       follow: "Соцсети",
       rights: "Все права защищены.",
