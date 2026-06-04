@@ -11,62 +11,125 @@ const manrope = Manrope({
 });
 
 const SITE = "https://bizbuyuk.com";
+const TITLE = "BIZBUYUK Real Estate — Your trusted partner in the Dubai property market";
+const DESCRIPTION =
+  "Off-plan launches from Dubai's leading developers, protected investments, and full relocation support. 0% commission to buyers. Get a free consultation.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
-  title: "BIZBUYUK Real Estate — Your trusted partner in the Dubai property market",
-  description:
-    "Off-plan launches from Dubai's leading developers, protected investments, and full relocation support. 0% commission to buyers. Get a free consultation.",
+  title: {
+    default: TITLE,
+    template: "%s | BIZBUYUK Real Estate",
+  },
+  description: DESCRIPTION,
+  applicationName: "BIZBUYUK Real Estate",
+  category: "real estate",
   keywords: [
     "Dubai real estate",
+    "Dubai property",
     "off-plan Dubai",
     "buy property Dubai",
     "Dubai investment",
+    "property for sale Dubai",
     "Emaar",
     "Damac",
+    "Sobha",
+    "Nakheel",
     "Dubai relocation",
+    "Dubai residence visa",
     "BIZBUYUK",
+    "недвижимость Дубай",
+    "купить квартиру в Дубае",
   ],
-  authors: [{ name: "BIZBUYUK Real Estate LLC" }],
+  authors: [{ name: "BIZBUYUK Real Estate LLC", url: SITE }],
+  creator: "BIZBUYUK Real Estate LLC",
+  publisher: "BIZBUYUK Real Estate LLC",
+  formatDetection: { telephone: true, email: true, address: true },
+  alternates: {
+    canonical: SITE,
+    languages: { en: SITE, ru: SITE, "x-default": SITE },
+  },
   openGraph: {
     type: "website",
-    title: "BIZBUYUK Real Estate — Dubai",
-    description:
-      "Your trusted partner in the Dubai property market. Off-plan, investment protection, relocation. 0% buyer commission.",
+    url: SITE,
+    title: TITLE,
+    description: DESCRIPTION,
     siteName: "BIZBUYUK Real Estate",
     locale: "en_US",
     alternateLocale: ["ru_RU"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "BIZBUYUK Real Estate — Dubai",
+    title: TITLE,
     description: "Your trusted partner in the Dubai property market.",
   },
-  robots: { index: true, follow: true },
-  alternates: { canonical: SITE },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  appleWebApp: { capable: true, title: "BIZBUYUK", statusBarStyle: "black-translucent" },
+  manifest: "/manifest.webmanifest",
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
 };
 
 export const viewport: Viewport = {
-  themeColor: "#08080a",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#08080a" },
+    { media: "(prefers-color-scheme: light)", color: "#f4efe6" },
+  ],
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "RealEstateAgent",
-  name: "BIZBUYUK Real Estate LLC",
-  description: "Dubai real estate agency — buying, selling, leasing, off-plan investment and relocation.",
-  url: SITE,
-  telephone: "+971554791313",
-  email: "info@bizbuyuk.com",
-  areaServed: "Dubai, United Arab Emirates",
-  address: { "@type": "PostalAddress", addressLocality: "Dubai", addressCountry: "AE" },
-  foundingDate: "2023",
-  sameAs: [
-    "https://instagram.com/bizbuyukrealestate",
-    "https://facebook.com/bizbuyukrealestate",
-    "https://youtube.com/@bizbuyukrealestate",
+  "@graph": [
+    {
+      "@type": "RealEstateAgent",
+      "@id": `${SITE}/#org`,
+      name: "BIZBUYUK Real Estate LLC",
+      alternateName: "BIZBUYUK",
+      description:
+        "Dubai real estate agency — buying, selling, leasing, off-plan investment and relocation. 0% commission to buyers.",
+      url: SITE,
+      logo: `${SITE}/icon.svg`,
+      image: `${SITE}/opengraph-image`,
+      telephone: "+971554791313",
+      email: "info@bizbuyuk.com",
+      priceRange: "$$$",
+      foundingDate: "2023",
+      areaServed: { "@type": "City", name: "Dubai" },
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Dubai",
+        addressCountry: "AE",
+      },
+      geo: { "@type": "GeoCoordinates", latitude: 25.2048, longitude: 55.2708 },
+      knowsLanguage: ["en", "ru"],
+      sameAs: [
+        "https://instagram.com/bizbuyukrealestate",
+        "https://facebook.com/bizbuyukrealestate",
+        "https://youtube.com/@bizbuyukrealestate",
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE}/#website`,
+      url: SITE,
+      name: "BIZBUYUK Real Estate",
+      inLanguage: ["en", "ru"],
+      publisher: { "@id": `${SITE}/#org` },
+    },
   ],
 };
 
