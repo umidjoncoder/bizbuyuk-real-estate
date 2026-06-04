@@ -63,8 +63,12 @@ type Lead = { name: string; phone: string; locale: string; when: string };
 
 async function sendTelegram(lead: Lead): Promise<"sent" | "skipped"> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) return "skipped";
+  // Supports one or many comma-separated chat ids (e.g. a personal chat + a channel).
+  const chatIds = (process.env.TELEGRAM_CHAT_ID || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!token || chatIds.length === 0) return "skipped";
 
   const text =
     `🏢 *New BIZBUYUK lead*\n\n` +
@@ -73,12 +77,28 @@ async function sendTelegram(lead: Lead): Promise<"sent" | "skipped"> {
     `🌐 *Language:* ${lead.locale.toUpperCase()}\n` +
     `🕒 *Time (Dubai):* ${escapeMd(lead.when)}`;
 
-  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: "Markdown" }),
-  });
-  if (!res.ok) throw new Error(`telegram ${res.status}`);
+  const sends = await Promise.allSettled(
+    chatIds.map(async (chatId) => {
+      const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text, parse_mode: "Markdown" }),
+      });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(`telegram ${chatId} ${res.status} ${body.slice(0, 140)}`);
+      }
+      return chatId;
+    })
+  );
+
+  for (const r of sends) {
+    if (r.status === "rejected") console.error("[lead][telegram]", r.reason?.message || r.reason);
+  }
+  // Delivered if at least one chat id received the message.
+  if (!sends.some((r) => r.status === "fulfilled")) {
+    throw new Error("telegram: all chat ids failed");
+  }
   return "sent";
 }
 
