@@ -37,6 +37,9 @@ export function Footer() {
             <a href={CONTACT.phoneHref} className="block text-sm text-muted transition-colors hover:text-gold">
               {CONTACT.phone}
             </a>
+            <a href={CONTACT.phone2Href} className="block text-sm text-muted transition-colors hover:text-gold">
+              {CONTACT.phone2}
+            </a>
             <a href={`mailto:${CONTACT.email}`} className="block text-sm text-muted transition-colors hover:text-gold">
               {CONTACT.email}
             </a>

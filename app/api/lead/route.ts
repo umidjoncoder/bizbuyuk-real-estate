@@ -5,6 +5,7 @@ export const runtime = "nodejs";
 type LeadBody = {
   name?: string;
   phone?: string;
+  email?: string;
   locale?: string;
   page?: string;
   /** honeypot — bots fill this, humans don't */
@@ -21,6 +22,7 @@ export async function POST(req: Request) {
 
   const name = (body.name || "").trim().slice(0, 120);
   const phone = (body.phone || "").trim().slice(0, 40);
+  const email = (body.email || "").trim().slice(0, 160);
   const locale = (body.locale || "—").slice(0, 5);
 
   // honeypot: silently accept & drop
@@ -37,8 +39,8 @@ export async function POST(req: Request) {
   }).format(new Date());
 
   const results = await Promise.allSettled([
-    sendTelegram({ name, phone, locale, when }),
-    sendEmail({ name, phone, locale, when }),
+    sendTelegram({ name, phone, email, locale, when }),
+    sendEmail({ name, phone, email, locale, when }),
   ]);
 
   const configured = results.filter((r) => r.status === "fulfilled" && r.value !== "skipped");
@@ -59,7 +61,7 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 
-type Lead = { name: string; phone: string; locale: string; when: string };
+type Lead = { name: string; phone: string; email: string; locale: string; when: string };
 
 async function sendTelegram(lead: Lead): Promise<"sent" | "skipped"> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -74,6 +76,7 @@ async function sendTelegram(lead: Lead): Promise<"sent" | "skipped"> {
     `🏢 *New BIZBUYUK lead*\n\n` +
     `👤 *Name:* ${escapeMd(lead.name)}\n` +
     `📞 *Phone:* ${escapeMd(lead.phone)}\n` +
+    (lead.email ? `✉️ *Email:* ${escapeMd(lead.email)}\n` : "") +
     `🌐 *Language:* ${lead.locale.toUpperCase()}\n` +
     `🕒 *Time (Dubai):* ${escapeMd(lead.when)}`;
 
@@ -114,6 +117,7 @@ async function sendEmail(lead: Lead): Promise<"sent" | "skipped"> {
       <table style="width:100%;border-collapse:collapse;margin-top:16px">
         <tr><td style="padding:8px 0;color:#9c9488">Name</td><td style="padding:8px 0">${escapeHtml(lead.name)}</td></tr>
         <tr><td style="padding:8px 0;color:#9c9488">Phone</td><td style="padding:8px 0">${escapeHtml(lead.phone)}</td></tr>
+        ${lead.email ? `<tr><td style="padding:8px 0;color:#9c9488">Email</td><td style="padding:8px 0">${escapeHtml(lead.email)}</td></tr>` : ""}
         <tr><td style="padding:8px 0;color:#9c9488">Language</td><td style="padding:8px 0">${lead.locale.toUpperCase()}</td></tr>
         <tr><td style="padding:8px 0;color:#9c9488">Time (Dubai)</td><td style="padding:8px 0">${escapeHtml(lead.when)}</td></tr>
       </table>
@@ -126,6 +130,7 @@ async function sendEmail(lead: Lead): Promise<"sent" | "skipped"> {
       from,
       to: [to],
       subject: `New lead — ${lead.name} (${lead.phone})`,
+      ...(lead.email ? { reply_to: lead.email } : {}),
       html,
     }),
   });

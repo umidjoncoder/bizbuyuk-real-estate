@@ -40,6 +40,8 @@ export type Dict = {
     sub: string;
     name: string;
     phone: string;
+    email: string;
+    emailOptional: string;
     submit: string;
     sending: string;
     success: string;
@@ -119,6 +121,8 @@ export const dictionary: Record<Locale, Dict> = {
       sub: "Tell us how to reach you and a senior advisor will be in touch within one business day.",
       name: "Your name",
       phone: "Phone number",
+      email: "Email",
+      emailOptional: "optional",
       submit: "Send request",
       sending: "Sending…",
       success: "Thank you — we'll be in touch shortly.",
@@ -196,6 +200,8 @@ export const dictionary: Record<Locale, Dict> = {
       sub: "Укажите контакты, и старший консультант свяжется с вами в течение рабочего дня.",
       name: "Ваше имя",
       phone: "Номер телефона",
+      email: "Email",
+      emailOptional: "необязательно",
       submit: "Отправить",
       sending: "Отправляем…",
       success: "Спасибо — мы скоро свяжемся с вами.",
@@ -218,6 +224,8 @@ export const dictionary: Record<Locale, Dict> = {
 export const CONTACT = {
   phone: "+971 55 479 13 13",
   phoneHref: "tel:+971554791313",
+  phone2: "+971 55 182 7010",
+  phone2Href: "tel:+971551827010",
   email: "info@bizbuyuk.com",
   instagram: "https://instagram.com/bizbuyukrealestate",
   instagramHandle: "@bizbuyukrealestate",

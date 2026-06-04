@@ -13,6 +13,7 @@ export function LeadForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [company, setCompany] = useState(""); // honeypot
 
   async function onSubmit(e: React.FormEvent) {
@@ -26,12 +27,13 @@ export function LeadForm() {
       const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, locale, company, page: "landing" }),
+        body: JSON.stringify({ name, phone, email, locale, company, page: "landing" }),
       });
       if (!res.ok) throw new Error();
       setStatus("success");
       setName("");
       setPhone("");
+      setEmail("");
     } catch {
       setStatus("error");
     }
@@ -54,6 +56,9 @@ export function LeadForm() {
             <div className="mt-8 flex flex-col gap-3">
               <a href={CONTACT.phoneHref} className="inline-flex items-center gap-3 text-lg font-bold text-coal transition-colors hover:text-bronze">
                 <Dot /> {CONTACT.phone}
+              </a>
+              <a href={CONTACT.phone2Href} className="inline-flex items-center gap-3 text-lg font-bold text-coal transition-colors hover:text-bronze">
+                <Dot /> {CONTACT.phone2}
               </a>
               <a href={`mailto:${CONTACT.email}`} className="inline-flex items-center gap-3 font-semibold text-muted-dark transition-colors hover:text-bronze">
                 <Dot /> {CONTACT.email}
@@ -84,11 +89,17 @@ export function LeadForm() {
 
                   <div>
                     <label className="mb-2 block text-sm font-bold text-coal">{t.lead.name}</label>
-                    <input className="field" type="text" value={name} onChange={(e) => { setName(e.target.value); if (status === "error") setStatus("idle"); }} placeholder={t.lead.name} autoComplete="name" required />
+                    <input className="field" type="text" value={name} onChange={(e) => { setName(e.target.value); if (status === "error") setStatus("idle"); }} autoComplete="name" required />
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-bold text-coal">{t.lead.phone}</label>
-                    <input className="field" type="tel" value={phone} onChange={(e) => { setPhone(e.target.value); if (status === "error") setStatus("idle"); }} placeholder="+971 50 000 0000" autoComplete="tel" required />
+                    <input className="field" type="tel" value={phone} onChange={(e) => { setPhone(e.target.value); if (status === "error") setStatus("idle"); }} autoComplete="tel" required />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-bold text-coal">
+                      {t.lead.email} <span className="font-medium text-muted-dark/60">({t.lead.emailOptional})</span>
+                    </label>
+                    <input className="field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
                   </div>
 
                   <button type="submit" disabled={status === "sending"} className="btn-gold mt-1 w-full justify-center disabled:opacity-60">
