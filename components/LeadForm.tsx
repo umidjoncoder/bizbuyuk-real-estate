@@ -18,7 +18,8 @@ export function LeadForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || phone.replace(/\D/g, "").length < 7) {
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    if (!name.trim() || phone.replace(/\D/g, "").length < 7 || !emailValid) {
       setStatus("error");
       return;
     }
@@ -96,10 +97,8 @@ export function LeadForm() {
                     <input className="field" type="tel" value={phone} onChange={(e) => { setPhone(e.target.value); if (status === "error") setStatus("idle"); }} autoComplete="tel" required />
                   </div>
                   <div>
-                    <label className="mb-2 block text-sm font-bold text-coal">
-                      {t.lead.email} <span className="font-medium text-muted-dark/60">({t.lead.emailOptional})</span>
-                    </label>
-                    <input className="field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
+                    <label className="mb-2 block text-sm font-bold text-coal">{t.lead.email}</label>
+                    <input className="field" type="email" value={email} onChange={(e) => { setEmail(e.target.value); if (status === "error") setStatus("idle"); }} autoComplete="email" required />
                   </div>
 
                   <button type="submit" disabled={status === "sending"} className="btn-gold mt-1 w-full justify-center disabled:opacity-60">

@@ -49,11 +49,8 @@ export function Why() {
           <Reveal>
             <p className="eyebrow mb-4">{t.why.eyebrow}</p>
           </Reveal>
-          <Reveal delay={0.08}>
-            <h2 className="display text-[clamp(1.8rem,4vw,2.8rem)]">{t.why.title}</h2>
-          </Reveal>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {t.why.cards.map((card, i) => (
               <Reveal as="div" key={card.title} delay={0.12 + i * 0.1}>
                 <article className="group h-full rounded-2xl border border-line bg-white/[0.02] p-6 transition-all duration-500 hover:-translate-y-1 hover:border-gold/45 hover:bg-white/[0.04]">

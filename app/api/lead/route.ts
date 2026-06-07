@@ -28,7 +28,8 @@ export async function POST(req: Request) {
   // honeypot: silently accept & drop
   if (body.company) return NextResponse.json({ ok: true });
 
-  if (!name || phone.replace(/\D/g, "").length < 7) {
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!name || phone.replace(/\D/g, "").length < 7 || !emailValid) {
     return NextResponse.json({ ok: false, error: "validation" }, { status: 422 });
   }
 

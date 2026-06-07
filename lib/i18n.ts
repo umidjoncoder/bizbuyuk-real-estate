@@ -35,7 +35,6 @@ export type Dict = {
   why: {
     about: { eyebrow: string; title: string; body: string };
     eyebrow: string;
-    title: string;
     cards: Step[];
   };
   partners: { eyebrow: string; title: string };
@@ -46,7 +45,6 @@ export type Dict = {
     name: string;
     phone: string;
     email: string;
-    emailOptional: string;
     submit: string;
     sending: string;
     success: string;
@@ -115,7 +113,6 @@ export const dictionary: Record<Locale, Dict> = {
         body: "Established in 2020, our mission is to deliver world-class real estate brokerage services with the highest standards of professionalism, ethics and quality. Founded on deep mutual trust and dedication, we aim to become the region's most valuable brokerage.",
       },
       eyebrow: "Why choose us",
-      title: "Discretion, data, and the right doors",
       cards: [
         { title: "Market experts", body: "Hardworking analysts who watch market trends and know the neighbourhoods — identifying the best opportunities for our clients." },
         { title: "Prime access", body: "Access to properties in prime locations directly from sellers, plus a wide selection of off-plan solutions for every budget." },
@@ -131,7 +128,6 @@ export const dictionary: Record<Locale, Dict> = {
       name: "Your name",
       phone: "Phone number",
       email: "Email",
-      emailOptional: "optional",
       submit: "Send request",
       sending: "Sending…",
       success: "Thank you — we'll be in touch shortly.",
@@ -198,7 +194,6 @@ export const dictionary: Record<Locale, Dict> = {
         body: "Основанное в 2020 году, наше агентство ставит миссией предоставлять брокерские услуги мирового класса с высочайшими стандартами профессионализма, этики и качества. Опираясь на глубокое взаимное доверие, мы стремимся стать самым ценным агентством недвижимости в регионе.",
       },
       eyebrow: "Почему мы",
-      title: "Конфиденциальность, данные и нужные двери",
       cards: [
         { title: "Эксперты рынка", body: "Команда аналитиков, которые следят за трендами рынка и знают районы — находят лучшие возможности для клиентов." },
         { title: "Прямой доступ", body: "Доступ к объектам в премиальных локациях напрямую от продавцов и широкий выбор off-plan решений под любой бюджет." },
@@ -214,7 +209,6 @@ export const dictionary: Record<Locale, Dict> = {
       name: "Ваше имя",
       phone: "Номер телефона",
       email: "Email",
-      emailOptional: "необязательно",
       submit: "Отправить",
       sending: "Отправляем…",
       success: "Спасибо — мы скоро свяжемся с вами.",
