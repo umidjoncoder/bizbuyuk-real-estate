@@ -1,0 +1,186 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  SALES_DIRECTOR
+  MARKETING_DIRECTOR
+  BROKER
+  DRIVER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  NEGOTIATION
+  VIEWING
+  WON
+  LOST
+}
+
+enum TaskType {
+  DAILY
+  WEEKLY
+  MONTHLY
+  LOGISTICS
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String // Hashed password
+  fullName  String
+  email     String   @unique
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  isActive Boolean @default(true) // soft-disable instead of hard delete
+
+  // Relations
+  assignedLeads Lead[]        @relation("AssignedBroker")
+  createdLeads  Lead[]        @relation("Creator")
+  assignedTasks Task[]        @relation("AssignedUser")
+  createdTasks  Task[]        @relation("CreatorUser")
+  auditLogs     AuditLog[]
+  reminders     Reminder[]    @relation("UserReminders")
+  leadEdits     LeadHistory[] @relation("UserLeadEdits")
+}
+
+model Property {
+  id          String         @id @default(uuid())
+  title       String
+  location    String
+  price       Float
+  type        String // e.g. "Off-plan" or "Secondary"
+  description String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  leads       LeadProperty[]
+}
+
+model Lead {
+  id         String     @id @default(uuid())
+  name       String
+  phone      String // For duplicate checks
+  email      String?
+  budget     Float?
+  status     LeadStatus @default(NEW)
+  lostReason String? // Required if status is LOST
+  source     String // e.g. "Facebook", "Instagram", "Google", "Website"
+  brokerId   String? // Assigned broker
+  broker     User?      @relation("AssignedBroker", fields: [brokerId], references: [id], onDelete: SetNull)
+  creatorId  String?
+  creator    User?      @relation("Creator", fields: [creatorId], references: [id], onDelete: SetNull)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  // Relations
+  comments   Comment[]
+  properties LeadProperty[]
+  reminders  Reminder[]
+  history    LeadHistory[]
+}
+
+model LeadProperty {
+  leadId     String
+  propertyId String
+  lead       Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@id([leadId, propertyId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  authorId  String? // user id of commenter (for filtering own comments)
+  author    String // Name or username of commenter
+  text      String
+  createdAt DateTime @default(now())
+
+  reminders Reminder[]
+}
+
+model Task {
+  id           String     @id @default(uuid())
+  title        String
+  description  String?
+  type         TaskType   @default(DAILY)
+  status       TaskStatus @default(TODO)
+  deadline     DateTime?
+  assignedToId String
+  assignedTo   User       @relation("AssignedUser", fields: [assignedToId], references: [id], onDelete: Cascade)
+  creatorId    String
+  creator      User       @relation("CreatorUser", fields: [creatorId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  reminders Reminder[]
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String // e.g. "LOGIN", "CREATE_LEAD", "UPDATE_LEAD", "DELETE_LEAD"
+  details   String // JSON text or action description
+  createdAt DateTime @default(now())
+}
+
+// Reminders: a broker can attach a "remind me on <date>" to a client comment or a task.
+// The reminder fires inside the CRM (notification bell) and optionally via email.
+model Reminder {
+  id       String   @id @default(uuid())
+  userId   String // who should be reminded
+  user     User     @relation("UserReminders", fields: [userId], references: [id], onDelete: Cascade)
+  message  String // what to remember
+  remindAt DateTime // when to fire
+
+  // optional context links (any combination)
+  leadId    String?
+  lead      Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  notified  Boolean  @default(false) // email/notification already sent
+  done      Boolean  @default(false) // user dismissed it
+  createdAt DateTime @default(now())
+
+  @@index([userId, done, remindAt])
+}
+
+// Field-level edit history for leads. Every change records old -> new so an
+// admin/owner can see exactly what a broker changed. `seen=false` shows red.
+model LeadHistory {
+  id         String   @id @default(uuid())
+  leadId     String
+  lead       Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  field      String // e.g. "name", "phone", "status", "budget"
+  oldValue   String?
+  newValue   String?
+  editorId   String?
+  editor     User?    @relation("UserLeadEdits", fields: [editorId], references: [id], onDelete: SetNull)
+  editorName String // snapshot of editor name + role
+  editorRole String?
+  seen       Boolean  @default(false) // admin/owner acknowledged -> clears red
+  createdAt  DateTime @default(now())
+
+  @@index([leadId, createdAt])
+}

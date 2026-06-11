@@ -25,10 +25,27 @@ export function LeadForm() {
     }
     setStatus("sending");
     try {
+      // Capture where this lead came from (ad campaign / referrer) so the CRM
+      // and Telegram both record the real source instead of a blank "Website".
+      const params = new URLSearchParams(window.location.search);
+      const utm = {
+        source: params.get("utm_source") || "",
+        medium: params.get("utm_medium") || "",
+        campaign: params.get("utm_campaign") || "",
+      };
       const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, email, locale, company, page: "landing" }),
+        body: JSON.stringify({
+          name,
+          phone,
+          email,
+          locale,
+          company,
+          page: window.location.pathname || "landing",
+          utm,
+          referrer: document.referrer || "",
+        }),
       });
       if (!res.ok) throw new Error();
       setStatus("success");

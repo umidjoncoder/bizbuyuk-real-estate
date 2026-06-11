@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -8,9 +9,39 @@ type LeadBody = {
   email?: string;
   locale?: string;
   page?: string;
+  utm?: { source?: string; medium?: string; campaign?: string };
+  referrer?: string;
   /** honeypot — bots fill this, humans don't */
   company?: string;
 };
+
+// Work out a human-friendly lead source from UTM params or the referrer host,
+// so the CRM shows "Facebook" / "Instagram" / "Google" instead of a blank.
+function deriveSource(utm?: LeadBody["utm"], referrer?: string): string {
+  const norm = (s: string) => {
+    const v = s.toLowerCase();
+    if (/(facebook|fb|meta)/.test(v)) return "Facebook";
+    if (/(instagram|insta|ig)/.test(v)) return "Instagram";
+    if (/(google|adwords|gads|youtube)/.test(v)) return "Google";
+    if (/(tiktok)/.test(v)) return "TikTok";
+    if (/(telegram|t\.me)/.test(v)) return "Telegram";
+    return "";
+  };
+  if (utm?.source) {
+    return norm(utm.source) || utm.source.charAt(0).toUpperCase() + utm.source.slice(1);
+  }
+  if (referrer) {
+    try {
+      const host = new URL(referrer).hostname.replace(/^www\./, "");
+      const mapped = norm(host);
+      if (mapped) return mapped;
+      if (host) return host;
+    } catch {
+      /* malformed referrer */
+    }
+  }
+  return "Website";
+}
 
 export async function POST(req: Request) {
   let body: LeadBody;
@@ -28,7 +59,7 @@ export async function POST(req: Request) {
   // honeypot: silently accept & drop
   if (body.company) return NextResponse.json({ ok: true });
 
-  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const emailValid = !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   if (!name || phone.replace(/\D/g, "").length < 7 || !emailValid) {
     return NextResponse.json({ ok: false, error: "validation" }, { status: 422 });
   }
@@ -39,9 +70,43 @@ export async function POST(req: Request) {
     timeZone: "Asia/Dubai",
   }).format(new Date());
 
+  const source = deriveSource(body.utm, body.referrer);
+
+  // Save to CRM database
+  try {
+    await prisma.lead.create({
+      data: {
+        name,
+        phone,
+        email: email || null,
+        source,
+        status: "NEW",
+      },
+    });
+
+    // Log audit log for incoming lead (keep the raw attribution for analytics)
+    await prisma.auditLog.create({
+      data: {
+        action: "WEBSITE_LEAD",
+        details: JSON.stringify({
+          name,
+          phone,
+          email,
+          locale,
+          source,
+          utm: body.utm || null,
+          referrer: body.referrer || null,
+          page: body.page || null,
+        }),
+      },
+    });
+  } catch (dbErr) {
+    console.error("[lead] Database insertion failed:", dbErr);
+  }
+
   const results = await Promise.allSettled([
-    sendTelegram({ name, phone, email, locale, when }),
-    sendEmail({ name, phone, email, locale, when }),
+    sendTelegram({ name, phone, email, locale, when, source }),
+    sendEmail({ name, phone, email, locale, when, source }),
   ]);
 
   const configured = results.filter((r) => r.status === "fulfilled" && r.value !== "skipped");
@@ -62,7 +127,8 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 
-type Lead = { name: string; phone: string; email: string; locale: string; when: string };
+
+type Lead = { name: string; phone: string; email: string; locale: string; when: string; source: string };
 
 async function sendTelegram(lead: Lead): Promise<"sent" | "skipped"> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -73,20 +139,23 @@ async function sendTelegram(lead: Lead): Promise<"sent" | "skipped"> {
     .filter(Boolean);
   if (!token || chatIds.length === 0) return "skipped";
 
+  // HTML parse mode (not Markdown) so dots/plus signs in emails & phones are
+  // shown verbatim instead of escaped as "gmail\.com" / "\+998...".
   const text =
-    `🏢 *New BIZBUYUK lead*\n\n` +
-    `👤 *Name:* ${escapeMd(lead.name)}\n` +
-    `📞 *Phone:* ${escapeMd(lead.phone)}\n` +
-    (lead.email ? `✉️ *Email:* ${escapeMd(lead.email)}\n` : "") +
-    `🌐 *Language:* ${lead.locale.toUpperCase()}\n` +
-    `🕒 *Time (Dubai):* ${escapeMd(lead.when)}`;
+    `🏢 <b>New BIZBUYUK lead</b>\n\n` +
+    `👤 <b>Name:</b> ${escapeHtml(lead.name)}\n` +
+    `📞 <b>Phone:</b> ${escapeHtml(lead.phone)}\n` +
+    (lead.email ? `✉️ <b>Email:</b> ${escapeHtml(lead.email)}\n` : "") +
+    `📍 <b>Source:</b> ${escapeHtml(lead.source)}\n` +
+    `🌐 <b>Language:</b> ${lead.locale.toUpperCase()}\n` +
+    `🕒 <b>Time (Dubai):</b> ${escapeHtml(lead.when)}`;
 
   const sends = await Promise.allSettled(
     chatIds.map(async (chatId) => {
       const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: chatId, text, parse_mode: "Markdown" }),
+        body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML", disable_web_page_preview: true }),
       });
       if (!res.ok) {
         const body = await res.text().catch(() => "");
@@ -119,6 +188,7 @@ async function sendEmail(lead: Lead): Promise<"sent" | "skipped"> {
         <tr><td style="padding:8px 0;color:#9c9488">Name</td><td style="padding:8px 0">${escapeHtml(lead.name)}</td></tr>
         <tr><td style="padding:8px 0;color:#9c9488">Phone</td><td style="padding:8px 0">${escapeHtml(lead.phone)}</td></tr>
         ${lead.email ? `<tr><td style="padding:8px 0;color:#9c9488">Email</td><td style="padding:8px 0">${escapeHtml(lead.email)}</td></tr>` : ""}
+        <tr><td style="padding:8px 0;color:#9c9488">Source</td><td style="padding:8px 0">${escapeHtml(lead.source)}</td></tr>
         <tr><td style="padding:8px 0;color:#9c9488">Language</td><td style="padding:8px 0">${lead.locale.toUpperCase()}</td></tr>
         <tr><td style="padding:8px 0;color:#9c9488">Time (Dubai)</td><td style="padding:8px 0">${escapeHtml(lead.when)}</td></tr>
       </table>
@@ -139,9 +209,6 @@ async function sendEmail(lead: Lead): Promise<"sent" | "skipped"> {
   return "sent";
 }
 
-function escapeMd(s: string) {
-  return s.replace(/([_*[\]()~`>#+\-=|{}.!])/g, "\\$1");
-}
 function escapeHtml(s: string) {
   return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string));
 }
