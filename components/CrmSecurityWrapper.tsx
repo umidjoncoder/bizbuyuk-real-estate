@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 type User = {
@@ -15,6 +15,7 @@ type CrmContextType = {
   user: User | null;
   loading: boolean;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
   theme: "light" | "dark";
   toggleTheme: () => void;
   lang: "en" | "ru";
@@ -25,6 +26,7 @@ const CrmContext = createContext<CrmContextType>({
   user: null,
   loading: true,
   logout: async () => {},
+  refreshUser: async () => {},
   theme: "dark",
   toggleTheme: () => {},
   lang: "en",
@@ -80,32 +82,41 @@ export function CrmSecurityWrapper({ children }: { children: React.ReactNode }) 
     localStorage.setItem("crm_lang", newLang);
   };
 
-  // Fetch User Profile on Mount or Page Change
-  useEffect(() => {
-    async function checkAuth() {
-      if (isLoginPage) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const res = await fetch("/api/crm/auth/me");
-        const data = await res.json();
-        if (data.user) {
-          setUser(data.user);
-        } else {
-          setUser(null);
-          router.replace("/crm/login");
-        }
-      } catch (err) {
-        console.error("Auth check failed:", err);
-        setUser(null);
-        router.replace("/crm/login");
-      } finally {
-        setLoading(false);
-      }
+  // Fetch the user profile. Exposed as refreshUser() so the login page can
+  // refresh the session without a full reload. Stable identity (no pathname
+  // dep) so it does NOT re-run on every navigation — that one /me round-trip
+  // per page change was the main cause of slow sidebar navigation.
+  const refreshUser = useCallback(async () => {
+    try {
+      const res = await fetch("/api/crm/auth/me");
+      const data = await res.json();
+      setUser(data.user || null);
+      return data.user || null;
+    } catch (err) {
+      console.error("Auth check failed:", err);
+      setUser(null);
+      return null;
     }
-    checkAuth();
-  }, [pathname, isLoginPage, router]);
+  }, []);
+
+  // Run the auth check ONCE when the CRM layout first mounts. Middleware
+  // already guards every /crm route server-side, so we don't need to
+  // re-verify on each client navigation.
+  const didInit = useRef(false);
+  useEffect(() => {
+    if (didInit.current) return;
+    didInit.current = true;
+    if (isLoginPage) {
+      setLoading(false);
+      return;
+    }
+    (async () => {
+      const u = await refreshUser();
+      if (!u) router.replace("/crm/login");
+      setLoading(false);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Inactivity Auto-logout (15 minutes = 900000 ms)
   useEffect(() => {
@@ -209,7 +220,7 @@ export function CrmSecurityWrapper({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <CrmContext.Provider value={{ user, loading, logout, theme, toggleTheme, lang, setLang }}>
+    <CrmContext.Provider value={{ user, loading, logout, refreshUser, theme, toggleTheme, lang, setLang }}>
       {children}
     </CrmContext.Provider>
   );

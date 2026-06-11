@@ -173,6 +173,17 @@ export default function LeadsPage() {
     }
   };
 
+  // Lightweight refresh after a mutation — only leads change, so don't re-pull
+  // properties + users every time (that triple-fetch made drag/drop feel janky).
+  const fetchLeads = async () => {
+    try {
+      const res = await fetch("/api/crm/leads");
+      if (res.ok) setLeads((await res.json()).leads);
+    } catch (err) {
+      console.error("Error refreshing leads:", err);
+    }
+  };
+
   const canEditLead = (lead: Lead) => {
     if (!user) return false;
     if (user.role === "DRIVER" || user.role === "MARKETING_DIRECTOR") return false;
@@ -224,7 +235,7 @@ export default function LeadsPage() {
       if (!res.ok) throw new Error(data.error || "Error saving lead");
       setIsNewLeadOpen(false);
       resetNewLeadForm();
-      fetchData();
+      fetchLeads();
     } catch (err: any) {
       setErrorMsg(err.message || "An error occurred");
     } finally {
@@ -254,7 +265,7 @@ export default function LeadsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus, lostReason: newStatus === "LOST" ? lostReason : undefined }),
       });
-      if (res.ok) fetchData(false);
+      if (res.ok) fetchLeads();
       else {
         const err = await res.json();
         alert(err.error || "Could not update status");
@@ -281,7 +292,7 @@ export default function LeadsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ brokerId }),
       });
-      if (res.ok) fetchData();
+      if (res.ok) fetchLeads();
     } catch (err) {
       console.error(err);
     }
@@ -311,7 +322,7 @@ export default function LeadsPage() {
       });
       if (res.ok) {
         setEditMode(false);
-        fetchData(false);
+        fetchLeads();
       } else {
         const err = await res.json();
         alert(err.error || "Could not save");
@@ -327,7 +338,7 @@ export default function LeadsPage() {
   const acknowledgeHistory = async (leadId: string) => {
     try {
       const res = await fetch(`/api/crm/leads/${leadId}/history`, { method: "PUT" });
-      if (res.ok) fetchData(false);
+      if (res.ok) fetchLeads();
     } catch (err) {
       console.error(err);
     }
@@ -360,7 +371,7 @@ export default function LeadsPage() {
         setRemindDays(null);
         setRemindDate("");
         setRemindNote("");
-        fetchData();
+        fetchLeads();
         if (remindAt) refreshNotifs();
       } else {
         const err = await res.json();
@@ -378,7 +389,7 @@ export default function LeadsPage() {
       const res = await fetch(`/api/crm/leads/${leadId}`, { method: "DELETE" });
       if (res.ok) {
         setSelectedLead(null);
-        fetchData();
+        fetchLeads();
       } else {
         const err = await res.json();
         alert(err.error || "Error deleting lead");

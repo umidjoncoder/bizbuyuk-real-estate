@@ -7,7 +7,7 @@ import { Lock, User, AlertCircle, Globe } from "lucide-react";
 import { crmTranslations } from "@/lib/crmTranslations";
 
 export default function LoginPage() {
-  const { user, loading, lang, setLang } = useCrm();
+  const { user, loading, lang, setLang, refreshUser } = useCrm();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -43,14 +43,17 @@ export default function LoginPage() {
         throw new Error(data.error || (lang === "en" ? "Authentication failed" : "Ошибка авторизации"));
       }
 
+      // Prime the shared session so the destination page renders instantly
+      // (no extra /me round-trip), then navigate. Keep the spinner running
+      // through the navigation so there's continuous feedback.
+      await refreshUser();
       if (data.user?.role === "DRIVER") {
-        router.push("/crm/tasks");
+        router.replace("/crm/tasks");
       } else {
-        router.push("/crm/dashboard");
+        router.replace("/crm/dashboard");
       }
     } catch (err: any) {
       setError(err.message || (lang === "en" ? "Connection error" : "Ошибка соединения"));
-    } finally {
       setSubmitting(false);
     }
   };

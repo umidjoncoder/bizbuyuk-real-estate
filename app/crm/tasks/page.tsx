@@ -72,8 +72,18 @@ export default function TasksPage() {
     }
   };
 
+  const fetchTasks = async () => {
+    try {
+      const res = await fetch("/api/crm/tasks");
+      if (res.ok) setTasks((await res.json()).tasks);
+    } catch (err) {
+      console.error("Error refreshing tasks:", err);
+    }
+  };
+
   const setStatus = async (taskId: string, newStatus: Task["status"]) => {
     const prev = [...tasks];
+    // Optimistic — the card updates instantly; we reconcile quietly afterwards.
     setTasks((p) => p.map((x) => (x.id === taskId ? { ...x, status: newStatus } : x)));
     try {
       const res = await fetch(`/api/crm/tasks/${taskId}`, {
@@ -81,7 +91,7 @@ export default function TasksPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
-      if (res.ok) fetchData(false);
+      if (res.ok) fetchTasks();
       else setTasks(prev);
     } catch {
       setTasks(prev);

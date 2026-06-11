@@ -235,15 +235,11 @@ html.dark select option {
   }
 }
 
+/* Fade opacity only — animating backdrop-filter is expensive and causes jank.
+   The static backdrop-blur utility on the element provides the blur instantly. */
 @keyframes backdropFadeIn {
-  from {
-    opacity: 0;
-    backdrop-filter: blur(0px);
-  }
-  to {
-    opacity: 1;
-    backdrop-filter: blur(8px);
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes drawerSlideIn {
