@@ -32,6 +32,7 @@ export async function GET() {
         email: true,
         role: true,
         isActive: true,
+        avatarUrl: true,
         createdAt: true,
       },
       orderBy: { fullName: "asc" },

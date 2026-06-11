@@ -9,6 +9,9 @@ export const crmTranslations = {
       inventory: "Inventory",
       users: "Employees",
       logs: "Audit Logs",
+      reminders: "Reminders",
+      finance: "Finance",
+      settings: "Settings",
       logout: "Log Out",
     },
     dashboard: {
@@ -229,6 +232,9 @@ export const crmTranslations = {
       inventory: "База квартир",
       users: "Сотрудники",
       logs: "Аудит-логи",
+      reminders: "Напоминания",
+      finance: "Финансы",
+      settings: "Настройки",
       logout: "Выйти",
     },
     dashboard: {

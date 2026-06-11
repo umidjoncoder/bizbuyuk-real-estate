@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { title, location, price, type, description } = await req.json();
+    const { title, location, price, type, description, developer } = await req.json();
 
     if (!title || !location || !price || !type) {
       return NextResponse.json({ error: "Required fields missing" }, { status: 400 });
@@ -49,6 +49,7 @@ export async function POST(req: Request) {
     const newProperty = await prisma.property.create({
       data: {
         title: title.trim(),
+        developer: developer ? String(developer).trim() : null,
         location: location.trim(),
         price: parseFloat(price),
         type: type.trim(),

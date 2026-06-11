@@ -6,6 +6,7 @@ import { useNotifications } from "@/components/CrmNotifications";
 import { useRouter } from "next/navigation";
 import { crmTranslations } from "@/lib/crmTranslations";
 import { formatMoney, formatPhone } from "@/lib/format";
+import { DEFAULT_SOURCES, mergeOptions } from "@/lib/options";
 import {
   Plus,
   Search,
@@ -97,7 +98,9 @@ export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [users, setUsers] = useState<UserType[]>([]);
+  const [sourceOptions, setSourceOptions] = useState<string[]>(DEFAULT_SOURCES);
   const [loading, setLoading] = useState(true);
+  const canManageOptions = user?.role === "OWNER" || user?.role === "ADMIN";
 
   const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban");
   const [archiveView, setArchiveView] = useState(false);
@@ -164,14 +167,16 @@ export default function LeadsPage() {
   const fetchData = async (showLoading = false) => {
     if (showLoading) setLoading(true);
     try {
-      const [leadsRes, propsRes, usersRes] = await Promise.all([
+      const [leadsRes, propsRes, usersRes, setRes] = await Promise.all([
         fetch(leadsUrl()),
         fetch("/api/crm/properties"),
         fetch("/api/crm/users"),
+        fetch("/api/crm/settings"),
       ]);
       if (leadsRes.ok) setLeads((await leadsRes.json()).leads);
       if (propsRes.ok) setProperties((await propsRes.json()).properties);
       if (usersRes.ok) setUsers((await usersRes.json()).users);
+      if (setRes.ok) { const s = await setRes.json(); setSourceOptions(mergeOptions(DEFAULT_SOURCES, (s.leadSource || []).map((o: any) => o.value))); }
     } catch (err) {
       console.error("Error loading leads page data:", err);
     } finally {
@@ -204,6 +209,23 @@ export default function LeadsPage() {
   };
 
   const unseenCount = (lead: Lead) => (isManager ? lead.history.filter((h) => !h.seen).length : 0);
+
+  // Quick-add a custom lead source (admin/owner) — "Add Agent"-style.
+  const addSource = async (setSelected?: (v: string) => void) => {
+    const name = prompt(lang === "en" ? "New source / agent name:" : "Yangi manba / agent nomi:");
+    if (!name || !name.trim()) return;
+    const v = name.trim();
+    const res = await fetch("/api/crm/settings", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ category: "leadSource", value: v }),
+    });
+    if (res.ok) {
+      setSourceOptions((p) => mergeOptions(p, [v]));
+      setSelected?.(v);
+    } else {
+      alert((await res.json()).error || "Error");
+    }
+  };
 
   // ---------- Export (Owner only) ----------
   const handleExport = () => {
@@ -493,18 +515,14 @@ export default function LeadsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t.leads.searchPlaceholder}
-            className="crm-input pl-10"
+            className="crm-input pl-icon"
           />
         </div>
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 crm-gold" />
           <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} className="crm-input crm-select w-auto">
             <option value="ALL">{t.leads.allSources}</option>
-            <option value="Website">Website</option>
-            <option value="Facebook">Facebook</option>
-            <option value="Instagram">Instagram</option>
-            <option value="Google">Google</option>
-            <option value="Manual">{t.leads.manualSource}</option>
+            {sourceOptions.map((s) => <option key={s} value={s}>{s === "Manual" ? t.leads.manualSource : s}</option>)}
           </select>
         </div>
         <div className="flex items-center rounded-xl p-1 md:ml-auto border crm-bd" style={{ background: "var(--crm-input-bg)" }}>
@@ -664,11 +682,16 @@ export default function LeadsPage() {
                 <Field label={t.leads.leadBudget}><input type="number" value={newLeadBudget} onChange={(e) => setNewLeadBudget(e.target.value)} placeholder="2000000" className="crm-input" /></Field>
               </div>
               <Field label={t.leads.leadSource}>
-                <select value={newLeadSource} onChange={(e) => setNewLeadSource(e.target.value)} className="crm-input crm-select">
-                  <option value="Manual">{t.leads.manualSource}</option>
-                  <option value="Facebook">Facebook</option><option value="Instagram">Instagram</option>
-                  <option value="Google">Google</option><option value="Website">Website</option>
-                </select>
+                <div className="flex gap-2">
+                  <select value={newLeadSource} onChange={(e) => setNewLeadSource(e.target.value)} className="crm-input crm-select flex-1">
+                    {sourceOptions.map((s) => <option key={s} value={s}>{s === "Manual" ? t.leads.manualSource : s}</option>)}
+                  </select>
+                  {canManageOptions && (
+                    <button type="button" onClick={() => addSource(setNewLeadSource)} className="crm-btn-ghost px-3 flex-shrink-0" title={lang === "en" ? "Add source/agent" : "Manba qo'shish"}>
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </Field>
               <Field label={t.leads.leadProps}>
                 <div className="max-h-32 overflow-y-auto crm-scroll border crm-bd rounded-xl p-2.5 space-y-1.5" style={{ background: "var(--crm-input-bg)" }}>
@@ -757,8 +780,7 @@ export default function LeadsPage() {
                   </div>
                   <Field label={t.leads.leadSource}>
                     <select value={editSource} onChange={(e) => setEditSource(e.target.value)} className="crm-input crm-select">
-                      <option value="Manual">{t.leads.manualSource}</option><option value="Facebook">Facebook</option>
-                      <option value="Instagram">Instagram</option><option value="Google">Google</option><option value="Website">Website</option>
+                      {sourceOptions.map((s) => <option key={s} value={s}>{s === "Manual" ? t.leads.manualSource : s}</option>)}
                     </select>
                   </Field>
                   <div className="flex gap-2 justify-end">

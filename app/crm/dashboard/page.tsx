@@ -11,8 +11,10 @@ type AnalyticsData = {
   statusCounts: { status: string; count: number }[];
   sourceCounts: { source: string; count: number }[];
   brokerPerformance: { name: string; totalLeads: number; wonLeads: number; totalSales: number }[];
+  totalSold: number | null;
+  bestBroker: string | null;
   propertyCount: number;
-  propertyTotalValue: number;
+  propertyTotalValue: number | null;
 };
 
 export default function DashboardPage() {
@@ -20,8 +22,10 @@ export default function DashboardPage() {
   const router = useRouter();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState("month");
   const t = crmTranslations[lang];
   const isDark = theme === "dark";
+  const en = lang === "en";
 
   // theme-aware chart palette
   const axisColor = isDark ? "#9c9488" : "#6b6357";
@@ -39,7 +43,7 @@ export default function DashboardPage() {
     if (user.role === "DRIVER") { router.replace("/crm/tasks"); return; }
     (async () => {
       try {
-        const res = await fetch("/api/crm/analytics");
+        const res = await fetch(`/api/crm/analytics?period=${period}`);
         if (res.ok) setData(await res.json());
       } catch (err) {
         console.error("Failed to load analytics:", err);
@@ -47,7 +51,7 @@ export default function DashboardPage() {
         setLoading(false);
       }
     })();
-  }, [user, router]);
+  }, [user, router, period]);
 
   if (loading || !data) {
     return <div className="h-[60vh] flex items-center justify-center"><Loader2 className="w-8 h-8 crm-gold animate-spin" /></div>;
@@ -64,20 +68,32 @@ export default function DashboardPage() {
   // Marketing Director does not see financial figures (portfolio value, broker $).
   const isMarketing = user?.role === "MARKETING_DIRECTOR";
 
+  const periods = [
+    { k: "week", l: en ? "Week" : "Неделя" }, { k: "month", l: en ? "Month" : "Месяц" },
+    { k: "year", l: en ? "Year" : "Год" }, { k: "all", l: en ? "All" : "Всё" },
+  ];
+
   const kpis = [
     { label: t.dashboard.totalLeads, value: totalLeads, sub: t.dashboard.activeLeadsSub, icon: Users },
-    { label: t.dashboard.propertiesCount, value: data.propertyCount, sub: t.dashboard.propertiesSub, icon: Building },
-    ...(!isMarketing && data.propertyTotalValue != null
-      ? [{ label: t.dashboard.portfolioValue, value: formatCurrency(data.propertyTotalValue), sub: t.dashboard.portfolioSub, icon: DollarSign, small: true }]
+    ...(!isMarketing && data.totalSold != null
+      ? [{ label: en ? "Total Sold" : "Продано на", value: formatCurrency(data.totalSold), sub: data.bestBroker ? `${en ? "Top" : "Лучший"}: ${data.bestBroker}` : (en ? "Won deals" : "Сделки"), icon: DollarSign, small: true }]
       : []),
+    { label: t.dashboard.propertiesCount, value: data.propertyCount, sub: t.dashboard.propertiesSub, icon: Building },
     { label: t.dashboard.conversionRate, value: `${conversionRate}%`, sub: t.dashboard.conversionSub, icon: TrendingUp },
   ];
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight crm-text">{t.dashboard.title}</h2>
-        <p className="text-sm crm-muted mt-1">{t.dashboard.subtitle}</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight crm-text">{t.dashboard.title}</h2>
+          <p className="text-sm crm-muted mt-1">{t.dashboard.subtitle}</p>
+        </div>
+        <div className="crm-panel p-1.5 inline-flex gap-1 self-start">
+          {periods.map((p) => (
+            <button key={p.k} onClick={() => setPeriod(p.k)} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${period === p.k ? "bg-[#c8a15a] text-[#08080a]" : "crm-muted hover:crm-text"}`}>{p.l}</button>
+          ))}
+        </div>
       </div>
 
       {/* KPI cards */}

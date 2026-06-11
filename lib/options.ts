@@ -1,0 +1,20 @@
+// Built-in default options. Admins can ADD more via Settings (stored in the DB);
+// the UI merges defaults + custom so dropdowns work out of the box and grow
+// without code changes.
+export const DEFAULT_SOURCES = ["Manual", "Facebook", "Instagram", "Google", "Website", "Telegram"];
+export const DEFAULT_DEVELOPERS = ["Emaar", "DAMAC", "Nakheel", "Sobha", "Danube", "Binghatti"];
+export const DEFAULT_PROPERTY_TYPES = ["Off-plan", "Secondary"];
+
+export type SettingsBundle = {
+  leadSource: string[];
+  developer: string[];
+  propertyType: string[];
+  logo: string | null;
+};
+
+// Merge defaults with custom values (custom appended, de-duplicated).
+export function mergeOptions(defaults: string[], custom: string[] | undefined): string[] {
+  const seen = new Set(defaults.map((d) => d.toLowerCase()));
+  const extra = (custom || []).filter((c) => c && !seen.has(c.toLowerCase()));
+  return [...defaults, ...extra];
+}

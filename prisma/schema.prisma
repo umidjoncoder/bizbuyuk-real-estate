@@ -48,7 +48,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  isActive Boolean @default(true) // soft-disable instead of hard delete
+  isActive  Boolean @default(true) // soft-disable instead of hard delete
+  avatarUrl String? @db.Text // profile photo (small base64 data URL)
 
   // Relations
   assignedLeads Lead[]        @relation("AssignedBroker")
@@ -63,6 +64,7 @@ model User {
 model Property {
   id          String         @id @default(uuid())
   title       String
+  developer   String? // e.g. "Emaar", "DAMAC" — from configurable list
   location    String
   price       Float
   type        String // e.g. "Off-plan" or "Secondary"
@@ -70,6 +72,38 @@ model Property {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
   leads       LeadProperty[]
+}
+
+// Admin-managed dropdown options (lead sources, developers, property types) and
+// singletons like the company logo — so new options don't need code changes.
+model Setting {
+  id        String   @id @default(uuid())
+  category  String // "leadSource" | "developer" | "propertyType" | "branding"
+  value     String   @db.Text // option label, or logo data URL for branding
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([category])
+}
+
+enum TxType {
+  INCOME
+  EXPENSE
+}
+
+// Finance ledger (Owner only): salaries, commissions, bonuses, office costs, income.
+model Transaction {
+  id          String   @id @default(uuid())
+  type        TxType
+  category    String // "Salary" | "Commission" | "Bonus" | "Office" | "Income" | "Other"
+  amount      Float
+  description String?
+  staffName   String? // optional: which employee (salary/commission/bonus)
+  date        DateTime @default(now())
+  createdById String?
+  createdAt   DateTime @default(now())
+
+  @@index([type, date])
 }
 
 model Lead {

@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { CrmSecurityWrapper, useCrm } from "@/components/CrmSecurityWrapper";
 import { CrmNotificationsProvider, NotificationBell } from "@/components/CrmNotifications";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { crmTranslations } from "@/lib/crmTranslations";
+import { fileToResizedDataUrl } from "@/lib/imageResize";
 import {
   LayoutDashboard,
   Users2,
@@ -22,13 +23,19 @@ import {
   Sun,
   Moon,
   Globe,
+  BellRing,
+  Wallet,
+  Settings as SettingsIcon,
+  Camera,
 } from "lucide-react";
 
 function CrmLayoutContent({ children }: { children: React.ReactNode }) {
-  const { user, logout, theme, toggleTheme, lang, setLang } = useCrm();
+  const { user, logout, refreshUser, theme, toggleTheme, lang, setLang } = useCrm();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [logo, setLogo] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const t = crmTranslations[lang];
 
@@ -39,6 +46,29 @@ function CrmLayoutContent({ children }: { children: React.ReactNode }) {
       setCollapsed(true);
     }
   }, []);
+
+  // Load company logo (if uploaded by Owner/Admin).
+  useEffect(() => {
+    fetch("/api/crm/branding").then((r) => r.json()).then((d) => setLogo(d.logo || null)).catch(() => {});
+  }, []);
+
+  const onAvatarPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      const dataUrl = await fileToResizedDataUrl(file, 256, 0.82);
+      const res = await fetch("/api/crm/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatarUrl: dataUrl }),
+      });
+      if (res.ok) refreshUser();
+      else alert((await res.json()).error || "Upload failed");
+    } catch {
+      alert("Could not process image");
+    }
+  };
 
   const toggleCollapse = () => {
     const newVal = !collapsed;
@@ -84,9 +114,27 @@ function CrmLayoutContent({ children }: { children: React.ReactNode }) {
       allowed: ["OWNER", "ADMIN", "SALES_DIRECTOR", "MARKETING_DIRECTOR", "BROKER"],
     },
     {
+      name: t.sidebar.reminders,
+      href: "/crm/reminders",
+      icon: BellRing,
+      allowed: ["OWNER", "ADMIN", "SALES_DIRECTOR", "MARKETING_DIRECTOR", "BROKER", "DRIVER"],
+    },
+    {
       name: t.sidebar.users,
       href: "/crm/users",
       icon: Users2,
+      allowed: ["OWNER", "ADMIN"],
+    },
+    {
+      name: t.sidebar.finance,
+      href: "/crm/finance",
+      icon: Wallet,
+      allowed: ["OWNER"],
+    },
+    {
+      name: t.sidebar.settings,
+      href: "/crm/settings",
+      icon: SettingsIcon,
       allowed: ["OWNER", "ADMIN"],
     },
     {
@@ -112,9 +160,13 @@ function CrmLayoutContent({ children }: { children: React.ReactNode }) {
       {/* Brand logo & Switchers */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#c8a15a] to-[#a47e3b] flex items-center justify-center font-bold text-[#08080a] shadow-lg shadow-[#c8a15a]/10 flex-shrink-0">
-            BB
-          </div>
+          {logo ? (
+            <img src={logo} alt="Logo" className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-[#c8a15a]/30" />
+          ) : (
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#c8a15a] to-[#a47e3b] flex items-center justify-center font-bold text-[#08080a] shadow-lg shadow-[#c8a15a]/10 flex-shrink-0">
+              BB
+            </div>
+          )}
           {!collapsed && (
             <div className="animate-in fade-in duration-300">
               <h1 className={`font-bold tracking-wider text-base leading-none ${isDark ? "text-[#f3ede1]" : "text-[#15120d]"}`}>
@@ -221,10 +273,22 @@ function CrmLayoutContent({ children }: { children: React.ReactNode }) {
         <div className={`mt-auto pt-6 border-t ${borderCol}`}>
           {!collapsed ? (
             <div className="space-y-4 animate-in fade-in duration-300">
+              <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={onAvatarPick} />
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[#c8a15a] bg-[#c8a15a]/10 border ${isDark ? "border-[#c8a15a]/30" : "border-[#c8a15a]/40"}`}>
-                  <UserCheck2 className="w-5 h-5" />
-                </div>
+                <button
+                  onClick={() => avatarInputRef.current?.click()}
+                  className={`relative group w-10 h-10 rounded-full flex items-center justify-center text-[#c8a15a] bg-[#c8a15a]/10 border overflow-hidden flex-shrink-0 ${isDark ? "border-[#c8a15a]/30" : "border-[#c8a15a]/40"}`}
+                  title="Change photo"
+                >
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <UserCheck2 className="w-5 h-5" />
+                  )}
+                  <span className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <Camera className="w-4 h-4 text-white" />
+                  </span>
+                </button>
                 <div className="overflow-hidden">
                   <p className={`text-sm font-medium truncate ${isDark ? "text-[#f3ede1]" : "text-[#15120d]"}`}>
                     {user.fullName}
@@ -288,9 +352,13 @@ function CrmLayoutContent({ children }: { children: React.ReactNode }) {
           isDark ? "bg-[#0d0d10] border-[#c8a15a]/20" : "bg-[#ffffff] border-[#c8a15a]/30 shadow-md"
         }`}>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#c8a15a] to-[#a47e3b] flex items-center justify-center font-bold text-[#08080a] text-sm">
-              BB
-            </div>
+            {logo ? (
+              <img src={logo} alt="Logo" className="w-8 h-8 rounded-lg object-cover border border-[#c8a15a]/30" />
+            ) : (
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#c8a15a] to-[#a47e3b] flex items-center justify-center font-bold text-[#08080a] text-sm">
+                BB
+              </div>
+            )}
             <h1 className={`font-bold tracking-wider text-sm ${isDark ? "text-[#f3ede1]" : "text-[#15120d]"}`}>
               BIZBUYUK
             </h1>

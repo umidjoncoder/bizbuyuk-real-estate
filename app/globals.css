@@ -340,6 +340,9 @@ html.light {
   transition: border-color 0.2s var(--ease-lux), box-shadow 0.2s var(--ease-lux);
 }
 .crm-input::placeholder { color: var(--crm-faint); }
+/* Higher specificity than .crm-input's padding shorthand so the search icon
+   doesn't sit on top of the placeholder text. */
+.crm-input.pl-icon { padding-left: 2.5rem; }
 .crm-input:focus {
   border-color: var(--crm-gold);
   box-shadow: 0 0 0 3px rgba(200, 161, 90, 0.16);

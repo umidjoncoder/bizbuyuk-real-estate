@@ -24,9 +24,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const existing = await prisma.property.findUnique({ where: { id } });
     if (!existing) return NextResponse.json({ error: "Property not found" }, { status: 404 });
 
-    const { title, location, price, type, description } = await req.json();
+    const { title, location, price, type, description, developer } = await req.json();
     const data: any = {};
     if (title !== undefined && title.trim()) data.title = title.trim();
+    if (developer !== undefined) data.developer = developer ? String(developer).trim() : null;
     if (location !== undefined && location.trim()) data.location = location.trim();
     if (price !== undefined && price !== "" && !isNaN(parseFloat(price))) data.price = parseFloat(price);
     if (type !== undefined && type.trim()) data.type = type.trim();

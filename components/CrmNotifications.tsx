@@ -210,7 +210,7 @@ export function NotificationBell({ compact = false }: { compact?: boolean }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-[340px] max-w-[calc(100vw-2rem)] crm-card p-0 overflow-hidden z-[90]">
+        <div className={`absolute ${compact ? "right-0" : "left-0"} mt-2 w-[340px] max-w-[calc(100vw-2rem)] crm-card p-0 overflow-hidden z-[90]`}>
           <div className="px-4 py-3 border-b crm-bd flex items-center justify-between">
             <span className="text-sm font-bold crm-text flex items-center gap-2">
               <Bell className="w-4 h-4 crm-gold" /> {t.title}
