@@ -102,9 +102,10 @@ export async function POST(req: Request) {
     const key = phoneKey(cleanPhone);
     let existing = null as any;
     if (key.length >= 7) {
+      // Compare normalised keys in JS (stored phones may have spaces / +).
       const candidates = await prisma.lead.findMany({
-        where: { phone: { contains: key }, archived: false },
-        include: { broker: { select: { fullName: true } } },
+        where: { archived: false },
+        select: { id: true, phone: true, name: true, createdAt: true, broker: { select: { fullName: true } } },
       });
       existing = candidates.find((c) => phoneKey(c.phone) === key) || null;
     }

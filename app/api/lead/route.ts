@@ -79,7 +79,9 @@ export async function POST(req: Request) {
     const key = phoneKey(phone);
     let dup = null as any;
     if (key.length >= 7) {
-      const candidates = await prisma.lead.findMany({ where: { phone: { contains: key }, archived: false } });
+      // Compare normalised keys in JS — stored phones may contain spaces/+ which
+      // a DB substring match would miss.
+      const candidates = await prisma.lead.findMany({ where: { archived: false }, select: { id: true, phone: true } });
       dup = candidates.find((c) => phoneKey(c.phone) === key) || null;
     }
 
