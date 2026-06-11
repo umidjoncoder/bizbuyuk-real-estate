@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
-import { Role, LeadStatus } from "@prisma/client";
+import { Role } from "@prisma/client";
 
 async function getSessionUser() {
   const cookieStore = await cookies();
@@ -49,12 +49,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     };
 
     if (status !== undefined && status !== existingLead.status) {
-      if (status === LeadStatus.LOST && (!lostReason || !lostReason.trim())) {
+      if (status === "LOST" && (!lostReason || !lostReason.trim())) {
         return NextResponse.json({ error: "Lost status requires a reason" }, { status: 400 });
       }
       updateData.status = status;
       track("status", existingLead.status, status);
-      if (status === LeadStatus.LOST) {
+      if (status === "LOST") {
         updateData.lostReason = lostReason.trim();
         track("lostReason", existingLead.lostReason, lostReason.trim());
       } else {

@@ -6,7 +6,7 @@ import { useNotifications } from "@/components/CrmNotifications";
 import { useRouter } from "next/navigation";
 import { crmTranslations } from "@/lib/crmTranslations";
 import { formatMoney, formatPhone } from "@/lib/format";
-import { DEFAULT_SOURCES, mergeOptions } from "@/lib/options";
+import { DEFAULT_SOURCES, DEFAULT_STATUSES, mergeOptions } from "@/lib/options";
 import {
   Plus,
   Search,
@@ -29,6 +29,8 @@ import {
   ShieldAlert,
   BellPlus,
   Save,
+  Copy,
+  MessageCircle,
 } from "lucide-react";
 
 type Comment = {
@@ -65,7 +67,7 @@ type Lead = {
   phone: string;
   email: string | null;
   budget: number | null;
-  status: "NEW" | "CONTACTED" | "NEGOTIATION" | "VIEWING" | "WON" | "LOST";
+  status: string;
   lostReason: string | null;
   source: string;
   brokerId: string | null;
@@ -88,6 +90,8 @@ const STATUS_META: Record<string, { dot: string; chip: string; bar: string }> = 
   WON: { dot: "bg-emerald-500", chip: "bg-emerald-500/12 text-emerald-500", bar: "bg-emerald-500" },
   LOST: { dot: "bg-red-500", chip: "bg-red-500/12 text-red-500", bar: "bg-red-500" },
 };
+const DEFAULT_META = { dot: "bg-[#c8a15a]", chip: "bg-[#c8a15a]/12 text-[#c8a15a]", bar: "bg-[#c8a15a]" };
+const sMeta = (s: string) => STATUS_META[s] || DEFAULT_META;
 
 export default function LeadsPage() {
   const { user, lang } = useCrm();
@@ -99,6 +103,7 @@ export default function LeadsPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [users, setUsers] = useState<UserType[]>([]);
   const [sourceOptions, setSourceOptions] = useState<string[]>(DEFAULT_SOURCES);
+  const [statusOptions, setStatusOptions] = useState<string[]>(DEFAULT_STATUSES);
   const [loading, setLoading] = useState(true);
   const canManageOptions = user?.role === "OWNER" || user?.role === "ADMIN";
 
@@ -122,6 +127,18 @@ export default function LeadsPage() {
   const [editBudget, setEditBudget] = useState("");
   const [editSource, setEditSource] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
+  const [copiedPhone, setCopiedPhone] = useState(false);
+
+  const copyPhone = async (phone: string) => {
+    try {
+      await navigator.clipboard.writeText(phone);
+      setCopiedPhone(true);
+      setTimeout(() => setCopiedPhone(false), 1500);
+    } catch {
+      /* clipboard unavailable */
+    }
+  };
+  const waLink = (phone: string) => `https://wa.me/${String(phone).replace(/\D/g, "")}`;
 
   // comment reminder
   const [remindOn, setRemindOn] = useState(false);
@@ -176,7 +193,11 @@ export default function LeadsPage() {
       if (leadsRes.ok) setLeads((await leadsRes.json()).leads);
       if (propsRes.ok) setProperties((await propsRes.json()).properties);
       if (usersRes.ok) setUsers((await usersRes.json()).users);
-      if (setRes.ok) { const s = await setRes.json(); setSourceOptions(mergeOptions(DEFAULT_SOURCES, (s.leadSource || []).map((o: any) => o.value))); }
+      if (setRes.ok) {
+        const s = await setRes.json();
+        setSourceOptions(mergeOptions(DEFAULT_SOURCES, (s.leadSource || []).map((o: any) => o.value)));
+        setStatusOptions(mergeOptions(DEFAULT_STATUSES, (s.leadStatus || []).map((o: any) => o.value)));
+      }
     } catch (err) {
       console.error("Error loading leads page data:", err);
     } finally {
@@ -469,14 +490,13 @@ export default function LeadsPage() {
     return matchesSearch && matchesSource;
   });
 
-  const kanbanColumns = [
-    { title: t.leads.colNew, status: "NEW" },
-    { title: t.leads.colContacted, status: "CONTACTED" },
-    { title: t.leads.colNegotiation, status: "NEGOTIATION" },
-    { title: t.leads.colViewing, status: "VIEWING" },
-    { title: t.leads.colWon, status: "WON" },
-    { title: t.leads.colLost, status: "LOST" },
-  ];
+  // Translate the 6 built-in statuses; custom statuses show their own name.
+  const STATUS_LABEL: Record<string, string> = {
+    NEW: t.leads.colNew, CONTACTED: t.leads.colContacted, NEGOTIATION: t.leads.colNegotiation,
+    VIEWING: t.leads.colViewing, WON: t.leads.colWon, LOST: t.leads.colLost,
+  };
+  const statusLabel = (s: string) => STATUS_LABEL[s] || s;
+  const kanbanColumns = statusOptions.map((s) => ({ title: statusLabel(s), status: s }));
 
   const fieldLabel = (f: string) => (t.leads.fields as Record<string, string>)[f] || f;
 
@@ -543,7 +563,7 @@ export default function LeadsPage() {
           {kanbanColumns.map((col) => {
             const colLeads = filteredLeads.filter((l) => l.status === col.status);
             const isOver = dragOverCol === col.status;
-            const meta = STATUS_META[col.status];
+            const meta = sMeta(col.status);
             return (
               <div
                 key={col.status}
@@ -625,7 +645,7 @@ export default function LeadsPage() {
               </thead>
               <tbody className="text-sm">
                 {filteredLeads.map((lead) => {
-                  const meta = STATUS_META[lead.status];
+                  const meta = sMeta(lead.status);
                   const unseen = unseenCount(lead);
                   return (
                     <tr key={lead.id} onClick={() => { setSelectedLead(lead); setEditMode(false); }}
@@ -637,7 +657,7 @@ export default function LeadsPage() {
                         </div>
                       </td>
                       <td className="p-4 crm-muted">{formatPhone(lead.phone)}</td>
-                      <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase ${meta.chip}`}>{lead.status}</span></td>
+                      <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase ${meta.chip}`}>{statusLabel(lead.status)}</span></td>
                       <td className="p-4 crm-gold font-bold">{formatMoney(lead.budget)}</td>
                       <td className="p-4 crm-text">{lead.broker?.fullName || "—"}</td>
                       <td className="p-4 text-xs crm-muted">{lead.source}</td>
@@ -739,7 +759,7 @@ export default function LeadsPage() {
                 <h3 className="text-2xl font-bold crm-text">{selectedLead.name}</h3>
                 <div className="flex items-center gap-2 mt-1.5">
                   <span className="crm-chip">{selectedLead.source}</span>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${STATUS_META[selectedLead.status].chip}`}>{selectedLead.status}</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${sMeta(selectedLead.status).chip}`}>{selectedLead.status}</span>
                 </div>
               </div>
               <div className="flex gap-2">
@@ -765,7 +785,18 @@ export default function LeadsPage() {
               {/* Contact info — view or edit */}
               {!editMode ? (
                 <div className="grid grid-cols-2 gap-4">
-                  <Info icon={<Phone className="w-4 h-4 crm-gold" />} label={lang === "en" ? "Phone" : "Телефон"} value={formatPhone(selectedLead.phone)} />
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase font-bold crm-muted">{lang === "en" ? "Phone" : "Телефон"}</span>
+                    <div className="flex items-center gap-2 text-sm crm-text"><Phone className="w-4 h-4 crm-gold" /> {formatPhone(selectedLead.phone)}</div>
+                    <div className="flex items-center gap-2 pt-1">
+                      <button onClick={() => copyPhone(selectedLead.phone)} className="crm-btn-ghost py-1 px-2 text-[11px] flex items-center gap-1" title={lang === "en" ? "Copy number" : "Skopirovat"}>
+                        <Copy className="w-3 h-3" /> {copiedPhone ? (lang === "en" ? "Copied" : "Nusxa olindi") : (lang === "en" ? "Copy" : "Nusxa")}
+                      </button>
+                      <a href={waLink(selectedLead.phone)} target="_blank" rel="noopener noreferrer" className="py-1 px-2 text-[11px] rounded-lg border border-emerald-500/40 text-emerald-500 hover:bg-emerald-500/10 flex items-center gap-1 font-semibold">
+                        <MessageCircle className="w-3 h-3" /> WhatsApp
+                      </a>
+                    </div>
+                  </div>
                   <Info icon={<Mail className="w-4 h-4 crm-gold" />} label="E-mail" value={selectedLead.email || "—"} />
                   <Info icon={<DollarSign className="w-4 h-4 crm-gold" />} label={lang === "en" ? "Budget" : "Бюджет"} value={formatMoney(selectedLead.budget)} gold />
                   <Info icon={<Clock className="w-4 h-4 crm-gold" />} label={lang === "en" ? "Created" : "Создан"} value={new Date(selectedLead.createdAt).toLocaleDateString()} />
@@ -796,13 +827,13 @@ export default function LeadsPage() {
               <div className="space-y-2">
                 <span className="text-[10px] uppercase font-bold crm-muted block">Status</span>
                 <div className="flex flex-wrap gap-2">
-                  {["NEW", "CONTACTED", "NEGOTIATION", "VIEWING", "WON", "LOST"].map((st) => {
+                  {statusOptions.map((st) => {
                     const active = selectedLead.status === st;
-                    const meta = STATUS_META[st];
+                    const meta = sMeta(st);
                     return (
                       <button key={st} onClick={() => handleUpdateStatus(selectedLead.id, st)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border ${active ? `${meta.bar} text-white border-transparent` : "crm-bd crm-muted hover:crm-text"}`}>
-                        {st}
+                        {statusLabel(st)}
                       </button>
                     );
                   })}

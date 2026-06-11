@@ -1,4 +1,4 @@
-import { PrismaClient, Role, LeadStatus, TaskStatus, TaskType } from "@prisma/client";
+import { PrismaClient, Role, TaskStatus, TaskType } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -133,7 +133,7 @@ async function main() {
       phone: "+998901234567",
       email: "akmal@gmail.com",
       budget: 2000000,
-      status: LeadStatus.NEW,
+      status: "NEW",
       source: "Website",
       brokerId: broker1.id,
       creatorId: admin.id,
@@ -146,7 +146,7 @@ async function main() {
       phone: "+998998887766",
       email: "sardor@mail.ru",
       budget: 3000000,
-      status: LeadStatus.NEGOTIATION,
+      status: "NEGOTIATION",
       source: "Facebook",
       brokerId: broker1.id,
       creatorId: admin.id,
@@ -159,7 +159,7 @@ async function main() {
       phone: "+79031112233",
       email: "elena@yandex.ru",
       budget: 1500000,
-      status: LeadStatus.VIEWING,
+      status: "VIEWING",
       source: "Google",
       brokerId: broker2.id,
       creatorId: salesDirector.id,
@@ -172,7 +172,7 @@ async function main() {
       phone: "+15550199222",
       email: "john@doe.com",
       budget: 5000000,
-      status: LeadStatus.WON,
+      status: "WON",
       source: "Instagram",
       brokerId: broker2.id,
       creatorId: owner.id,

@@ -11,7 +11,7 @@ async function getSessionUser() {
   return verifyJWT(token);
 }
 
-const LIST_CATEGORIES = ["leadSource", "developer", "propertyType"];
+const LIST_CATEGORIES = ["leadSource", "developer", "propertyType", "leadStatus"];
 
 // GET: all custom settings, grouped. Any logged-in user may read (to populate
 // dropdowns + show the logo).
@@ -21,7 +21,7 @@ export async function GET() {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const rows = await prisma.setting.findMany({ orderBy: { sortOrder: "asc" } });
-    const grouped: Record<string, { id: string; value: string }[]> = { leadSource: [], developer: [], propertyType: [] };
+    const grouped: Record<string, { id: string; value: string }[]> = { leadSource: [], developer: [], propertyType: [], leadStatus: [] };
     let logo: string | null = null;
     for (const r of rows) {
       if (r.category === "branding") logo = r.value;

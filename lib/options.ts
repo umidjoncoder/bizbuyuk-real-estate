@@ -2,6 +2,8 @@
 // the UI merges defaults + custom so dropdowns work out of the box and grow
 // without code changes.
 export const DEFAULT_SOURCES = ["Manual", "Facebook", "Instagram", "Google", "Website", "Telegram"];
+// Pipeline stages. WON/LOST are special (sale / requires reason) and always kept.
+export const DEFAULT_STATUSES = ["NEW", "CONTACTED", "NEGOTIATION", "VIEWING", "WON", "LOST"];
 export const DEFAULT_DEVELOPERS = ["Emaar", "DAMAC", "Nakheel", "Sobha", "Danube", "Binghatti"];
 export const DEFAULT_PROPERTY_TYPES = ["Off-plan", "Secondary"];
 
