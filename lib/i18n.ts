@@ -45,6 +45,11 @@ export type Dict = {
     name: string;
     phone: string;
     email: string;
+    contactPref: string;
+    contactCall: string;
+    contactWhatsApp: string;
+    contactTelegram: string;
+    contactEmail: string;
     submit: string;
     sending: string;
     success: string;
@@ -128,6 +133,11 @@ export const dictionary: Record<Locale, Dict> = {
       name: "Your name",
       phone: "Phone number",
       email: "Email",
+      contactPref: "Preferred way to reach you",
+      contactCall: "Call",
+      contactWhatsApp: "WhatsApp",
+      contactTelegram: "Telegram",
+      contactEmail: "Email",
       submit: "Send request",
       sending: "Sending…",
       success: "Thank you — we'll be in touch shortly.",
@@ -209,6 +219,11 @@ export const dictionary: Record<Locale, Dict> = {
       name: "Ваше имя",
       phone: "Номер телефона",
       email: "Email",
+      contactPref: "Удобный способ связи",
+      contactCall: "Звонок",
+      contactWhatsApp: "WhatsApp",
+      contactTelegram: "Telegram",
+      contactEmail: "Email",
       submit: "Отправить",
       sending: "Отправляем…",
       success: "Спасибо — мы скоро свяжемся с вами.",

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { crmTranslations } from "@/lib/crmTranslations";
 import { formatMoney, formatPhone } from "@/lib/format";
 import { DEFAULT_SOURCES, DEFAULT_STATUSES, mergeOptions } from "@/lib/options";
+import { PhoneField } from "@/components/PhoneField";
 import {
   Plus,
   Search,
@@ -31,6 +32,8 @@ import {
   Save,
   Copy,
   MessageCircle,
+  Send,
+  PhoneCall,
 } from "lucide-react";
 
 type Comment = {
@@ -70,6 +73,7 @@ type Lead = {
   status: string;
   lostReason: string | null;
   source: string;
+  preferredContact: string | null;
   brokerId: string | null;
   broker: { fullName: string; id: string } | null;
   createdAt: string;
@@ -81,6 +85,19 @@ type Lead = {
 };
 
 type UserType = { id: string; fullName: string; role: string; isActive?: boolean };
+
+// Preferred contact channel options (shown on the public form too).
+const PREF_OPTIONS: { value: string; en: string; ru: string }[] = [
+  { value: "Call", en: "Call", ru: "Звонок" },
+  { value: "WhatsApp", en: "WhatsApp", ru: "WhatsApp" },
+  { value: "Telegram", en: "Telegram", ru: "Telegram" },
+  { value: "Email", en: "Email", ru: "Email" },
+];
+const prefLabel = (v: string | null, lang: string) => {
+  if (!v) return "—";
+  const o = PREF_OPTIONS.find((p) => p.value.toLowerCase() === v.toLowerCase());
+  return o ? (lang === "en" ? o.en : o.ru) : v;
+};
 
 const STATUS_META: Record<string, { dot: string; chip: string; bar: string }> = {
   NEW: { dot: "bg-sky-500", chip: "bg-sky-500/12 text-sky-500", bar: "bg-sky-500" },
@@ -126,6 +143,7 @@ export default function LeadsPage() {
   const [editEmail, setEditEmail] = useState("");
   const [editBudget, setEditBudget] = useState("");
   const [editSource, setEditSource] = useState("");
+  const [editPref, setEditPref] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
 
@@ -152,6 +170,7 @@ export default function LeadsPage() {
   const [newLeadEmail, setNewLeadEmail] = useState("");
   const [newLeadBudget, setNewLeadBudget] = useState("");
   const [newLeadSource, setNewLeadSource] = useState("Manual");
+  const [newLeadPref, setNewLeadPref] = useState("");
   const [newLeadProps, setNewLeadProps] = useState<string[]>([]);
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
@@ -251,9 +270,9 @@ export default function LeadsPage() {
   // ---------- Export (Owner only) ----------
   const handleExport = () => {
     if (user?.role !== "OWNER") return;
-    const headers = ["ID", "Name", "Phone", "E-mail", "Budget", "Status", "Lost Reason", "Source", "Broker", "Created"];
+    const headers = ["ID", "Name", "Phone", "E-mail", "Preferred Contact", "Budget", "Status", "Lost Reason", "Source", "Broker", "Created"];
     const rows = leads.map((l) => [
-      l.id, l.name, l.phone, l.email || "", l.budget || "", l.status, l.lostReason || "",
+      l.id, l.name, l.phone, l.email || "", prefLabel(l.preferredContact, lang), l.budget || "", l.status, l.lostReason || "",
       l.source, l.broker?.fullName || "—", new Date(l.createdAt).toLocaleString(),
     ]);
     const csv = "data:text/csv;charset=utf-8,﻿" +
@@ -278,7 +297,8 @@ export default function LeadsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: newLeadName, phone: newLeadPhone, email: newLeadEmail,
-          budget: newLeadBudget, source: newLeadSource, propertyIds: newLeadProps, force,
+          budget: newLeadBudget, source: newLeadSource, preferredContact: newLeadPref || null,
+          propertyIds: newLeadProps, force,
         }),
       });
       const data = await res.json();
@@ -300,7 +320,7 @@ export default function LeadsPage() {
 
   const resetNewLeadForm = () => {
     setNewLeadName(""); setNewLeadPhone(""); setNewLeadEmail("");
-    setNewLeadBudget(""); setNewLeadSource("Manual"); setNewLeadProps([]);
+    setNewLeadBudget(""); setNewLeadSource("Manual"); setNewLeadPref(""); setNewLeadProps([]);
     setDuplicateWarning(null); setErrorMsg("");
   };
 
@@ -360,6 +380,7 @@ export default function LeadsPage() {
     setEditEmail(lead.email || "");
     setEditBudget(lead.budget ? String(lead.budget) : "");
     setEditSource(lead.source);
+    setEditPref(lead.preferredContact || "");
     setEditMode(true);
   };
 
@@ -372,7 +393,7 @@ export default function LeadsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: editName, phone: editPhone, email: editEmail,
-          budget: editBudget, source: editSource,
+          budget: editBudget, source: editSource, preferredContact: editPref || null,
         }),
       });
       if (res.ok) {
@@ -601,6 +622,11 @@ export default function LeadsPage() {
                         </div>
                         <p className="text-[11px] mt-1 flex items-center gap-1 crm-muted">
                           <Phone className="w-3 h-3 crm-gold" /> {formatPhone(lead.phone)}
+                          {lead.preferredContact && (
+                            <span className="ml-auto flex items-center" title={prefLabel(lead.preferredContact, lang)}>
+                              {prefIcon(lead.preferredContact)}
+                            </span>
+                          )}
                         </p>
                         {lead.budget && <p className="text-xs crm-gold font-bold mt-2">{formatMoney(lead.budget)}</p>}
                         <div className="mt-3 pt-2.5 border-t crm-bd flex items-center justify-between gap-2">
@@ -640,6 +666,7 @@ export default function LeadsPage() {
                   <th className="p-4">{lang === "en" ? "Budget" : "Бюджет"}</th>
                   <th className="p-4">{lang === "en" ? "Broker" : "Брокер"}</th>
                   <th className="p-4">{lang === "en" ? "Source" : "Источник"}</th>
+                  <th className="p-4">{t.leads.fields.preferredContact}</th>
                   <th className="p-4 text-right">{t.leads.tblActions}</th>
                 </tr>
               </thead>
@@ -661,6 +688,11 @@ export default function LeadsPage() {
                       <td className="p-4 crm-gold font-bold">{formatMoney(lead.budget)}</td>
                       <td className="p-4 crm-text">{lead.broker?.fullName || "—"}</td>
                       <td className="p-4 text-xs crm-muted">{lead.source}</td>
+                      <td className="p-4">
+                        {lead.preferredContact
+                          ? <span className="inline-flex items-center gap-1.5 text-xs crm-muted">{prefIcon(lead.preferredContact)}{prefLabel(lead.preferredContact, lang)}</span>
+                          : <span className="text-xs crm-faint">—</span>}
+                      </td>
                       <td className="p-4 text-right">
                         <button onClick={(e) => { e.stopPropagation(); setSelectedLead(lead); setEditMode(false); }}
                                 className="text-xs crm-gold border crm-bd hover:bg-[#c8a15a] hover:text-[#08080a] px-3 py-1 rounded-lg transition-all">
@@ -671,7 +703,7 @@ export default function LeadsPage() {
                   );
                 })}
                 {filteredLeads.length === 0 && (
-                  <tr><td colSpan={7} className="p-10 text-center crm-muted">{t.leads.noLeads}</td></tr>
+                  <tr><td colSpan={8} className="p-10 text-center crm-muted">{t.leads.noLeads}</td></tr>
                 )}
               </tbody>
             </table>
@@ -695,7 +727,7 @@ export default function LeadsPage() {
             <form onSubmit={(e) => handleCreateLead(e, false)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <Field label={t.leads.leadName}><input required value={newLeadName} onChange={(e) => setNewLeadName(e.target.value)} placeholder={lang === "en" ? "Name..." : "Имя..."} className="crm-input" /></Field>
-                <Field label={t.leads.leadPhone}><input required value={newLeadPhone} onChange={(e) => setNewLeadPhone(e.target.value)} placeholder="+971..." className="crm-input" /></Field>
+                <Field label={t.leads.leadPhone}><PhoneField theme="crm" required value={newLeadPhone} onChange={setNewLeadPhone} /></Field>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <Field label={t.leads.leadEmail}><input type="email" value={newLeadEmail} onChange={(e) => setNewLeadEmail(e.target.value)} placeholder="mail@example.com" className="crm-input" /></Field>
@@ -712,6 +744,9 @@ export default function LeadsPage() {
                     </button>
                   )}
                 </div>
+              </Field>
+              <Field label={t.leads.fields.preferredContact}>
+                <PrefPicker value={newLeadPref} onChange={setNewLeadPref} lang={lang} />
               </Field>
               <Field label={t.leads.leadProps}>
                 <div className="max-h-32 overflow-y-auto crm-scroll border crm-bd rounded-xl p-2.5 space-y-1.5" style={{ background: "var(--crm-input-bg)" }}>
@@ -798,6 +833,7 @@ export default function LeadsPage() {
                     </div>
                   </div>
                   <Info icon={<Mail className="w-4 h-4 crm-gold" />} label="E-mail" value={selectedLead.email || "—"} />
+                  <Info icon={prefIcon(selectedLead.preferredContact)} label={t.leads.fields.preferredContact} value={prefLabel(selectedLead.preferredContact, lang)} />
                   <Info icon={<DollarSign className="w-4 h-4 crm-gold" />} label={lang === "en" ? "Budget" : "Бюджет"} value={formatMoney(selectedLead.budget)} gold />
                   <Info icon={<Clock className="w-4 h-4 crm-gold" />} label={lang === "en" ? "Created" : "Создан"} value={new Date(selectedLead.createdAt).toLocaleDateString()} />
                 </div>
@@ -805,7 +841,7 @@ export default function LeadsPage() {
                 <div className="crm-panel p-4 space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     <Field label={t.leads.leadName}><input value={editName} onChange={(e) => setEditName(e.target.value)} className="crm-input" /></Field>
-                    <Field label={t.leads.leadPhone}><input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} className="crm-input" /></Field>
+                    <Field label={t.leads.leadPhone}><PhoneField theme="crm" value={editPhone} onChange={setEditPhone} /></Field>
                     <Field label={t.leads.leadEmail}><input value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="crm-input" /></Field>
                     <Field label={t.leads.leadBudget}><input type="number" value={editBudget} onChange={(e) => setEditBudget(e.target.value)} className="crm-input" /></Field>
                   </div>
@@ -813,6 +849,9 @@ export default function LeadsPage() {
                     <select value={editSource} onChange={(e) => setEditSource(e.target.value)} className="crm-input crm-select">
                       {sourceOptions.map((s) => <option key={s} value={s}>{s === "Manual" ? t.leads.manualSource : s}</option>)}
                     </select>
+                  </Field>
+                  <Field label={t.leads.fields.preferredContact}>
+                    <PrefPicker value={editPref} onChange={setEditPref} lang={lang} />
                   </Field>
                   <div className="flex gap-2 justify-end">
                     <button onClick={() => setEditMode(false)} className="crm-btn-ghost">{t.leads.btnCancel}</button>
@@ -971,6 +1010,42 @@ export default function LeadsPage() {
 }
 
 /* ---------- small presentational helpers ---------- */
+function prefIcon(v: string | null) {
+  switch ((v || "").toLowerCase()) {
+    case "call": return <PhoneCall className="w-4 h-4 crm-gold" />;
+    case "whatsapp": return <MessageCircle className="w-4 h-4 crm-gold" />;
+    case "telegram": return <Send className="w-4 h-4 crm-gold" />;
+    case "email": return <Mail className="w-4 h-4 crm-gold" />;
+    default: return <MessageSquare className="w-4 h-4 crm-gold" />;
+  }
+}
+
+// Segmented selector for the preferred contact channel (Call/WhatsApp/Telegram/Email).
+function PrefPicker({ value, onChange, lang }: { value: string; onChange: (v: string) => void; lang: string }) {
+  return (
+    <div className="grid grid-cols-4 gap-2">
+      {PREF_OPTIONS.map((o) => {
+        const active = value.toLowerCase() === o.value.toLowerCase();
+        return (
+          <button
+            key={o.value}
+            type="button"
+            onClick={() => onChange(active ? "" : o.value)}
+            aria-pressed={active}
+            className={`flex flex-col items-center justify-center gap-1 rounded-lg border px-1 py-2 text-[11px] font-semibold transition-all ${
+              active ? "border-[#c8a15a] bg-[#c8a15a]/12 crm-gold" : "crm-bd crm-muted hover:crm-text"
+            }`}
+            style={active ? undefined : { background: "var(--crm-input-bg)" }}
+          >
+            {prefIcon(o.value)}
+            {lang === "en" ? o.en : o.ru}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">

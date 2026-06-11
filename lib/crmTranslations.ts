@@ -102,6 +102,7 @@ export const crmTranslations = {
         source: "Source",
         broker: "Broker",
         lostReason: "Lost reason",
+        preferredContact: "Preferred contact",
       },
     },
     tasks: {
@@ -325,6 +326,7 @@ export const crmTranslations = {
         source: "Источник",
         broker: "Брокер",
         lostReason: "Причина отказа",
+        preferredContact: "Способ связи",
       },
     },
     tasks: {

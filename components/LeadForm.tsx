@@ -5,8 +5,11 @@ import { motion, AnimatePresence } from "motion/react";
 import { useLang } from "./LanguageProvider";
 import { Reveal } from "./Reveal";
 import { CONTACT } from "@/lib/i18n";
+import { PhoneField } from "./PhoneField";
 
 type Status = "idle" | "sending" | "success" | "error";
+
+const DEFAULT_PREF = "WhatsApp";
 
 export function LeadForm() {
   const { t, locale } = useLang();
@@ -14,7 +17,15 @@ export function LeadForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [preferred, setPreferred] = useState(DEFAULT_PREF);
   const [company, setCompany] = useState(""); // honeypot
+
+  const contactOptions = [
+    { value: "Call", label: t.lead.contactCall, icon: <CallGlyph /> },
+    { value: "WhatsApp", label: t.lead.contactWhatsApp, icon: <WhatsAppGlyph /> },
+    { value: "Telegram", label: t.lead.contactTelegram, icon: <TelegramGlyph /> },
+    { value: "Email", label: t.lead.contactEmail, icon: <MailGlyph /> },
+  ];
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,6 +51,7 @@ export function LeadForm() {
           name,
           phone,
           email,
+          preferredContact: preferred,
           locale,
           company,
           page: window.location.pathname || "landing",
@@ -52,6 +64,7 @@ export function LeadForm() {
       setName("");
       setPhone("");
       setEmail("");
+      setPreferred(DEFAULT_PREF);
     } catch {
       setStatus("error");
     }
@@ -111,11 +124,41 @@ export function LeadForm() {
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-bold text-coal">{t.lead.phone}</label>
-                    <input className="field" type="tel" value={phone} onChange={(e) => { setPhone(e.target.value); if (status === "error") setStatus("idle"); }} autoComplete="tel" required />
+                    <PhoneField
+                      theme="light"
+                      required
+                      value={phone}
+                      onChange={(v) => { setPhone(v); if (status === "error") setStatus("idle"); }}
+                    />
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-bold text-coal">{t.lead.email}</label>
                     <input className="field" type="email" value={email} onChange={(e) => { setEmail(e.target.value); if (status === "error") setStatus("idle"); }} autoComplete="email" required />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-bold text-coal">{t.lead.contactPref}</label>
+                    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                      {contactOptions.map((opt) => {
+                        const active = preferred === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => setPreferred(opt.value)}
+                            aria-pressed={active}
+                            className={`flex flex-col items-center justify-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-bold transition-all ${
+                              active
+                                ? "border-gold bg-gold/10 text-coal shadow-[0_0_0_3px_rgba(200,161,90,0.14)]"
+                                : "border-line-dark bg-white text-muted-dark hover:border-gold/50 hover:text-coal"
+                            }`}
+                          >
+                            <span className={active ? "text-bronze" : "text-muted-dark"}>{opt.icon}</span>
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   <button type="submit" disabled={status === "sending"} className="btn-gold mt-1 w-full justify-center disabled:opacity-60">
@@ -143,4 +186,37 @@ export function LeadForm() {
 
 function Dot() {
   return <span className="h-1.5 w-1.5 rounded-full bg-gold" />;
+}
+
+function CallGlyph() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z" />
+    </svg>
+  );
+}
+
+function WhatsAppGlyph() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.86 9.86 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 1.67c2.2 0 4.27.86 5.83 2.42a8.2 8.2 0 0 1 2.42 5.83c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24Zm-3.05 4.4c-.14 0-.38.05-.58.27-.2.22-.76.75-.76 1.82 0 1.08.78 2.12.89 2.26.11.15 1.53 2.34 3.71 3.28.52.22.93.36 1.24.46.52.17.99.14 1.37.09.42-.06 1.28-.52 1.46-1.03.18-.5.18-.94.13-1.03-.05-.09-.2-.14-.42-.25-.22-.11-1.28-.63-1.48-.7-.2-.07-.34-.11-.49.11-.14.22-.56.7-.69.85-.13.14-.25.16-.47.05-.22-.11-.92-.34-1.76-1.08-.65-.58-1.09-1.3-1.22-1.52-.13-.22-.01-.34.1-.45.1-.1.22-.25.33-.38.11-.13.14-.22.22-.36.07-.15.04-.27-.02-.38-.06-.11-.49-1.18-.67-1.62-.18-.42-.36-.36-.49-.37l-.42-.01Z" />
+    </svg>
+  );
+}
+
+function TelegramGlyph() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M21.94 4.64a1.3 1.3 0 0 0-1.34-.2L3.36 11.2c-.95.38-.94 1.73.02 2.09l4.2 1.57 1.62 5.2c.2.65 1.02.85 1.5.36l2.34-2.32 4.3 3.17c.55.4 1.34.1 1.49-.56l3.06-14.2a1.3 1.3 0 0 0-.95-1.57Zm-3.7 3.07-7.3 6.62a.9.9 0 0 0-.28.53l-.35 2.45-1.18-3.78 8.7-5.45c.43-.27.85.3.41.61Z" />
+    </svg>
+  );
+}
+
+function MailGlyph() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </svg>
+  );
 }

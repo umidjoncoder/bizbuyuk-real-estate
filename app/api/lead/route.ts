@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { phoneKey } from "@/lib/format";
+import { normalizePref } from "@/lib/contact";
 
 export const runtime = "nodejs";
 
@@ -8,6 +9,7 @@ type LeadBody = {
   name?: string;
   phone?: string;
   email?: string;
+  preferredContact?: string;
   locale?: string;
   page?: string;
   utm?: { source?: string; medium?: string; campaign?: string };
@@ -55,6 +57,7 @@ export async function POST(req: Request) {
   const name = (body.name || "").trim().slice(0, 120);
   const phone = (body.phone || "").trim().slice(0, 40);
   const email = (body.email || "").trim().slice(0, 160);
+  const preferredContact = normalizePref(body.preferredContact);
   const locale = (body.locale || "—").slice(0, 5);
 
   // honeypot: silently accept & drop
@@ -87,19 +90,19 @@ export async function POST(req: Request) {
 
     if (dup) {
       await prisma.comment.create({
-        data: { leadId: dup.id, author: "Website", text: `Repeat website inquiry (${source})${email ? ` · ${email}` : ""}` },
+        data: { leadId: dup.id, author: "Website", text: `Repeat website inquiry (${source})${preferredContact ? ` · prefers ${preferredContact}` : ""}${email ? ` · ${email}` : ""}` },
       });
       await prisma.auditLog.create({
-        data: { action: "WEBSITE_LEAD", details: JSON.stringify({ name, phone, source, duplicate: true, mergedInto: dup.id }) },
+        data: { action: "WEBSITE_LEAD", details: JSON.stringify({ name, phone, source, preferredContact, duplicate: true, mergedInto: dup.id }) },
       });
     } else {
       await prisma.lead.create({
-        data: { name, phone, email: email || null, source, status: "NEW" },
+        data: { name, phone, email: email || null, source, status: "NEW", preferredContact },
       });
       await prisma.auditLog.create({
         data: {
           action: "WEBSITE_LEAD",
-          details: JSON.stringify({ name, phone, email, locale, source, utm: body.utm || null, referrer: body.referrer || null, page: body.page || null }),
+          details: JSON.stringify({ name, phone, email, preferredContact, locale, source, utm: body.utm || null, referrer: body.referrer || null, page: body.page || null }),
         },
       });
     }
@@ -108,8 +111,8 @@ export async function POST(req: Request) {
   }
 
   const results = await Promise.allSettled([
-    sendTelegram({ name, phone, email, locale, when, source }),
-    sendEmail({ name, phone, email, locale, when, source }),
+    sendTelegram({ name, phone, email, preferredContact, locale, when, source }),
+    sendEmail({ name, phone, email, preferredContact, locale, when, source }),
   ]);
 
   const configured = results.filter((r) => r.status === "fulfilled" && r.value !== "skipped");
@@ -131,7 +134,18 @@ export async function POST(req: Request) {
 }
 
 
-type Lead = { name: string; phone: string; email: string; locale: string; when: string; source: string };
+type Lead = { name: string; phone: string; email: string; preferredContact: string | null; locale: string; when: string; source: string };
+
+// Emoji + label for the preferred channel, used in the Telegram alert.
+function prefBadge(pref: string | null): string {
+  switch (pref) {
+    case "Call": return "📞 Call";
+    case "WhatsApp": return "🟢 WhatsApp";
+    case "Telegram": return "✈️ Telegram";
+    case "Email": return "✉️ Email";
+    default: return "—";
+  }
+}
 
 async function sendTelegram(lead: Lead): Promise<"sent" | "skipped"> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -149,6 +163,7 @@ async function sendTelegram(lead: Lead): Promise<"sent" | "skipped"> {
     `👤 <b>Name:</b> ${escapeHtml(lead.name)}\n` +
     `📞 <b>Phone:</b> ${escapeHtml(lead.phone)}\n` +
     (lead.email ? `✉️ <b>Email:</b> ${escapeHtml(lead.email)}\n` : "") +
+    `💬 <b>Prefers:</b> ${escapeHtml(prefBadge(lead.preferredContact))}\n` +
     `📍 <b>Source:</b> ${escapeHtml(lead.source)}\n` +
     `🌐 <b>Language:</b> ${lead.locale.toUpperCase()}\n` +
     `🕒 <b>Time (Dubai):</b> ${escapeHtml(lead.when)}`;
@@ -191,6 +206,7 @@ async function sendEmail(lead: Lead): Promise<"sent" | "skipped"> {
         <tr><td style="padding:8px 0;color:#9c9488">Name</td><td style="padding:8px 0">${escapeHtml(lead.name)}</td></tr>
         <tr><td style="padding:8px 0;color:#9c9488">Phone</td><td style="padding:8px 0">${escapeHtml(lead.phone)}</td></tr>
         ${lead.email ? `<tr><td style="padding:8px 0;color:#9c9488">Email</td><td style="padding:8px 0">${escapeHtml(lead.email)}</td></tr>` : ""}
+        <tr><td style="padding:8px 0;color:#9c9488">Prefers</td><td style="padding:8px 0">${escapeHtml(prefBadge(lead.preferredContact))}</td></tr>
         <tr><td style="padding:8px 0;color:#9c9488">Source</td><td style="padding:8px 0">${escapeHtml(lead.source)}</td></tr>
         <tr><td style="padding:8px 0;color:#9c9488">Language</td><td style="padding:8px 0">${lead.locale.toUpperCase()}</td></tr>
         <tr><td style="padding:8px 0;color:#9c9488">Time (Dubai)</td><td style="padding:8px 0">${escapeHtml(lead.when)}</td></tr>

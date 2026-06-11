@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
 import { phoneKey } from "@/lib/format";
+import { normalizePref } from "@/lib/contact";
 import { Role } from "@prisma/client";
 
 // Get current session helper
@@ -89,7 +90,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { name, phone, email, budget, source, propertyIds, force } = await req.json();
+    const { name, phone, email, budget, source, preferredContact, propertyIds, force } = await req.json();
 
     if (!name || !phone) {
       return NextResponse.json({ error: "Name and phone are required" }, { status: 400 });
@@ -129,6 +130,7 @@ export async function POST(req: Request) {
         email: email ? email.trim() : null,
         budget: budget ? parseFloat(budget) : null,
         source: source || "Manual",
+        preferredContact: normalizePref(preferredContact),
         // If Broker creates, auto-assign to self, otherwise assign to specified or leave null
         brokerId: user.role === Role.BROKER ? user.id : null,
         creatorId: user.id,

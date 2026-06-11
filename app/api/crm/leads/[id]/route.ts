@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
+import { normalizePref } from "@/lib/contact";
 import { Role } from "@prisma/client";
 
 async function getSessionUser() {
@@ -19,7 +20,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id } = await params;
-    const { status, lostReason, brokerId, name, phone, email, budget, source, propertyIds, archived } = await req.json();
+    const { status, lostReason, brokerId, name, phone, email, budget, source, preferredContact, propertyIds, archived } = await req.json();
 
     const existingLead = await prisma.lead.findUnique({
       where: { id },
@@ -88,6 +89,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (source !== undefined && source !== existingLead.source) {
       updateData.source = source;
       track("source", existingLead.source, source);
+    }
+    if (preferredContact !== undefined) {
+      const newPref = normalizePref(preferredContact);
+      if (newPref !== existingLead.preferredContact) {
+        updateData.preferredContact = newPref;
+        track("preferredContact", existingLead.preferredContact, newPref);
+      }
     }
 
     // Broker assignment: Broker and Marketing Director cannot reassign brokers

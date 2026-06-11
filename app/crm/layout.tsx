@@ -27,6 +27,8 @@ import {
   Wallet,
   Settings as SettingsIcon,
   Camera,
+  KeyRound,
+  Loader2,
 } from "lucide-react";
 
 function CrmLayoutContent({ children }: { children: React.ReactNode }) {
@@ -36,8 +38,47 @@ function CrmLayoutContent({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [logo, setLogo] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [acUsername, setAcUsername] = useState("");
+  const [acPassword, setAcPassword] = useState("");
+  const [acSaving, setAcSaving] = useState(false);
+  const [acMsg, setAcMsg] = useState("");
 
   const t = crmTranslations[lang];
+
+  const canManageCreds = user?.role === "OWNER" || user?.role === "ADMIN";
+
+  const openAccount = () => {
+    setAcUsername(user?.username || "");
+    setAcPassword("");
+    setAcMsg("");
+    setAccountOpen(true);
+  };
+
+  const saveAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAcSaving(true);
+    setAcMsg("");
+    try {
+      const body: any = {};
+      if (acUsername.trim() && acUsername.trim() !== user?.username) body.username = acUsername.trim();
+      if (acPassword) body.password = acPassword;
+      if (!body.username && !body.password) { setAccountOpen(false); return; }
+      const res = await fetch("/api/crm/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error");
+      await refreshUser();
+      setAccountOpen(false);
+    } catch (err: any) {
+      setAcMsg(err.message || "Error");
+    } finally {
+      setAcSaving(false);
+    }
+  };
 
   // Load sidebar state on mount
   useEffect(() => {
@@ -298,6 +339,15 @@ function CrmLayoutContent({ children }: { children: React.ReactNode }) {
                   </span>
                 </div>
               </div>
+              {canManageCreds && (
+                <button
+                  onClick={openAccount}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-[#c8a15a]/30 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer text-[#c8a15a] hover:bg-[#c8a15a]/10"
+                >
+                  <KeyRound className="w-4 h-4" />
+                  {lang === "en" ? "My Account" : "Mening akkauntim"}
+                </button>
+              )}
               <button
                 onClick={logout}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#c8a15a]/10 hover:bg-[#c8a15a] hover:text-[#08080a] text-[#c8a15a] border border-[#c8a15a]/30 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer"
@@ -393,6 +443,56 @@ function CrmLayoutContent({ children }: { children: React.ReactNode }) {
         {/* Content body */}
         <main className="flex-1 p-6 lg:p-10 overflow-y-auto">{children}</main>
       </div>
+
+      {/* My Account modal — Owner/Admin self-service login + password reset */}
+      {accountOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm crm-backdrop" onClick={() => !acSaving && setAccountOpen(false)}>
+          <div className="crm-card w-full max-w-md p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold crm-text flex items-center gap-2">
+                <KeyRound className="w-5 h-5 crm-gold" />
+                {lang === "en" ? "My Account" : "Mening akkauntim"}
+              </h3>
+              <button onClick={() => !acSaving && setAccountOpen(false)} className="crm-faint hover:crm-text"><X className="w-5 h-5" /></button>
+            </div>
+            <p className="text-xs crm-muted">
+              {lang === "en"
+                ? "Change your own login (username) and password. Use at least 6 characters for the password."
+                : "Измените свой логин и пароль. Пароль — не менее 6 символов."}
+            </p>
+            <form onSubmit={saveAccount} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold crm-muted mb-1.5">{lang === "en" ? "Login (username)" : "Логин"}</label>
+                <input
+                  value={acUsername}
+                  onChange={(e) => setAcUsername(e.target.value)}
+                  autoComplete="username"
+                  className="crm-input w-full"
+                  placeholder={user?.username || "username"}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold crm-muted mb-1.5">{lang === "en" ? "New password" : "Новый пароль"}</label>
+                <input
+                  value={acPassword}
+                  onChange={(e) => setAcPassword(e.target.value)}
+                  type="text"
+                  autoComplete="new-password"
+                  className="crm-input w-full"
+                  placeholder={lang === "en" ? "Leave blank to keep current" : "Оставьте пустым, чтобы не менять"}
+                />
+              </div>
+              {acMsg && <p className="text-xs text-red-500">{acMsg}</p>}
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={() => setAccountOpen(false)} disabled={acSaving} className="crm-btn-ghost flex-1">{lang === "en" ? "Cancel" : "Отмена"}</button>
+                <button type="submit" disabled={acSaving} className="crm-btn-primary flex-1 justify-center">
+                  {acSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : (lang === "en" ? "Save" : "Сохранить")}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

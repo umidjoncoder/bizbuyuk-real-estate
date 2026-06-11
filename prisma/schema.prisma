@@ -108,6 +108,7 @@ model Lead {
   lostReason String? // Required if status is LOST
   archived   Boolean    @default(false) // soft-delete: hidden from lists, restorable by Owner
   source     String // e.g. "Facebook", "Instagram", "Google", "Website"
+  preferredContact String? // how the client prefers to be reached: Call / WhatsApp / Telegram / Email
   brokerId   String? // Assigned broker
   broker     User?      @relation("AssignedBroker", fields: [brokerId], references: [id], onDelete: SetNull)
   creatorId  String?
