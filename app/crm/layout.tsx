@@ -158,8 +158,8 @@ function CrmLayoutContent({ children }: { children: React.ReactNode }) {
   const sidebarContent = (
     <div className={`flex flex-col h-full border-r transition-all duration-300 ${sidebarBg} ${collapsed ? "p-4" : "p-6"}`}>
       {/* Brand logo & Switchers */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3 overflow-hidden">
+      <div className={`mb-8 ${collapsed ? "flex flex-col items-center gap-4" : "flex flex-col gap-4"}`}>
+        <div className="flex items-center gap-3 min-w-0">
           {logo ? (
             <img src={logo} alt="Logo" className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-[#c8a15a]/30" />
           ) : (
@@ -169,10 +169,10 @@ function CrmLayoutContent({ children }: { children: React.ReactNode }) {
           )}
           {!collapsed && (
             <div className="animate-in fade-in duration-300">
-              <h1 className={`font-bold tracking-wider text-base leading-none ${isDark ? "text-[#f3ede1]" : "text-[#15120d]"}`}>
+              <h1 className={`font-bold tracking-tight text-base leading-none whitespace-nowrap ${isDark ? "text-[#f3ede1]" : "text-[#15120d]"}`}>
                 BIZBUYUK
               </h1>
-              <span className="text-[10px] text-[#c8a15a] uppercase tracking-widest font-medium">REAL ESTATE</span>
+              <span className="text-[10px] text-[#c8a15a] uppercase tracking-wide font-medium">REAL ESTATE</span>
             </div>
           )}
         </div>

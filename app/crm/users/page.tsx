@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useCrm } from "@/components/CrmSecurityWrapper";
 import { useRouter } from "next/navigation";
 import { crmTranslations } from "@/lib/crmTranslations";
+import { DEFAULT_POSITIONS, mergeOptions } from "@/lib/options";
 import { Plus, X, AlertCircle, Loader2, Pencil, Trash2, Power, PowerOff, ShieldCheck } from "lucide-react";
 
 type StaffUser = {
@@ -13,6 +14,7 @@ type StaffUser = {
   email: string;
   role: string;
   isActive?: boolean;
+  position?: string | null;
   createdAt: string;
 };
 
@@ -42,6 +44,7 @@ export default function UsersPage() {
   const [cFullName, setCFullName] = useState("");
   const [cEmail, setCEmail] = useState("");
   const [cRole, setCRole] = useState("BROKER");
+  const [cPosition, setCPosition] = useState("");
   const [creating, setCreating] = useState(false);
   const [createErr, setCreateErr] = useState("");
 
@@ -50,9 +53,28 @@ export default function UsersPage() {
   const [eFullName, setEFullName] = useState("");
   const [eEmail, setEEmail] = useState("");
   const [eRole, setERole] = useState("BROKER");
+  const [ePosition, setEPosition] = useState("");
   const [ePassword, setEPassword] = useState("");
   const [saving, setSaving] = useState(false);
   const [editErr, setEditErr] = useState("");
+
+  const [positionOptions, setPositionOptions] = useState<string[]>(DEFAULT_POSITIONS);
+
+  const fetchPositions = async () => {
+    try {
+      const res = await fetch("/api/crm/settings");
+      if (res.ok) { const s = await res.json(); setPositionOptions(mergeOptions(DEFAULT_POSITIONS, (s.position || []).map((o: any) => o.value))); }
+    } catch (err) { console.error(err); }
+  };
+
+  const addPosition = async (setSel: (v: string) => void) => {
+    const name = prompt(lang === "en" ? "New position / title:" : "Yangi lavozim nomi:");
+    if (!name || !name.trim()) return;
+    const v = name.trim();
+    const res = await fetch("/api/crm/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ category: "position", value: v }) });
+    if (res.ok) { setPositionOptions((p) => mergeOptions(p, [v])); setSel(v); }
+    else alert((await res.json()).error || "Error");
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -61,6 +83,7 @@ export default function UsersPage() {
       return;
     }
     fetchUsers(true);
+    fetchPositions();
   }, [user, router]);
 
   const fetchUsers = async (showLoading = false) => {
@@ -86,12 +109,12 @@ export default function UsersPage() {
       const res = await fetch("/api/crm/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: cUsername, password: cPassword, fullName: cFullName, email: cEmail, role: cRole }),
+        body: JSON.stringify({ username: cUsername, password: cPassword, fullName: cFullName, email: cEmail, role: cRole, position: cPosition }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error creating profile");
       setIsCreateOpen(false);
-      setCUsername(""); setCPassword(""); setCFullName(""); setCEmail(""); setCRole("BROKER");
+      setCUsername(""); setCPassword(""); setCFullName(""); setCEmail(""); setCRole("BROKER"); setCPosition("");
       fetchUsers(false);
     } catch (err: any) {
       setCreateErr(err.message || "Connection error");
@@ -105,6 +128,7 @@ export default function UsersPage() {
     setEFullName(u.fullName);
     setEEmail(u.email);
     setERole(u.role);
+    setEPosition(u.position || "");
     setEPassword("");
     setEditErr("");
   };
@@ -122,6 +146,7 @@ export default function UsersPage() {
           fullName: eFullName,
           email: eEmail,
           role: eRole,
+          position: ePosition,
           ...(ePassword ? { password: ePassword } : {}),
         }),
       });
@@ -212,7 +237,10 @@ export default function UsersPage() {
                       </td>
                       <td className="p-4 crm-muted">{staff.username}</td>
                       <td className="p-4 crm-muted">{staff.email}</td>
-                      <td className="p-4"><span className="crm-chip">{ROLE_LABEL[staff.role] || staff.role}</span></td>
+                      <td className="p-4">
+                        <span className="crm-chip">{ROLE_LABEL[staff.role] || staff.role}</span>
+                        {staff.position && <div className="text-[11px] crm-muted mt-1">{staff.position}</div>}
+                      </td>
                       <td className="p-4">
                         <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase ${active ? "bg-emerald-500/12 text-emerald-500" : "bg-red-500/12 text-red-500"}`}>
                           {active ? t.users.active : t.users.inactive}
@@ -258,11 +286,22 @@ export default function UsersPage() {
                 <FieldU label={t.users.password}><input type="password" required value={cPassword} onChange={(e) => setCPassword(e.target.value)} placeholder="••••••••" className="crm-input" /></FieldU>
                 <FieldU label={t.users.gmail}><input type="email" required value={cEmail} onChange={(e) => setCEmail(e.target.value)} placeholder="sardor@gmail.com" className="crm-input" /></FieldU>
               </div>
-              <FieldU label={t.users.role}>
-                <select value={cRole} onChange={(e) => setCRole(e.target.value)} className="crm-input crm-select">
-                  {roleOptions(isOwner).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                </select>
-              </FieldU>
+              <div className="grid grid-cols-2 gap-4">
+                <FieldU label={lang === "en" ? "Role (access level) *" : "Роль (доступ) *"}>
+                  <select value={cRole} onChange={(e) => setCRole(e.target.value)} className="crm-input crm-select">
+                    {roleOptions(isOwner).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                  </select>
+                </FieldU>
+                <FieldU label={lang === "en" ? "Position (title)" : "Lavozim"}>
+                  <div className="flex gap-2">
+                    <select value={cPosition} onChange={(e) => setCPosition(e.target.value)} className="crm-input crm-select flex-1">
+                      <option value="">{lang === "en" ? "— none —" : "— yo'q —"}</option>
+                      {positionOptions.map((p) => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                    <button type="button" onClick={() => addPosition(setCPosition)} className="crm-btn-ghost px-2 flex-shrink-0"><Plus className="w-4 h-4" /></button>
+                  </div>
+                </FieldU>
+              </div>
               <button type="submit" disabled={creating} className="crm-btn-primary w-full py-3">
                 {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : t.users.btnSaveUser}
               </button>
@@ -284,11 +323,22 @@ export default function UsersPage() {
                 <FieldU label={t.users.fullName}><input required value={eFullName} onChange={(e) => setEFullName(e.target.value)} className="crm-input" /></FieldU>
                 <FieldU label={t.users.gmail}><input type="email" required value={eEmail} onChange={(e) => setEEmail(e.target.value)} className="crm-input" /></FieldU>
               </div>
-              <FieldU label={t.users.role}>
-                <select value={eRole} onChange={(e) => setERole(e.target.value)} disabled={editUser.role === "OWNER" && !isOwner} className="crm-input crm-select">
-                  {roleOptions(isOwner).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                </select>
-              </FieldU>
+              <div className="grid grid-cols-2 gap-4">
+                <FieldU label={lang === "en" ? "Role (access level)" : "Роль (доступ)"}>
+                  <select value={eRole} onChange={(e) => setERole(e.target.value)} disabled={editUser.role === "OWNER" && !isOwner} className="crm-input crm-select">
+                    {roleOptions(isOwner).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                  </select>
+                </FieldU>
+                <FieldU label={lang === "en" ? "Position (title)" : "Lavozim"}>
+                  <div className="flex gap-2">
+                    <select value={ePosition} onChange={(e) => setEPosition(e.target.value)} className="crm-input crm-select flex-1">
+                      <option value="">{lang === "en" ? "— none —" : "— yo'q —"}</option>
+                      {positionOptions.map((p) => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                    <button type="button" onClick={() => addPosition(setEPosition)} className="crm-btn-ghost px-2 flex-shrink-0"><Plus className="w-4 h-4" /></button>
+                  </div>
+                </FieldU>
+              </div>
               <FieldU label={t.users.newPassword}>
                 <input type="password" value={ePassword} onChange={(e) => setEPassword(e.target.value)} placeholder="••••••••" className="crm-input" />
                 <p className="text-[10px] crm-faint mt-1">{t.users.passwordHint}</p>

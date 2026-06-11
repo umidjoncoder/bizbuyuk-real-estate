@@ -41,6 +41,7 @@ model User {
 
   isActive  Boolean @default(true) // soft-disable instead of hard delete
   avatarUrl String? @db.Text // profile photo (small base64 data URL)
+  position  String? // job title (configurable label, separate from the security role)
 
   // Relations
   assignedLeads Lead[]        @relation("AssignedBroker")

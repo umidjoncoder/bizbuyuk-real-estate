@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCrm } from "@/components/CrmSecurityWrapper";
 import { fileToResizedDataUrl } from "@/lib/imageResize";
-import { DEFAULT_SOURCES, DEFAULT_DEVELOPERS, DEFAULT_PROPERTY_TYPES, DEFAULT_STATUSES } from "@/lib/options";
+import { DEFAULT_SOURCES, DEFAULT_DEVELOPERS, DEFAULT_PROPERTY_TYPES, DEFAULT_STATUSES, DEFAULT_POSITIONS } from "@/lib/options";
 import { Settings as SettingsIcon, Plus, X, Loader2, Image as ImageIcon, Lock } from "lucide-react";
 
 type Opt = { id: string; value: string };
@@ -14,7 +14,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const en = lang === "en";
 
-  const [custom, setCustom] = useState<{ leadSource: Opt[]; developer: Opt[]; propertyType: Opt[]; leadStatus: Opt[] }>({ leadSource: [], developer: [], propertyType: [], leadStatus: [] });
+  const [custom, setCustom] = useState<{ leadSource: Opt[]; developer: Opt[]; propertyType: Opt[]; leadStatus: Opt[]; position: Opt[] }>({ leadSource: [], developer: [], propertyType: [], leadStatus: [], position: [] });
   const [logo, setLogo] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [savingLogo, setSavingLogo] = useState(false);
@@ -31,7 +31,7 @@ export default function SettingsPage() {
       const res = await fetch("/api/crm/settings");
       if (res.ok) {
         const d = await res.json();
-        setCustom({ leadSource: d.leadSource || [], developer: d.developer || [], propertyType: d.propertyType || [], leadStatus: d.leadStatus || [] });
+        setCustom({ leadSource: d.leadSource || [], developer: d.developer || [], propertyType: d.propertyType || [], leadStatus: d.leadStatus || [], position: d.position || [] });
         setLogo(d.logo || null);
       }
     } catch (err) { console.error(err); } finally { setLoading(false); }
@@ -84,6 +84,7 @@ export default function SettingsPage() {
       <OptionList title={en ? "Lead Sources" : "Источники лидов"} category="leadSource" defaults={DEFAULT_SOURCES} custom={custom.leadSource} onAdd={addOption} onRemove={removeOption} en={en} />
       <OptionList title={en ? "Developers" : "Застройщики"} category="developer" defaults={DEFAULT_DEVELOPERS} custom={custom.developer} onAdd={addOption} onRemove={removeOption} en={en} />
       <OptionList title={en ? "Property Types" : "Типы объектов"} category="propertyType" defaults={DEFAULT_PROPERTY_TYPES} custom={custom.propertyType} onAdd={addOption} onRemove={removeOption} en={en} />
+      <OptionList title={en ? "Employee Positions (titles)" : "Должности сотрудников"} category="position" defaults={DEFAULT_POSITIONS} custom={custom.position} onAdd={addOption} onRemove={removeOption} en={en} />
 
       <div className="crm-panel p-3 text-xs crm-muted flex items-center gap-2">
         <Lock className="w-4 h-4 crm-gold" /> {en ? "Roles are fixed (they control permissions). Everything else above is editable." : "Роли фиксированы (управляют правами). Всё остальное выше — редактируемо."}

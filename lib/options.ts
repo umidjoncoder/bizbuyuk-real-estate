@@ -6,6 +6,8 @@ export const DEFAULT_SOURCES = ["Manual", "Facebook", "Instagram", "Google", "We
 export const DEFAULT_STATUSES = ["NEW", "CONTACTED", "NEGOTIATION", "VIEWING", "WON", "LOST"];
 export const DEFAULT_DEVELOPERS = ["Emaar", "DAMAC", "Nakheel", "Sobha", "Danube", "Binghatti"];
 export const DEFAULT_PROPERTY_TYPES = ["Off-plan", "Secondary"];
+// Job titles (labels). Admin can add more; the security role is separate.
+export const DEFAULT_POSITIONS = ["Owner", "Administrator", "Sales Director", "Marketing Director", "Broker", "Senior Broker", "Driver", "Receptionist"];
 
 export type SettingsBundle = {
   leadSource: string[];

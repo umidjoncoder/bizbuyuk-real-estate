@@ -33,6 +33,7 @@ export async function GET() {
         role: true,
         isActive: true,
         avatarUrl: true,
+        position: true,
         createdAt: true,
       },
       orderBy: { fullName: "asc" },
@@ -55,7 +56,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Forbidden: Only Admin/Owner can manage users" }, { status: 403 });
     }
 
-    const { username, password, fullName, email, role } = await req.json();
+    const { username, password, fullName, email, role, position } = await req.json();
 
     if (!username || !password || !fullName || !email || !role) {
       return NextResponse.json({ error: "Required fields missing" }, { status: 400 });
@@ -95,6 +96,7 @@ export async function POST(req: Request) {
         fullName: fullName.trim(),
         email: email.toLowerCase().trim(),
         role: role as Role,
+        position: position ? String(position).trim() : null,
       },
     });
 

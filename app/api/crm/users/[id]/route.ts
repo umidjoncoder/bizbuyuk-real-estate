@@ -25,7 +25,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const target = await prisma.user.findUnique({ where: { id } });
     if (!target) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    const { fullName, email, role, password, isActive } = await req.json();
+    const { fullName, email, role, password, isActive, position } = await req.json();
 
     // Admin cannot edit an Owner, nor promote anyone to Owner.
     if (actor.role === Role.ADMIN) {
@@ -40,6 +40,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const data: any = {};
 
     if (fullName !== undefined && fullName.trim()) data.fullName = fullName.trim();
+    if (position !== undefined) data.position = position ? String(position).trim() : null;
 
     if (email !== undefined && email.trim()) {
       const normalized = email.toLowerCase().trim();
@@ -85,7 +86,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const updated = await prisma.user.update({
       where: { id },
       data,
-      select: { id: true, username: true, fullName: true, email: true, role: true, isActive: true, createdAt: true },
+      select: { id: true, username: true, fullName: true, email: true, role: true, isActive: true, position: true, createdAt: true },
     });
 
     await prisma.auditLog.create({
