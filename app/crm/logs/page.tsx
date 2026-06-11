@@ -30,6 +30,11 @@ function actionMeta(action: string, lang: "en" | "ru") {
     UPDATE_USER: { label: en ? "Employee edited" : "Сотрудник изменён", tone: "gold" },
     DELETE_USER: { label: en ? "Employee deleted" : "Сотрудник удалён", tone: "red" },
     CREATE_PROPERTY: { label: en ? "Property added" : "Объект добавлен", tone: "green" },
+    UPDATE_PROPERTY: { label: en ? "Property edited" : "Объект изменён", tone: "gold" },
+    DELETE_PROPERTY: { label: en ? "Property deleted" : "Объект удалён", tone: "red" },
+    UPDATE_TASK: { label: en ? "Task edited" : "Задача изменена", tone: "gold" },
+    DELETE_TASK: { label: en ? "Task deleted" : "Задача удалена", tone: "red" },
+    ARCHIVE_LEAD: { label: en ? "Lead archived" : "Лид в архив", tone: "gold" },
     CREATE_REMINDER: { label: en ? "Reminder set" : "Напоминание", tone: "gold" },
   };
   return map[action] || { label: action.replace(/_/g, " ").toLowerCase(), tone: "gold" as const };
@@ -47,27 +52,74 @@ export default function LogsPage() {
   const router = useRouter();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [filterAction, setFilterAction] = useState("");
+  const [search, setSearch] = useState("");
   const [selectedDetails, setSelectedDetails] = useState<string | null>(null);
   const t = crmTranslations[lang];
   const en = lang === "en";
+  const PAGE = 50;
 
   const fieldLabel = (f: string) => (t.leads.fields as Record<string, string>)[f] || f;
+
+  const ACTION_OPTIONS = [
+    "LOGIN", "CREATE_LEAD", "WEBSITE_LEAD", "UPDATE_LEAD", "DELETE_LEAD", "ARCHIVE_LEAD",
+    "CREATE_TASK", "UPDATE_TASK", "UPDATE_TASK_STATUS", "DELETE_TASK",
+    "CREATE_USER", "UPDATE_USER", "DELETE_USER", "CREATE_PROPERTY", "UPDATE_PROPERTY", "DELETE_PROPERTY", "CREATE_REMINDER",
+  ];
 
   useEffect(() => {
     if (!user) return;
     if (user.role !== "OWNER") { router.replace("/crm/dashboard"); return; }
     fetchLogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, router]);
+
+  // Re-query when filters change (debounced for the search box).
+  useEffect(() => {
+    if (!user || user.role !== "OWNER") return;
+    const id = setTimeout(fetchLogs, 300);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterAction, search]);
+
+  const buildUrl = (skip: number) => {
+    const p = new URLSearchParams({ take: String(PAGE), skip: String(skip) });
+    if (filterAction) p.set("action", filterAction);
+    if (search.trim()) p.set("q", search.trim());
+    return `/api/crm/logs?${p.toString()}`;
+  };
 
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/crm/logs");
-      if (res.ok) setLogs((await res.json()).logs);
+      const res = await fetch(buildUrl(0));
+      if (res.ok) {
+        const data = await res.json();
+        setLogs(data.logs);
+        setHasMore(!!data.hasMore);
+      }
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadMore = async () => {
+    setLoadingMore(true);
+    try {
+      const res = await fetch(buildUrl(logs.length));
+      if (res.ok) {
+        const data = await res.json();
+        setLogs((prev) => [...prev, ...data.logs]);
+        setHasMore(!!data.hasMore);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -92,6 +144,16 @@ export default function LogsPage() {
       }
       case "DELETE_LEAD":
         return en ? `Deleted lead “${d.name}” (${phone})` : `Удалён лид «${d.name}» (${phone})`;
+      case "ARCHIVE_LEAD":
+        return en ? `Archived lead “${d.name}” (${phone})` : `Лид в архив «${d.name}» (${phone})`;
+      case "UPDATE_PROPERTY":
+        return en ? `Edited property “${d.title}”` : `Изменён объект «${d.title}»`;
+      case "DELETE_PROPERTY":
+        return en ? `Deleted property “${d.title}”` : `Удалён объект «${d.title}»`;
+      case "UPDATE_TASK":
+        return (en ? "Edited task" : "Задача изменена") + (Array.isArray(d.changed) && d.changed.length ? ` (${d.changed.join(", ")})` : "");
+      case "DELETE_TASK":
+        return en ? `Deleted task “${d.title}”` : `Удалена задача «${d.title}»`;
       case "CREATE_TASK":
         return en
           ? `Assigned task “${d.title}”${d.assignee ? ` to ${d.assignee}` : ""}`
@@ -124,15 +186,22 @@ export default function LogsPage() {
     try { return JSON.stringify(JSON.parse(raw), null, 2); } catch { return raw; }
   };
 
-  if (loading) {
-    return <div className="h-[60vh] flex items-center justify-center"><Loader2 className="w-8 h-8 crm-gold animate-spin" /></div>;
-  }
-
   return (
     <div className="space-y-7">
       <div>
         <h2 className="text-3xl font-bold tracking-tight crm-text">{t.logs.title}</h2>
         <p className="text-sm crm-muted mt-1">{t.logs.subtitle}</p>
+      </div>
+
+      {/* Filters */}
+      <div className="crm-panel p-3 flex flex-col md:flex-row items-stretch md:items-center gap-3">
+        <div className="relative flex-1 md:max-w-sm">
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={en ? "Search details…" : "Поиск по деталям…"} className="crm-input" />
+        </div>
+        <select value={filterAction} onChange={(e) => setFilterAction(e.target.value)} className="crm-input crm-select w-auto">
+          <option value="">{en ? "All actions" : "Все действия"}</option>
+          {ACTION_OPTIONS.map((a) => <option key={a} value={a}>{actionMeta(a, lang).label}</option>)}
+        </select>
       </div>
 
       <div className="crm-panel overflow-hidden">
@@ -180,10 +249,18 @@ export default function LogsPage() {
                   </tr>
                 );
               })}
-              {logs.length === 0 && <tr><td colSpan={4} className="p-10 text-center crm-muted">{t.logs.noLogs}</td></tr>}
+              {loading && <tr><td colSpan={4} className="p-10 text-center crm-muted"><Loader2 className="w-6 h-6 crm-gold animate-spin inline" /></td></tr>}
+              {!loading && logs.length === 0 && <tr><td colSpan={4} className="p-10 text-center crm-muted">{t.logs.noLogs}</td></tr>}
             </tbody>
           </table>
         </div>
+        {hasMore && !loading && (
+          <div className="p-4 border-t crm-bd text-center">
+            <button onClick={loadMore} disabled={loadingMore} className="crm-btn-ghost">
+              {loadingMore ? <Loader2 className="w-4 h-4 animate-spin" /> : (en ? "Load more" : "Показать ещё")}
+            </button>
+          </div>
+        )}
       </div>
 
       {selectedDetails && (

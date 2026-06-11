@@ -71,7 +71,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { title, description, type, deadline, assignedToId } = await req.json();
+    const { title, description, type, deadline, assignedToId, recurring } = await req.json();
 
     if (!title || !assignedToId) {
       return NextResponse.json({ error: "Title and Assignee are required" }, { status: 400 });
@@ -93,6 +93,7 @@ export async function POST(req: Request) {
         title: title.trim(),
         description: description ? description.trim() : null,
         type: type || TaskType.DAILY,
+        recurring: !!recurring,
         deadline: deadline ? new Date(deadline) : null,
         assignedToId,
         creatorId: user.id,

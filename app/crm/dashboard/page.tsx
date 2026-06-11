@@ -61,10 +61,15 @@ export default function DashboardPage() {
   const conversionRate = totalLeads > 0 ? Math.round((wonLeads / totalLeads) * 100) : 0;
   const GOLD_COLORS = ["#c8a15a", "#a47e3b", "#e6c280", "#876222", "#f7dcab", "#523c13"];
 
+  // Marketing Director does not see financial figures (portfolio value, broker $).
+  const isMarketing = user?.role === "MARKETING_DIRECTOR";
+
   const kpis = [
     { label: t.dashboard.totalLeads, value: totalLeads, sub: t.dashboard.activeLeadsSub, icon: Users },
     { label: t.dashboard.propertiesCount, value: data.propertyCount, sub: t.dashboard.propertiesSub, icon: Building },
-    { label: t.dashboard.portfolioValue, value: formatCurrency(data.propertyTotalValue), sub: t.dashboard.portfolioSub, icon: DollarSign, small: true },
+    ...(!isMarketing && data.propertyTotalValue != null
+      ? [{ label: t.dashboard.portfolioValue, value: formatCurrency(data.propertyTotalValue), sub: t.dashboard.portfolioSub, icon: DollarSign, small: true }]
+      : []),
     { label: t.dashboard.conversionRate, value: `${conversionRate}%`, sub: t.dashboard.conversionSub, icon: TrendingUp },
   ];
 
@@ -127,7 +132,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Leaderboard */}
+      {/* Leaderboard — hidden from Marketing (financial/broker performance) */}
+      {!isMarketing && (
       <div className="crm-card p-6">
         <h4 className="text-base font-semibold mb-6 crm-text">{t.dashboard.leaderboardTitle}</h4>
         <div className="overflow-x-auto crm-scroll">
@@ -156,6 +162,7 @@ export default function DashboardPage() {
           </table>
         </div>
       </div>
+      )}
     </div>
   );
 }

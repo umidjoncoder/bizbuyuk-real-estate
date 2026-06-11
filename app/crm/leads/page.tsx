@@ -56,6 +56,8 @@ type LeadHistory = {
   createdAt: string;
 };
 
+type Reminder = { id: string; message: string; remindAt: string; commentId: string | null; done: boolean };
+
 type Lead = {
   id: string;
   name: string;
@@ -72,9 +74,10 @@ type Lead = {
   comments: Comment[];
   properties: { property: Property }[];
   history: LeadHistory[];
+  reminders?: Reminder[];
 };
 
-type UserType = { id: string; fullName: string; role: string };
+type UserType = { id: string; fullName: string; role: string; isActive?: boolean };
 
 const STATUS_META: Record<string, { dot: string; chip: string; bar: string }> = {
   NEW: { dot: "bg-sky-500", chip: "bg-sky-500/12 text-sky-500", bar: "bg-sky-500" },
@@ -97,6 +100,7 @@ export default function LeadsPage() {
   const [loading, setLoading] = useState(true);
 
   const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban");
+  const [archiveView, setArchiveView] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState("ALL");
   const [dragOverCol, setDragOverCol] = useState<string | null>(null);
@@ -155,11 +159,13 @@ export default function LeadsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [leads]);
 
+  const leadsUrl = () => `/api/crm/leads${archiveView ? "?archived=1" : ""}`;
+
   const fetchData = async (showLoading = false) => {
     if (showLoading) setLoading(true);
     try {
       const [leadsRes, propsRes, usersRes] = await Promise.all([
-        fetch("/api/crm/leads"),
+        fetch(leadsUrl()),
         fetch("/api/crm/properties"),
         fetch("/api/crm/users"),
       ]);
@@ -177,12 +183,18 @@ export default function LeadsPage() {
   // properties + users every time (that triple-fetch made drag/drop feel janky).
   const fetchLeads = async () => {
     try {
-      const res = await fetch("/api/crm/leads");
+      const res = await fetch(leadsUrl());
       if (res.ok) setLeads((await res.json()).leads);
     } catch (err) {
       console.error("Error refreshing leads:", err);
     }
   };
+
+  // Re-load when switching between active and archive views.
+  useEffect(() => {
+    if (user && user.role !== "DRIVER") fetchLeads();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [archiveView]);
 
   const canEditLead = (lead: Lead) => {
     if (!user) return false;
@@ -382,21 +394,34 @@ export default function LeadsPage() {
     }
   };
 
-  // ---------- Delete ----------
+  // ---------- Archive / Restore / Hard-delete ----------
   const handleDeleteLead = async (leadId: string) => {
-    if (!confirm(lang === "en" ? "Delete this lead permanently?" : "Удалить этого лида навсегда?")) return;
+    // Soft-delete: moves to Archive (reversible), per the no-accidental-loss policy.
+    if (!confirm(lang === "en" ? "Move this lead to Archive?" : "Переместить лида в архив?")) return;
     try {
       const res = await fetch(`/api/crm/leads/${leadId}`, { method: "DELETE" });
-      if (res.ok) {
-        setSelectedLead(null);
-        fetchLeads();
-      } else {
-        const err = await res.json();
-        alert(err.error || "Error deleting lead");
-      }
-    } catch (err) {
-      console.error(err);
-    }
+      if (res.ok) { setSelectedLead(null); fetchLeads(); }
+      else alert((await res.json()).error || "Error");
+    } catch (err) { console.error(err); }
+  };
+
+  const handleRestoreLead = async (leadId: string) => {
+    try {
+      const res = await fetch(`/api/crm/leads/${leadId}`, {
+        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ archived: false }),
+      });
+      if (res.ok) { setSelectedLead(null); fetchLeads(); }
+      else alert((await res.json()).error || "Error");
+    } catch (err) { console.error(err); }
+  };
+
+  const handleHardDelete = async (leadId: string) => {
+    if (!confirm(lang === "en" ? "Permanently delete? This cannot be undone." : "Удалить навсегда? Это необратимо.")) return;
+    try {
+      const res = await fetch(`/api/crm/leads/${leadId}?hard=1`, { method: "DELETE" });
+      if (res.ok) { setSelectedLead(null); fetchLeads(); }
+      else alert((await res.json()).error || "Error");
+    } catch (err) { console.error(err); }
   };
 
   // ---------- Drag & drop ----------
@@ -443,11 +468,16 @@ export default function LeadsPage() {
         </div>
         <div className="flex items-center gap-3">
           {user?.role === "OWNER" && (
+            <button onClick={() => { setSelectedLead(null); setArchiveView((v) => !v); }} className={`crm-btn-ghost ${archiveView ? "crm-gold" : ""}`}>
+              <History className="w-4 h-4" /> {archiveView ? (lang === "en" ? "Active" : "Активные") : (lang === "en" ? "Archive" : "Архив")}
+            </button>
+          )}
+          {user?.role === "OWNER" && !archiveView && (
             <button onClick={handleExport} className="crm-btn-ghost">
               <Download className="w-4 h-4" /> {t.leads.btnExport}
             </button>
           )}
-          {user?.role !== "MARKETING_DIRECTOR" && (
+          {user?.role !== "MARKETING_DIRECTOR" && !archiveView && (
             <button onClick={() => setIsNewLeadOpen(true)} className="crm-btn-primary">
               <Plus className="w-4 h-4" /> {t.leads.btnAddLead}
             </button>
@@ -693,8 +723,17 @@ export default function LeadsPage() {
                 {canEditLead(selectedLead) && !editMode && (
                   <button onClick={() => openEdit(selectedLead)} className="crm-btn-ghost py-2 px-3" title={t.leads.btnEdit}><Pencil className="w-4 h-4" /></button>
                 )}
-                {(user?.role === "OWNER" || user?.role === "ADMIN") && (
-                  <button onClick={() => handleDeleteLead(selectedLead.id)} className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 rounded-xl transition-all" title="Delete"><Trash2 className="w-4 h-4" /></button>
+                {archiveView ? (
+                  <>
+                    <button onClick={() => handleRestoreLead(selectedLead.id)} className="crm-btn-ghost py-2 px-3 text-emerald-500" title={lang === "en" ? "Restore" : "Восстановить"}><History className="w-4 h-4" /></button>
+                    {user?.role === "OWNER" && (
+                      <button onClick={() => handleHardDelete(selectedLead.id)} className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 rounded-xl transition-all" title={lang === "en" ? "Delete permanently" : "Удалить навсегда"}><Trash2 className="w-4 h-4" /></button>
+                    )}
+                  </>
+                ) : (
+                  (user?.role === "OWNER" || user?.role === "ADMIN") && (
+                    <button onClick={() => handleDeleteLead(selectedLead.id)} className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 rounded-xl transition-all" title={lang === "en" ? "Archive" : "В архив"}><Trash2 className="w-4 h-4" /></button>
+                  )
                 )}
               </div>
             </div>
@@ -759,7 +798,7 @@ export default function LeadsPage() {
                   <span className="text-[10px] uppercase font-bold crm-muted block">{t.leads.assignedBroker}</span>
                   <select value={selectedLead.brokerId || ""} onChange={(e) => handleAssignBroker(selectedLead.id, e.target.value)} className="crm-input crm-select">
                     <option value="">{t.leads.unassigned}</option>
-                    {users.filter((u) => u.role === "BROKER").map((u) => <option key={u.id} value={u.id}>{u.fullName}</option>)}
+                    {users.filter((u) => u.role === "BROKER" && u.isActive !== false).map((u) => <option key={u.id} value={u.id}>{u.fullName}</option>)}
                   </select>
                 </div>
               )}
@@ -849,15 +888,23 @@ export default function LeadsPage() {
                   </form>
 
                   <div className="space-y-2 max-h-72 overflow-y-auto crm-scroll pr-1">
-                    {selectedLead.comments.map((c) => (
-                      <div key={c.id} className="rounded-xl p-3 border crm-bd" style={{ background: "var(--crm-surface-2)" }}>
-                        <div className="flex justify-between text-[10px]">
-                          <span className="font-bold crm-gold">{c.author}</span>
-                          <span className="crm-faint">{new Date(c.createdAt).toLocaleString()}</span>
+                    {selectedLead.comments.map((c) => {
+                      const rem = (selectedLead.reminders || []).find((r) => r.commentId === c.id && !r.done);
+                      return (
+                        <div key={c.id} className="rounded-xl p-3 border crm-bd" style={{ background: "var(--crm-surface-2)" }}>
+                          <div className="flex justify-between text-[10px]">
+                            <span className="font-bold crm-gold">{c.author}</span>
+                            <span className="crm-faint">{new Date(c.createdAt).toLocaleString()}</span>
+                          </div>
+                          <p className="text-xs crm-text mt-1">{c.text}</p>
+                          {rem && (
+                            <div className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold crm-gold bg-[#c8a15a]/10 border crm-bd px-2 py-0.5 rounded-full">
+                              <BellPlus className="w-3 h-3" /> {new Date(rem.remindAt).toLocaleDateString()}
+                            </div>
+                          )}
                         </div>
-                        <p className="text-xs crm-text mt-1">{c.text}</p>
-                      </div>
-                    ))}
+                      );
+                    })}
                     {selectedLead.comments.length === 0 && <p className="text-xs crm-faint italic">{t.leads.noComments}</p>}
                   </div>
                 </div>

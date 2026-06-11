@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
+import { phoneKey } from "@/lib/format";
 import { Role } from "@prisma/client";
 
 // Get current session helper
@@ -22,16 +23,25 @@ export async function GET(req: Request) {
       return NextResponse.json({ leads: [] });
     }
 
+    // ?archived=1 shows the archive (Owner only); default shows active leads.
+    const wantArchived = new URL(req.url).searchParams.get("archived") === "1";
+    const archived = wantArchived && user.role === Role.OWNER;
+
+    // Reminders are personal — include only the current user's pending ones so
+    // each comment can show its own ⏰ badge.
+    const myReminders = { where: { userId: user.id, done: false } } as const;
+
     let leads;
     if (user.role === Role.BROKER) {
-      // Brokers only see their own assigned leads
+      // Brokers only see their own assigned, non-archived leads
       leads = await prisma.lead.findMany({
-        where: { brokerId: user.id },
+        where: { brokerId: user.id, archived: false },
         include: {
           broker: { select: { fullName: true, id: true } },
           comments: { orderBy: { createdAt: "desc" } },
           properties: { include: { property: true } },
           history: { orderBy: { createdAt: "desc" } },
+          reminders: myReminders,
         },
         orderBy: { updatedAt: "desc" },
       });
@@ -41,9 +51,11 @@ export async function GET(req: Request) {
       // private client comments or the edit history, so we omit those relations.
       const includePrivate = user.role !== Role.MARKETING_DIRECTOR;
       leads = await prisma.lead.findMany({
+        where: { archived },
         include: {
           broker: { select: { fullName: true, id: true } },
           properties: { include: { property: true } },
+          reminders: myReminders,
           ...(includePrivate
             ? {
                 comments: { orderBy: { createdAt: "desc" } },
@@ -83,14 +95,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Name and phone are required" }, { status: 400 });
     }
 
-    // Clean phone number format for check (digits only or direct string check)
     const cleanPhone = phone.trim();
 
-    // Duplicate Check
-    const existing = await prisma.lead.findFirst({
-      where: { phone: cleanPhone },
-      include: { broker: { select: { fullName: true } } },
-    });
+    // Duplicate check by normalised phone (last 9 digits) so "+998 90 123 45 67",
+    // "998901234567" and "0901234567" all collide.
+    const key = phoneKey(cleanPhone);
+    let existing = null as any;
+    if (key.length >= 7) {
+      const candidates = await prisma.lead.findMany({
+        where: { phone: { contains: key }, archived: false },
+        include: { broker: { select: { fullName: true } } },
+      });
+      existing = candidates.find((c) => phoneKey(c.phone) === key) || null;
+    }
 
     if (existing && !force) {
       const timeDiff = Math.abs(Date.now() - existing.createdAt.getTime());

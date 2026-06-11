@@ -11,6 +11,13 @@ export function formatMoney(value: number | string | null | undefined, currency 
   }).format(n);
 }
 
+// Normalised key for duplicate matching — last 9 digits, so "+998 90 123 45 67",
+// "998901234567" and "0901234567" all collapse to the same key.
+export function phoneKey(phone: string | null | undefined): string {
+  const digits = String(phone || "").replace(/\D/g, "");
+  return digits.slice(-9);
+}
+
 // Groups a phone number into readable chunks, e.g.
 //   "+998901234567" -> "+998 901 234 567"
 //   "93938991"      -> "93 938 991"

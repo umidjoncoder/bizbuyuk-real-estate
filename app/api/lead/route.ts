@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { phoneKey } from "@/lib/format";
 
 export const runtime = "nodejs";
 
@@ -72,34 +73,34 @@ export async function POST(req: Request) {
 
   const source = deriveSource(body.utm, body.referrer);
 
-  // Save to CRM database
+  // Save to CRM database — but don't create duplicates. A repeat inquiry from the
+  // same phone is logged as a comment on the existing lead instead.
   try {
-    await prisma.lead.create({
-      data: {
-        name,
-        phone,
-        email: email || null,
-        source,
-        status: "NEW",
-      },
-    });
+    const key = phoneKey(phone);
+    let dup = null as any;
+    if (key.length >= 7) {
+      const candidates = await prisma.lead.findMany({ where: { phone: { contains: key }, archived: false } });
+      dup = candidates.find((c) => phoneKey(c.phone) === key) || null;
+    }
 
-    // Log audit log for incoming lead (keep the raw attribution for analytics)
-    await prisma.auditLog.create({
-      data: {
-        action: "WEBSITE_LEAD",
-        details: JSON.stringify({
-          name,
-          phone,
-          email,
-          locale,
-          source,
-          utm: body.utm || null,
-          referrer: body.referrer || null,
-          page: body.page || null,
-        }),
-      },
-    });
+    if (dup) {
+      await prisma.comment.create({
+        data: { leadId: dup.id, author: "Website", text: `Repeat website inquiry (${source})${email ? ` · ${email}` : ""}` },
+      });
+      await prisma.auditLog.create({
+        data: { action: "WEBSITE_LEAD", details: JSON.stringify({ name, phone, source, duplicate: true, mergedInto: dup.id }) },
+      });
+    } else {
+      await prisma.lead.create({
+        data: { name, phone, email: email || null, source, status: "NEW" },
+      });
+      await prisma.auditLog.create({
+        data: {
+          action: "WEBSITE_LEAD",
+          details: JSON.stringify({ name, phone, email, locale, source, utm: body.utm || null, referrer: body.referrer || null, page: body.page || null }),
+        },
+      });
+    }
   } catch (dbErr) {
     console.error("[lead] Database insertion failed:", dbErr);
   }

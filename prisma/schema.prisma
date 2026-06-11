@@ -80,6 +80,7 @@ model Lead {
   budget     Float?
   status     LeadStatus @default(NEW)
   lostReason String? // Required if status is LOST
+  archived   Boolean    @default(false) // soft-delete: hidden from lists, restorable by Owner
   source     String // e.g. "Facebook", "Instagram", "Google", "Website"
   brokerId   String? // Assigned broker
   broker     User?      @relation("AssignedBroker", fields: [brokerId], references: [id], onDelete: SetNull)
@@ -122,6 +123,7 @@ model Task {
   description  String?
   type         TaskType   @default(DAILY)
   status       TaskStatus @default(TODO)
+  recurring    Boolean    @default(false) // weekly/monthly: regenerate next occurrence when done
   deadline     DateTime?
   assignedToId String
   assignedTo   User       @relation("AssignedUser", fields: [assignedToId], references: [id], onDelete: Cascade)

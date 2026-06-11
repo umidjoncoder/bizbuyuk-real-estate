@@ -19,7 +19,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id } = await params;
-    const { status, lostReason, brokerId, name, phone, email, budget, source, propertyIds } = await req.json();
+    const { status, lostReason, brokerId, name, phone, email, budget, source, propertyIds, archived } = await req.json();
 
     const existingLead = await prisma.lead.findUnique({
       where: { id },
@@ -91,6 +91,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     }
 
     // Broker assignment: Broker and Marketing Director cannot reassign brokers
+    let notifyBrokerId: string | null = null;
     if (brokerId !== undefined && user.role !== Role.BROKER && user.role !== Role.MARKETING_DIRECTOR) {
       const newBrokerId = brokerId || null;
       if (newBrokerId !== existingLead.brokerId) {
@@ -99,7 +100,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
           ? await prisma.user.findUnique({ where: { id: newBrokerId }, select: { fullName: true } })
           : null;
         track("broker", existingLead.broker?.fullName, newBroker?.fullName);
+        if (newBrokerId && newBrokerId !== user.id) notifyBrokerId = newBrokerId; // notify the assignee
       }
+    }
+
+    // Archive / restore (soft-delete) — Owner only.
+    if (archived !== undefined && user.role === Role.OWNER) {
+      updateData.archived = !!archived;
     }
 
     // Perform update only if something actually changed
@@ -120,6 +127,18 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
           data: propertyIds.map((pid: string) => ({ leadId: id, propertyId: pid })),
         });
       }
+    }
+
+    // Notify the broker a lead was assigned to them (shows in their bell instantly).
+    if (notifyBrokerId) {
+      await prisma.reminder.create({
+        data: {
+          userId: notifyBrokerId,
+          message: `New lead assigned to you: ${updatedLead.name} (${updatedLead.phone})`,
+          remindAt: new Date(),
+          leadId: id,
+        },
+      });
     }
 
     // Record field-level edit history. Owner/Admin edits are pre-acknowledged
@@ -170,12 +189,20 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const lead = await prisma.lead.findUnique({ where: { id } });
     if (!lead) return NextResponse.json({ error: "Lead not found" }, { status: 404 });
 
-    await prisma.lead.delete({ where: { id } });
+    // ?hard=1 (Owner only) permanently removes; otherwise soft-delete (archive),
+    // which is reversible — protects against accidental data loss.
+    const hard = new URL(req.url).searchParams.get("hard") === "1" && user.role === Role.OWNER;
+
+    if (hard) {
+      await prisma.lead.delete({ where: { id } });
+    } else {
+      await prisma.lead.update({ where: { id }, data: { archived: true } });
+    }
 
     await prisma.auditLog.create({
       data: {
         userId: user.id,
-        action: "DELETE_LEAD",
+        action: hard ? "DELETE_LEAD" : "ARCHIVE_LEAD",
         details: JSON.stringify({ leadId: id, name: lead.name, phone: lead.phone }),
       },
     });

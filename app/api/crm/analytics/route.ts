@@ -72,12 +72,16 @@ export async function GET() {
       },
     });
 
+    // Marketing Director sees lead sources/funnel only — NOT broker financials
+    // or portfolio value (those are sales/owner figures).
+    const isMarketing = user.role === Role.MARKETING_DIRECTOR;
+
     return NextResponse.json({
       statusCounts: statusCounts.map((s) => ({ status: s.status, count: s._count })),
       sourceCounts: sourceCounts.map((s) => ({ source: s.source, count: s._count })),
-      brokerPerformance,
+      brokerPerformance: isMarketing ? [] : brokerPerformance,
       propertyCount,
-      propertyTotalValue: propertySum._sum.price || 0,
+      propertyTotalValue: isMarketing ? null : (propertySum._sum.price || 0),
     });
   } catch (err: any) {
     console.error("GET Analytics Error:", err);

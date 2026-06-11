@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useCrm } from "@/components/CrmSecurityWrapper";
 import { crmTranslations } from "@/lib/crmTranslations";
-import { Plus, Search, Building2, MapPin, ListFilter, X, Loader2 } from "lucide-react";
+import { Plus, Search, Building2, MapPin, ListFilter, X, Loader2, Pencil, Trash2 } from "lucide-react";
 
 type Property = {
   id: string;
@@ -24,6 +24,7 @@ export default function InventoryPage() {
   const t = crmTranslations[lang];
 
   const [isOpen, setIsOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [price, setPrice] = useState("");
@@ -46,20 +47,30 @@ export default function InventoryPage() {
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const resetForm = () => {
+    setEditId(null); setTitle(""); setLocation(""); setPrice(""); setType("Off-plan"); setDescription(""); setErrorMsg("");
+  };
+
+  const openCreate = () => { resetForm(); setIsOpen(true); };
+  const openEdit = (p: Property) => {
+    setEditId(p.id); setTitle(p.title); setLocation(p.location); setPrice(String(p.price));
+    setType(p.type); setDescription(p.description || ""); setErrorMsg(""); setIsOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
     setSubmitting(true);
     try {
-      const res = await fetch("/api/crm/properties", {
-        method: "POST",
+      const res = await fetch(editId ? `/api/crm/properties/${editId}` : "/api/crm/properties", {
+        method: editId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, location, price: parseFloat(price), type, description }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error saving property");
       setIsOpen(false);
-      setTitle(""); setLocation(""); setPrice(""); setType("Off-plan"); setDescription("");
+      resetForm();
       fetchProperties(false);
     } catch (err: any) {
       setErrorMsg(err.message || "An error occurred");
@@ -67,6 +78,18 @@ export default function InventoryPage() {
       setSubmitting(false);
     }
   };
+
+  const handleDelete = async (p: Property) => {
+    if (!confirm(lang === "en" ? `Delete property "${p.title}"?` : `Удалить объект «${p.title}»?`)) return;
+    try {
+      const res = await fetch(`/api/crm/properties/${p.id}`, { method: "DELETE" });
+      if (res.ok) fetchProperties(false);
+      else alert((await res.json()).error || "Error");
+    } catch (err) { console.error(err); }
+  };
+
+  const canManage = user && user.role !== "BROKER" && user.role !== "DRIVER";
+  const canDelete = user && (user.role === "OWNER" || user.role === "ADMIN");
 
   const filtered = properties.filter((p) => {
     const q = search.toLowerCase();
@@ -89,7 +112,7 @@ export default function InventoryPage() {
           <p className="text-sm crm-muted mt-1">{t.inventory.subtitle}</p>
         </div>
         {canAdd && (
-          <button onClick={() => setIsOpen(true)} className="crm-btn-primary">
+          <button onClick={openCreate} className="crm-btn-primary">
             <Plus className="w-4 h-4" /> {t.inventory.btnAddProp}
           </button>
         )}
@@ -120,6 +143,14 @@ export default function InventoryPage() {
             <div key={p.id} className="crm-card crm-lift p-6 flex flex-col gap-4">
               <div className="flex justify-between items-start">
                 <span className="crm-chip">{p.type === "Off-plan" ? t.inventory.offPlan : t.inventory.secondary}</span>
+                {canManage && (
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => openEdit(p)} className="p-1.5 rounded-lg border crm-bd crm-muted hover:crm-gold transition-colors" title={t.leads.btnEdit}><Pencil className="w-3.5 h-3.5" /></button>
+                    {canDelete && (
+                      <button onClick={() => handleDelete(p)} className="p-1.5 rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 transition-colors" title={t.users.btnDelete}><Trash2 className="w-3.5 h-3.5" /></button>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="space-y-1">
                 <h3 className="text-lg font-bold flex items-center gap-2 crm-text"><Building2 className="w-5 h-5 crm-gold flex-shrink-0" />{p.title}</h3>
@@ -142,10 +173,10 @@ export default function InventoryPage() {
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-backdrop">
           <div className="crm-card w-full max-w-lg p-6 relative animate-modal">
-            <button onClick={() => { setIsOpen(false); setErrorMsg(""); }} className="absolute top-4 right-4 crm-muted hover:crm-text"><X className="w-5 h-5" /></button>
-            <h3 className="text-xl font-bold border-b crm-bd pb-4 mb-4 crm-text">{t.inventory.modalTitle}</h3>
+            <button onClick={() => { setIsOpen(false); resetForm(); }} className="absolute top-4 right-4 crm-muted hover:crm-text"><X className="w-5 h-5" /></button>
+            <h3 className="text-xl font-bold border-b crm-bd pb-4 mb-4 crm-text">{editId ? (lang === "en" ? "Edit Property" : "Изменить объект") : t.inventory.modalTitle}</h3>
             {errorMsg && <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-500 text-xs flex items-center gap-2"><X className="w-4 h-4" />{errorMsg}</div>}
-            <form onSubmit={handleCreate} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <FieldI label={t.inventory.propTitle}><input required value={title} onChange={(e) => setTitle(e.target.value)} placeholder={lang === "en" ? "Project name..." : "Название проекта..."} className="crm-input" /></FieldI>
               <FieldI label={t.inventory.propLocation}><input required value={location} onChange={(e) => setLocation(e.target.value)} placeholder={lang === "en" ? "Location..." : "Локация..."} className="crm-input" /></FieldI>
               <div className="grid grid-cols-2 gap-4">

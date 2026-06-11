@@ -17,6 +17,9 @@ import {
   ClipboardList,
   MailWarning,
   BellPlus,
+  Pencil,
+  Trash2,
+  Repeat,
 } from "lucide-react";
 
 type Task = {
@@ -25,6 +28,7 @@ type Task = {
   description: string | null;
   type: "DAILY" | "WEEKLY" | "MONTHLY" | "LOGISTICS";
   status: "TODO" | "IN_PROGRESS" | "DONE";
+  recurring?: boolean;
   deadline: string | null;
   assignedToId: string;
   assignedTo: { fullName: string; role: string };
@@ -42,13 +46,17 @@ export default function TasksPage() {
   const t = crmTranslations[lang];
 
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState<string>("DAILY");
   const [deadline, setDeadline] = useState("");
   const [assignedToId, setAssignedToId] = useState("");
+  const [recurring, setRecurring] = useState(false);
   const [savingTask, setSavingTask] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  const isManager = user && user.role !== "BROKER" && user.role !== "DRIVER";
 
   // per-task reminder
   const [remindTask, setRemindTask] = useState<Task | null>(null);
@@ -98,26 +106,45 @@ export default function TasksPage() {
     }
   };
 
-  const handleCreateTask = async (e: React.FormEvent) => {
+  const resetTaskForm = () => {
+    setEditId(null); setTitle(""); setDescription(""); setType("DAILY"); setDeadline(""); setAssignedToId(""); setRecurring(false); setErrorMsg("");
+  };
+  const openCreate = () => { resetTaskForm(); setIsNewTaskOpen(true); };
+  const openEdit = (task: Task) => {
+    setEditId(task.id); setTitle(task.title); setDescription(task.description || ""); setType(task.type);
+    setDeadline(task.deadline ? new Date(task.deadline).toISOString().slice(0, 10) : "");
+    setAssignedToId(task.assignedToId); setRecurring(!!task.recurring); setErrorMsg(""); setIsNewTaskOpen(true);
+  };
+
+  const handleSaveTask = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
     setSavingTask(true);
     try {
-      const res = await fetch("/api/crm/tasks", {
-        method: "POST",
+      const res = await fetch(editId ? `/api/crm/tasks/${editId}` : "/api/crm/tasks", {
+        method: editId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, type, deadline: deadline || undefined, assignedToId }),
+        body: JSON.stringify({ title, description, type, deadline: deadline || null, assignedToId, recurring }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Error creating task");
+      if (!res.ok) throw new Error(data.error || "Error saving task");
       setIsNewTaskOpen(false);
-      setTitle(""); setDescription(""); setType("DAILY"); setDeadline(""); setAssignedToId("");
+      resetTaskForm();
       fetchData(false);
     } catch (err: any) {
       setErrorMsg(err.message || "Error");
     } finally {
       setSavingTask(false);
     }
+  };
+
+  const handleDeleteTask = async (task: Task) => {
+    if (!confirm(lang === "en" ? `Delete task "${task.title}"?` : `Удалить задачу «${task.title}»?`)) return;
+    try {
+      const res = await fetch(`/api/crm/tasks/${task.id}`, { method: "DELETE" });
+      if (res.ok) fetchTasks();
+      else alert((await res.json()).error || "Error");
+    } catch (err) { console.error(err); }
   };
 
   const saveReminder = async () => {
@@ -167,7 +194,7 @@ export default function TasksPage() {
           <p className="text-sm crm-muted mt-1">{t.tasks.subtitle}</p>
         </div>
         {canCreate && (
-          <button onClick={() => setIsNewTaskOpen(true)} className="crm-btn-primary">
+          <button onClick={openCreate} className="crm-btn-primary">
             <Plus className="w-4 h-4" /> {t.tasks.btnCreateTask}
           </button>
         )}
@@ -195,6 +222,9 @@ export default function TasksPage() {
                       {task.description && <p className="text-xs crm-muted">{task.description}</p>}
                       <div className="flex flex-wrap items-center gap-2 pt-2 text-[10px]">
                         <span className="crm-chip">{typeLabel(task.type)}</span>
+                        {task.recurring && (
+                          <span className="crm-chip flex items-center gap-1"><Repeat className="w-3 h-3" />{lang === "en" ? "Recurring" : "Повтор"}</span>
+                        )}
                         {task.deadline && (
                           <span className={`flex items-center gap-1 font-semibold ${overdue ? "text-red-500" : "crm-gold"}`}>
                             <Calendar className="w-3 h-3" />
@@ -205,7 +235,7 @@ export default function TasksPage() {
                           <span className="flex items-center gap-1 crm-muted"><User className="w-3 h-3 crm-gold" />{task.assignedTo.fullName}</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 pt-2">
+                      <div className="flex flex-wrap items-center gap-2 pt-2">
                         {task.status === "TODO" && (
                           <button onClick={() => setStatus(task.id, "IN_PROGRESS")} className="text-[11px] crm-btn-ghost py-1 px-2">{t.tasks.markInProgress}</button>
                         )}
@@ -213,6 +243,12 @@ export default function TasksPage() {
                         <button onClick={() => { setRemindTask(task); setRemDays(1); setRemDate(""); setRemNote(""); }} className="text-[11px] crm-btn-ghost py-1 px-2 flex items-center gap-1">
                           <BellPlus className="w-3 h-3" /> {t.tasks.btnRemindMe}
                         </button>
+                        {isManager && (
+                          <>
+                            <button onClick={() => openEdit(task)} className="text-[11px] crm-btn-ghost py-1 px-2 flex items-center gap-1"><Pencil className="w-3 h-3" /></button>
+                            <button onClick={() => handleDeleteTask(task)} className="text-[11px] py-1 px-2 rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 flex items-center gap-1"><Trash2 className="w-3 h-3" /></button>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -257,10 +293,10 @@ export default function TasksPage() {
       {isNewTaskOpen && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-backdrop">
           <div className="crm-card w-full max-w-lg p-6 relative animate-modal">
-            <button onClick={() => { setIsNewTaskOpen(false); setErrorMsg(""); }} className="absolute top-4 right-4 crm-muted hover:crm-text"><X className="w-5 h-5" /></button>
-            <h3 className="text-xl font-bold border-b crm-bd pb-4 mb-4 crm-text">{t.tasks.modalTitle}</h3>
+            <button onClick={() => { setIsNewTaskOpen(false); resetTaskForm(); }} className="absolute top-4 right-4 crm-muted hover:crm-text"><X className="w-5 h-5" /></button>
+            <h3 className="text-xl font-bold border-b crm-bd pb-4 mb-4 crm-text">{editId ? (lang === "en" ? "Edit Task" : "Изменить задачу") : t.tasks.modalTitle}</h3>
             {errorMsg && <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-500 text-xs flex items-center gap-2"><AlertCircle className="w-4 h-4" />{errorMsg}</div>}
-            <form onSubmit={handleCreateTask} className="space-y-4">
+            <form onSubmit={handleSaveTask} className="space-y-4">
               <FieldT label={t.tasks.taskLabel}><input required value={title} onChange={(e) => setTitle(e.target.value)} placeholder={lang === "en" ? "Task title..." : "Тема задачи..."} className="crm-input" /></FieldT>
               <FieldT label={t.tasks.taskDesc}><textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} placeholder={lang === "en" ? "Details..." : "Детали..."} className="crm-input" /></FieldT>
               <div className="grid grid-cols-2 gap-4">
@@ -278,6 +314,11 @@ export default function TasksPage() {
                   {users.map((u) => <option key={u.id} value={u.id}>{u.fullName} ({u.role})</option>)}
                 </select>
               </FieldT>
+              <label className="flex items-center gap-2 text-xs crm-text cursor-pointer">
+                <input type="checkbox" checked={recurring} onChange={(e) => setRecurring(e.target.checked)} className="accent-[#c8a15a]" />
+                <Repeat className="w-3.5 h-3.5 crm-gold" />
+                {lang === "en" ? "Recurring — auto-create the next one when done" : "Повторяющаяся — создавать следующую при завершении"}
+              </label>
               <div className="p-3 border crm-bd rounded-xl text-[11px] flex items-center gap-2 crm-gold" style={{ background: "var(--crm-surface-2)" }}>
                 <MailWarning className="w-4 h-4 flex-shrink-0" /> {t.tasks.emailAlertNote}
               </div>
