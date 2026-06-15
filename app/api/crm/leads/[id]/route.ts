@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
 import { normalizePref } from "@/lib/contact";
+import { notifyUserTelegram, leadAssignedMessage } from "@/lib/notify";
 import { Role } from "@prisma/client";
 
 async function getSessionUser() {
@@ -100,15 +101,19 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     // Broker assignment: Broker and Marketing Director cannot reassign brokers
     let notifyBrokerId: string | null = null;
+    let notifyBroker: { fullName: string; telegramChatId: string | null } | null = null;
     if (brokerId !== undefined && user.role !== Role.BROKER && user.role !== Role.MARKETING_DIRECTOR) {
       const newBrokerId = brokerId || null;
       if (newBrokerId !== existingLead.brokerId) {
         updateData.brokerId = newBrokerId;
         const newBroker = newBrokerId
-          ? await prisma.user.findUnique({ where: { id: newBrokerId }, select: { fullName: true } })
+          ? await prisma.user.findUnique({ where: { id: newBrokerId }, select: { fullName: true, telegramChatId: true } })
           : null;
         track("broker", existingLead.broker?.fullName, newBroker?.fullName);
-        if (newBrokerId && newBrokerId !== user.id) notifyBrokerId = newBrokerId; // notify the assignee
+        if (newBrokerId && newBrokerId !== user.id) {
+          notifyBrokerId = newBrokerId; // notify the assignee
+          notifyBroker = newBroker;
+        }
       }
     }
 
@@ -147,6 +152,19 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
           leadId: id,
         },
       });
+
+      // Also push a Telegram alert (broker's own chat if set, else the company channel).
+      await notifyUserTelegram(
+        notifyBroker,
+        leadAssignedMessage({
+          brokerName: notifyBroker?.fullName || "Broker",
+          leadName: updatedLead.name,
+          leadPhone: updatedLead.phone,
+          assignedBy: user.fullName,
+          appUrl: process.env.NEXT_PUBLIC_APP_URL || "",
+        }),
+        { alsoGlobal: true }
+      );
     }
 
     // Record field-level edit history. Owner/Admin edits are pre-acknowledged

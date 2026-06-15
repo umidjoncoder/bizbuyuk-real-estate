@@ -5,18 +5,33 @@ import { useCrm } from "@/components/CrmSecurityWrapper";
 import { crmTranslations } from "@/lib/crmTranslations";
 import { formatMoney } from "@/lib/format";
 import { DEFAULT_DEVELOPERS, DEFAULT_PROPERTY_TYPES, mergeOptions } from "@/lib/options";
-import { Plus, Search, Building2, MapPin, ListFilter, X, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, Building2, MapPin, ListFilter, X, Loader2, Pencil, Trash2, User2, Phone, Mail, Wallet, ExternalLink } from "lucide-react";
 
 type Property = {
   id: string;
   title: string;
   developer: string | null;
+  agentName: string | null;
+  agentPhone: string | null;
+  agentEmail: string | null;
   location: string;
+  locationUrl: string | null;
+  startPrice: number | null;
   price: number;
   type: string;
+  cashAccepted: boolean;
   description: string | null;
   createdAt: string;
 };
+
+// Make a user-entered location link safe + absolute (prefix https:// if missing).
+function normalizeUrl(raw: string | null): string | null {
+  if (!raw) return null;
+  const v = raw.trim();
+  if (!v) return null;
+  if (/^https?:\/\//i.test(v)) return v;
+  return `https://${v}`;
+}
 
 export default function InventoryPage() {
   const { user, lang } = useCrm();
@@ -30,9 +45,15 @@ export default function InventoryPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [developer, setDeveloper] = useState("");
+  const [agentName, setAgentName] = useState("");
+  const [agentPhone, setAgentPhone] = useState("");
+  const [agentEmail, setAgentEmail] = useState("");
   const [location, setLocation] = useState("");
+  const [locationUrl, setLocationUrl] = useState("");
+  const [startPrice, setStartPrice] = useState("");
   const [price, setPrice] = useState("");
   const [type, setType] = useState("Off-plan");
+  const [cashAccepted, setCashAccepted] = useState(false);
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -76,13 +97,18 @@ export default function InventoryPage() {
   };
 
   const resetForm = () => {
-    setEditId(null); setTitle(""); setDeveloper(""); setLocation(""); setPrice(""); setType("Off-plan"); setDescription(""); setErrorMsg("");
+    setEditId(null); setTitle(""); setDeveloper(""); setAgentName(""); setAgentPhone(""); setAgentEmail("");
+    setLocation(""); setLocationUrl(""); setStartPrice(""); setPrice(""); setType("Off-plan");
+    setCashAccepted(false); setDescription(""); setErrorMsg("");
   };
 
   const openCreate = () => { resetForm(); setIsOpen(true); };
   const openEdit = (p: Property) => {
-    setEditId(p.id); setTitle(p.title); setDeveloper(p.developer || ""); setLocation(p.location); setPrice(String(p.price));
-    setType(p.type); setDescription(p.description || ""); setErrorMsg(""); setIsOpen(true);
+    setEditId(p.id); setTitle(p.title); setDeveloper(p.developer || "");
+    setAgentName(p.agentName || ""); setAgentPhone(p.agentPhone || ""); setAgentEmail(p.agentEmail || "");
+    setLocation(p.location); setLocationUrl(p.locationUrl || "");
+    setStartPrice(p.startPrice != null ? String(p.startPrice) : ""); setPrice(String(p.price));
+    setType(p.type); setCashAccepted(!!p.cashAccepted); setDescription(p.description || ""); setErrorMsg(""); setIsOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,7 +119,11 @@ export default function InventoryPage() {
       const res = await fetch(editId ? `/api/crm/properties/${editId}` : "/api/crm/properties", {
         method: editId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, developer, location, price: parseFloat(price), type, description }),
+        body: JSON.stringify({
+          title, developer, agentName, agentPhone, agentEmail,
+          location, locationUrl, startPrice, price: parseFloat(price),
+          type, cashAccepted, description,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error saving property");
@@ -121,7 +151,11 @@ export default function InventoryPage() {
 
   const filtered = properties.filter((p) => {
     const q = search.toLowerCase();
-    const matchesSearch = p.title.toLowerCase().includes(q) || p.location.toLowerCase().includes(q);
+    const matchesSearch =
+      p.title.toLowerCase().includes(q) ||
+      p.location.toLowerCase().includes(q) ||
+      (p.developer || "").toLowerCase().includes(q) ||
+      (p.agentName || "").toLowerCase().includes(q);
     const matchesType = filterType === "ALL" || p.type === filterType;
     return matchesSearch && matchesType;
   });
@@ -163,12 +197,19 @@ export default function InventoryPage() {
         <div className="py-24 flex items-center justify-center"><Loader2 className="w-8 h-8 crm-gold animate-spin" /></div>
       ) : (
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((p) => (
+          {filtered.map((p) => {
+            const mapUrl = normalizeUrl(p.locationUrl);
+            return (
             <div key={p.id} className="crm-card crm-lift p-6 flex flex-col gap-4">
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="crm-chip">{p.type === "Off-plan" ? t.inventory.offPlan : p.type === "Secondary" ? t.inventory.secondary : p.type}</span>
                   {p.developer && <span className="crm-chip">{p.developer}</span>}
+                  {p.cashAccepted && (
+                    <span className="crm-chip inline-flex items-center gap-1 !text-emerald-500 !border-emerald-500/30">
+                      <Wallet className="w-3 h-3" /> {t.inventory.cashYes}
+                    </span>
+                  )}
                 </div>
                 {canManage && (
                   <div className="flex items-center gap-1">
@@ -181,15 +222,37 @@ export default function InventoryPage() {
               </div>
               <div className="space-y-1">
                 <h3 className="text-lg font-bold flex items-center gap-2 crm-text"><Building2 className="w-5 h-5 crm-gold flex-shrink-0" />{p.title}</h3>
-                <p className="text-xs flex items-center gap-1.5 crm-muted"><MapPin className="w-3.5 h-3.5 crm-gold" />{p.location}</p>
+                {mapUrl ? (
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="text-xs inline-flex items-center gap-1.5 crm-gold hover:underline w-fit">
+                    <MapPin className="w-3.5 h-3.5" />{p.location}<ExternalLink className="w-3 h-3 opacity-70" />
+                  </a>
+                ) : (
+                  <p className="text-xs flex items-center gap-1.5 crm-muted"><MapPin className="w-3.5 h-3.5 crm-gold" />{p.location}</p>
+                )}
               </div>
+
+              {/* Agent contact */}
+              {(p.agentName || p.agentPhone || p.agentEmail) && (
+                <div className="rounded-xl border crm-bd p-3 space-y-1.5 text-xs">
+                  {p.agentName && <div className="flex items-center gap-1.5 crm-text font-semibold"><User2 className="w-3.5 h-3.5 crm-gold" />{p.agentName}</div>}
+                  {p.agentPhone && <a href={`tel:${p.agentPhone}`} className="flex items-center gap-1.5 crm-muted hover:crm-gold transition-colors"><Phone className="w-3.5 h-3.5 crm-gold" />{p.agentPhone}</a>}
+                  {p.agentEmail && <a href={`mailto:${p.agentEmail}`} className="flex items-center gap-1.5 crm-muted hover:crm-gold transition-colors break-all"><Mail className="w-3.5 h-3.5 crm-gold" />{p.agentEmail}</a>}
+                </div>
+              )}
+
               {p.description && <p className="text-xs crm-muted line-clamp-3 leading-relaxed">{p.description}</p>}
-              <div className="pt-4 border-t crm-bd mt-auto flex justify-between items-center">
+              <div className="pt-4 border-t crm-bd mt-auto flex justify-between items-end gap-2">
                 <span className="text-[10px] uppercase tracking-wider font-semibold crm-muted">{t.inventory.priceLabel}</span>
-                <span className="text-xl font-black crm-gold">{formatMoney(p.price)}</span>
+                <div className="text-right">
+                  {p.startPrice != null && (
+                    <div className="text-[11px] crm-muted">{t.inventory.priceFrom} {formatMoney(p.startPrice)}</div>
+                  )}
+                  <span className="text-xl font-black crm-gold">{formatMoney(p.price)}</span>
+                </div>
               </div>
             </div>
-          ))}
+            );
+          })}
           {filtered.length === 0 && (
             <div className="col-span-full py-16 text-center crm-muted border border-dashed crm-bd rounded-2xl">{t.inventory.noProperties}</div>
           )}
@@ -199,7 +262,7 @@ export default function InventoryPage() {
       {/* Modal */}
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-backdrop">
-          <div className="crm-card w-full max-w-lg p-6 relative animate-modal">
+          <div className="crm-card w-full max-w-lg p-6 relative animate-modal max-h-[90vh] overflow-y-auto crm-scroll">
             <button onClick={() => { setIsOpen(false); resetForm(); }} className="absolute top-4 right-4 crm-muted hover:crm-text"><X className="w-5 h-5" /></button>
             <h3 className="text-xl font-bold border-b crm-bd pb-4 mb-4 crm-text">{editId ? (lang === "en" ? "Edit Property" : "Изменить объект") : t.inventory.modalTitle}</h3>
             {errorMsg && <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-500 text-xs flex items-center gap-2"><X className="w-4 h-4" />{errorMsg}</div>}
@@ -216,20 +279,41 @@ export default function InventoryPage() {
                 </div>
               </FieldI>
               <FieldI label={t.inventory.propTitle}><input required value={title} onChange={(e) => setTitle(e.target.value)} placeholder={lang === "en" ? "Project name..." : "Название проекта..."} className="crm-input" /></FieldI>
-              <FieldI label={t.inventory.propLocation}><input required value={location} onChange={(e) => setLocation(e.target.value)} placeholder={lang === "en" ? "Location..." : "Локация..."} className="crm-input" /></FieldI>
+
+              {/* Agent contact */}
               <div className="grid grid-cols-2 gap-4">
-                <FieldI label={t.inventory.propPrice}><input type="number" required value={price} onChange={(e) => setPrice(e.target.value)} placeholder="2500000" className="crm-input" /></FieldI>
-                <FieldI label={t.inventory.propType}>
-                  <div className="flex gap-2">
-                    <select value={type} onChange={(e) => setType(e.target.value)} className="crm-input crm-select flex-1">
-                      {typeOptions.map((tp) => <option key={tp} value={tp}>{tp === "Off-plan" ? t.inventory.offPlan : tp === "Secondary" ? t.inventory.secondary : tp}</option>)}
-                    </select>
-                    {canManageOptions && (
-                      <button type="button" onClick={() => addOption("propertyType", typeOptions, setTypeOptions, setType)} className="crm-btn-ghost px-2 flex-shrink-0"><Plus className="w-4 h-4" /></button>
-                    )}
-                  </div>
-                </FieldI>
+                <FieldI label={t.inventory.propAgentName}><input value={agentName} onChange={(e) => setAgentName(e.target.value)} placeholder={lang === "en" ? "Agent name..." : "Имя агента..."} className="crm-input" /></FieldI>
+                <FieldI label={t.inventory.propAgentPhone}><input value={agentPhone} onChange={(e) => setAgentPhone(e.target.value)} placeholder="+998 90 123 45 67" className="crm-input" /></FieldI>
               </div>
+              <FieldI label={t.inventory.propAgentEmail}><input type="email" value={agentEmail} onChange={(e) => setAgentEmail(e.target.value)} placeholder="agent@example.com" className="crm-input" /></FieldI>
+
+              <FieldI label={t.inventory.propLocation}><input required value={location} onChange={(e) => setLocation(e.target.value)} placeholder={lang === "en" ? "Location name..." : "Название локации..."} className="crm-input" /></FieldI>
+              <FieldI label={t.inventory.propLocationUrl}>
+                <input type="url" value={locationUrl} onChange={(e) => setLocationUrl(e.target.value)} placeholder="https://maps.google.com/..." className="crm-input" />
+              </FieldI>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FieldI label={t.inventory.propStartPrice}><input type="number" value={startPrice} onChange={(e) => setStartPrice(e.target.value)} placeholder="1500000" className="crm-input" /></FieldI>
+                <FieldI label={t.inventory.propAllPrice}><input type="number" required value={price} onChange={(e) => setPrice(e.target.value)} placeholder="2500000" className="crm-input" /></FieldI>
+              </div>
+
+              <FieldI label={t.inventory.propType}>
+                <div className="flex gap-2">
+                  <select value={type} onChange={(e) => setType(e.target.value)} className="crm-input crm-select flex-1">
+                    {typeOptions.map((tp) => <option key={tp} value={tp}>{tp === "Off-plan" ? t.inventory.offPlan : tp === "Secondary" ? t.inventory.secondary : tp}</option>)}
+                  </select>
+                  {canManageOptions && (
+                    <button type="button" onClick={() => addOption("propertyType", typeOptions, setTypeOptions, setType)} className="crm-btn-ghost px-2 flex-shrink-0"><Plus className="w-4 h-4" /></button>
+                  )}
+                </div>
+              </FieldI>
+
+              {/* Cash toggle */}
+              <label className="flex items-center gap-3 cursor-pointer rounded-xl border crm-bd p-3 hover:bg-[var(--crm-surface-hover)] transition-colors">
+                <input type="checkbox" checked={cashAccepted} onChange={(e) => setCashAccepted(e.target.checked)} className="w-4 h-4 accent-[var(--crm-gold)]" />
+                <span className="text-sm crm-text flex items-center gap-1.5"><Wallet className="w-4 h-4 crm-gold" />{t.inventory.propCash}</span>
+              </label>
+
               <FieldI label={t.inventory.propDesc}><textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} placeholder={lang === "en" ? "Description..." : "Описание..."} className="crm-input" /></FieldI>
               <button type="submit" disabled={submitting} className="crm-btn-primary w-full py-3">
                 {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : t.inventory.btnSaveProp}

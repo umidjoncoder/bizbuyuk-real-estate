@@ -42,6 +42,8 @@ model User {
   isActive  Boolean @default(true) // soft-disable instead of hard delete
   avatarUrl String? @db.Text // profile photo (small base64 data URL)
   position  String? // job title (configurable label, separate from the security role)
+  phone          String? // contact phone (also used for the WhatsApp deep-link)
+  telegramChatId String? // personal Telegram chat id — assignment alerts go here
 
   // Relations
   assignedLeads Lead[]        @relation("AssignedBroker")
@@ -55,11 +57,18 @@ model User {
 
 model Property {
   id          String         @id @default(uuid())
-  title       String
-  developer   String? // e.g. "Emaar", "DAMAC" — from configurable list
-  location    String
-  price       Float
+  title       String // Project name
+  developer   String? // e.g. "Emaar", "DAMAC" — from configurable list (the застройщик)
+  // Contact agent representing this developer/project
+  agentName   String?
+  agentPhone  String?
+  agentEmail  String?
+  location    String // human-readable location name, e.g. "Dubai Marina"
+  locationUrl String? @db.Text // clickable map link (Google Maps / 2GIS), opened in a new tab
+  startPrice  Float? // "from" price (boshlang'ich narx)
+  price       Float // full / "all" price
   type        String // e.g. "Off-plan" or "Secondary"
+  cashAccepted Boolean       @default(false) // does the developer accept cash? (naqt pul)
   description String?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt

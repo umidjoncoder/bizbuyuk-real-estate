@@ -34,6 +34,8 @@ export async function GET() {
         isActive: true,
         avatarUrl: true,
         position: true,
+        phone: true,
+        telegramChatId: true,
         createdAt: true,
       },
       orderBy: { fullName: "asc" },
@@ -56,7 +58,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Forbidden: Only Admin/Owner can manage users" }, { status: 403 });
     }
 
-    const { username, password, fullName, email, role, position } = await req.json();
+    const { username, password, fullName, email, role, position, phone, telegramChatId } = await req.json();
 
     if (!username || !password || !fullName || !email || !role) {
       return NextResponse.json({ error: "Required fields missing" }, { status: 400 });
@@ -97,6 +99,8 @@ export async function POST(req: Request) {
         email: email.toLowerCase().trim(),
         role: role as Role,
         position: position ? String(position).trim() : null,
+        phone: phone ? String(phone).trim() : null,
+        telegramChatId: telegramChatId ? String(telegramChatId).trim() : null,
       },
     });
 

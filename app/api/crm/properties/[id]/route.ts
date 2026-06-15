@@ -24,14 +24,24 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const existing = await prisma.property.findUnique({ where: { id } });
     if (!existing) return NextResponse.json({ error: "Property not found" }, { status: 404 });
 
-    const { title, location, price, type, description, developer } = await req.json();
+    const {
+      title, location, locationUrl, price, startPrice, type, description, developer,
+      agentName, agentPhone, agentEmail, cashAccepted,
+    } = await req.json();
+    const str = (v: unknown) => (v && String(v).trim() ? String(v).trim() : null);
     const data: any = {};
     if (title !== undefined && title.trim()) data.title = title.trim();
-    if (developer !== undefined) data.developer = developer ? String(developer).trim() : null;
+    if (developer !== undefined) data.developer = str(developer);
+    if (agentName !== undefined) data.agentName = str(agentName);
+    if (agentPhone !== undefined) data.agentPhone = str(agentPhone);
+    if (agentEmail !== undefined) data.agentEmail = str(agentEmail);
     if (location !== undefined && location.trim()) data.location = location.trim();
+    if (locationUrl !== undefined) data.locationUrl = str(locationUrl);
+    if (startPrice !== undefined) data.startPrice = startPrice !== "" && !isNaN(parseFloat(startPrice)) ? parseFloat(startPrice) : null;
     if (price !== undefined && price !== "" && !isNaN(parseFloat(price))) data.price = parseFloat(price);
     if (type !== undefined && type.trim()) data.type = type.trim();
-    if (description !== undefined) data.description = description ? description.trim() : null;
+    if (cashAccepted !== undefined) data.cashAccepted = !!cashAccepted;
+    if (description !== undefined) data.description = str(description);
 
     const updated = await prisma.property.update({ where: { id }, data });
 

@@ -40,20 +40,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { title, location, price, type, description, developer } = await req.json();
+    const {
+      title, location, locationUrl, price, startPrice, type, description, developer,
+      agentName, agentPhone, agentEmail, cashAccepted,
+    } = await req.json();
 
     if (!title || !location || !price || !type) {
       return NextResponse.json({ error: "Required fields missing" }, { status: 400 });
     }
 
+    const str = (v: unknown) => (v !== undefined && v !== null && String(v).trim() ? String(v).trim() : null);
+
     const newProperty = await prisma.property.create({
       data: {
         title: title.trim(),
-        developer: developer ? String(developer).trim() : null,
+        developer: str(developer),
+        agentName: str(agentName),
+        agentPhone: str(agentPhone),
+        agentEmail: str(agentEmail),
         location: location.trim(),
+        locationUrl: str(locationUrl),
+        startPrice: startPrice !== undefined && startPrice !== "" && !isNaN(parseFloat(startPrice)) ? parseFloat(startPrice) : null,
         price: parseFloat(price),
         type: type.trim(),
-        description: description ? description.trim() : null,
+        cashAccepted: !!cashAccepted,
+        description: str(description),
       },
     });
 

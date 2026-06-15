@@ -15,6 +15,8 @@ type StaffUser = {
   role: string;
   isActive?: boolean;
   position?: string | null;
+  phone?: string | null;
+  telegramChatId?: string | null;
   createdAt: string;
 };
 
@@ -45,6 +47,8 @@ export default function UsersPage() {
   const [cEmail, setCEmail] = useState("");
   const [cRole, setCRole] = useState("BROKER");
   const [cPosition, setCPosition] = useState("");
+  const [cPhone, setCPhone] = useState("");
+  const [cTelegram, setCTelegram] = useState("");
   const [creating, setCreating] = useState(false);
   const [createErr, setCreateErr] = useState("");
 
@@ -54,6 +58,8 @@ export default function UsersPage() {
   const [eEmail, setEEmail] = useState("");
   const [eRole, setERole] = useState("BROKER");
   const [ePosition, setEPosition] = useState("");
+  const [ePhone, setEPhone] = useState("");
+  const [eTelegram, setETelegram] = useState("");
   const [ePassword, setEPassword] = useState("");
   const [saving, setSaving] = useState(false);
   const [editErr, setEditErr] = useState("");
@@ -109,12 +115,12 @@ export default function UsersPage() {
       const res = await fetch("/api/crm/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: cUsername, password: cPassword, fullName: cFullName, email: cEmail, role: cRole, position: cPosition }),
+        body: JSON.stringify({ username: cUsername, password: cPassword, fullName: cFullName, email: cEmail, role: cRole, position: cPosition, phone: cPhone, telegramChatId: cTelegram }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error creating profile");
       setIsCreateOpen(false);
-      setCUsername(""); setCPassword(""); setCFullName(""); setCEmail(""); setCRole("BROKER"); setCPosition("");
+      setCUsername(""); setCPassword(""); setCFullName(""); setCEmail(""); setCRole("BROKER"); setCPosition(""); setCPhone(""); setCTelegram("");
       fetchUsers(false);
     } catch (err: any) {
       setCreateErr(err.message || "Connection error");
@@ -129,6 +135,8 @@ export default function UsersPage() {
     setEEmail(u.email);
     setERole(u.role);
     setEPosition(u.position || "");
+    setEPhone(u.phone || "");
+    setETelegram(u.telegramChatId || "");
     setEPassword("");
     setEditErr("");
   };
@@ -147,6 +155,8 @@ export default function UsersPage() {
           email: eEmail,
           role: eRole,
           position: ePosition,
+          phone: ePhone,
+          telegramChatId: eTelegram,
           ...(ePassword ? { password: ePassword } : {}),
         }),
       });
@@ -302,6 +312,13 @@ export default function UsersPage() {
                   </div>
                 </FieldU>
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <FieldU label={lang === "en" ? "Phone" : "Телефон"}><input value={cPhone} onChange={(e) => setCPhone(e.target.value)} placeholder="+998 90 123 45 67" className="crm-input" /></FieldU>
+                <FieldU label={lang === "en" ? "Telegram Chat ID" : "Telegram Chat ID"}>
+                  <input value={cTelegram} onChange={(e) => setCTelegram(e.target.value)} placeholder="123456789" className="crm-input" />
+                  <p className="text-[10px] crm-faint mt-1">{lang === "en" ? "For task/lead alerts. Get it from @userinfobot." : "Для уведомлений о задачах/лидах. Узнать через @userinfobot."}</p>
+                </FieldU>
+              </div>
               <button type="submit" disabled={creating} className="crm-btn-primary w-full py-3">
                 {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : t.users.btnSaveUser}
               </button>
@@ -343,6 +360,13 @@ export default function UsersPage() {
                 <input type="password" value={ePassword} onChange={(e) => setEPassword(e.target.value)} placeholder="••••••••" className="crm-input" />
                 <p className="text-[10px] crm-faint mt-1">{t.users.passwordHint}</p>
               </FieldU>
+              <div className="grid grid-cols-2 gap-4">
+                <FieldU label={lang === "en" ? "Phone" : "Телефон"}><input value={ePhone} onChange={(e) => setEPhone(e.target.value)} placeholder="+998 90 123 45 67" className="crm-input" /></FieldU>
+                <FieldU label={lang === "en" ? "Telegram Chat ID" : "Telegram Chat ID"}>
+                  <input value={eTelegram} onChange={(e) => setETelegram(e.target.value)} placeholder="123456789" className="crm-input" />
+                  <p className="text-[10px] crm-faint mt-1">{lang === "en" ? "For task/lead alerts. Get it from @userinfobot." : "Для уведомлений о задачах/лидах. Узнать через @userinfobot."}</p>
+                </FieldU>
+              </div>
               <button type="submit" disabled={saving} className="crm-btn-primary w-full py-3">
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : t.users.btnSaveChanges}
               </button>

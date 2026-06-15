@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
+import { notifyUserTelegram, taskAssignedMessage } from "@/lib/notify";
 import { Role, TaskType, TaskStatus } from "@prisma/client";
 
 async function getSessionUser() {
@@ -108,6 +109,21 @@ export async function POST(req: Request) {
         details: JSON.stringify({ taskId: newTask.id, title: newTask.title, assignee: assignee.fullName }),
       },
     });
+
+    // Telegram alert to the assignee (their own chat if set, else the company channel).
+    await notifyUserTelegram(
+      assignee,
+      taskAssignedMessage({
+        assigneeName: assignee.fullName,
+        title: newTask.title,
+        description: newTask.description,
+        type: newTask.type,
+        deadline: newTask.deadline,
+        assignedBy: user.fullName,
+        appUrl: process.env.NEXT_PUBLIC_APP_URL || "",
+      }),
+      { alsoGlobal: true }
+    );
 
     // Send email notification to assignee's email via Resend API
     const resendApiKey = process.env.RESEND_API_KEY;
