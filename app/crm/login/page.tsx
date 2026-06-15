@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [logo, setLogo] = useState<string | null>(null);
   const router = useRouter();
 
   const t = crmTranslations[lang];
@@ -25,6 +26,12 @@ export default function LoginPage() {
       }
     }
   }, [user, loading, router]);
+
+  // Show the company logo (uploaded by Owner/Admin in Settings) — same source
+  // as the sidebar. Falls back to the "BB" monogram if none is set.
+  useEffect(() => {
+    fetch("/api/crm/branding").then((r) => r.json()).then((d) => setLogo(d.logo || null)).catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,9 +87,13 @@ export default function LoginPage() {
 
         {/* Brand */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#c8a15a] to-[#a47e3b] flex items-center justify-center font-bold text-[#08080a] text-2xl mx-auto shadow-xl shadow-[#c8a15a]/10 mb-4">
-            BB
-          </div>
+          {logo ? (
+            <img src={logo} alt="BIZBUYUK" className="w-16 h-16 rounded-2xl object-cover mx-auto shadow-xl shadow-[#c8a15a]/10 mb-4 border border-[#c8a15a]/30" />
+          ) : (
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#c8a15a] to-[#a47e3b] flex items-center justify-center font-bold text-[#08080a] text-2xl mx-auto shadow-xl shadow-[#c8a15a]/10 mb-4">
+              BB
+            </div>
+          )}
           <h2 className="text-2xl font-bold text-[#f3ede1] tracking-wide">BIZBUYUK</h2>
           <span className="text-xs text-[#c8a15a] uppercase tracking-widest font-semibold">{t.auth.loginTitle}</span>
         </div>
