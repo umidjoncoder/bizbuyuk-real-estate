@@ -34,6 +34,7 @@ import {
   MessageCircle,
   Send,
   PhoneCall,
+  Users2,
 } from "lucide-react";
 
 type Comment = {
@@ -128,6 +129,7 @@ export default function LeadsPage() {
   const [archiveView, setArchiveView] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState("ALL");
+  const [brokerFilter, setBrokerFilter] = useState("ALL");
   const [dragOverCol, setDragOverCol] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
@@ -502,13 +504,28 @@ export default function LeadsPage() {
     if (leadId) await handleUpdateStatus(leadId, status);
   };
 
+  // Broker filter is only meaningful for managers (a Broker already sees only
+  // their own leads). Sorted A–Z; includes any broker referenced by a lead even
+  // if now inactive, so historical assignments stay filterable.
+  const showBrokerFilter = !!user && user.role !== "BROKER";
+  const brokerOptions = (() => {
+    const map = new Map<string, string>();
+    users.forEach((u) => { if (u.role === "BROKER") map.set(u.id, u.fullName); });
+    leads.forEach((l) => { if (l.brokerId && l.broker) map.set(l.brokerId, l.broker.fullName); });
+    return Array.from(map, ([id, fullName]) => ({ id, fullName }))
+      .sort((a, b) => a.fullName.localeCompare(b.fullName));
+  })();
+
   const filteredLeads = leads.filter((l) => {
     const q = searchQuery.toLowerCase();
     const matchesSearch =
       l.name.toLowerCase().includes(q) || l.phone.includes(searchQuery) ||
       (l.email && l.email.toLowerCase().includes(q));
     const matchesSource = sourceFilter === "ALL" || l.source === sourceFilter;
-    return matchesSearch && matchesSource;
+    const matchesBroker =
+      brokerFilter === "ALL" ||
+      (brokerFilter === "UNASSIGNED" ? !l.brokerId : l.brokerId === brokerFilter);
+    return matchesSearch && matchesSource && matchesBroker;
   });
 
   // Translate the 6 built-in statuses; custom statuses show their own name.
@@ -566,6 +583,16 @@ export default function LeadsPage() {
             {sourceOptions.map((s) => <option key={s} value={s}>{s === "Manual" ? t.leads.manualSource : s}</option>)}
           </select>
         </div>
+        {showBrokerFilter && (
+          <div className="flex items-center gap-2">
+            <Users2 className="w-4 h-4 crm-gold" />
+            <select value={brokerFilter} onChange={(e) => setBrokerFilter(e.target.value)} className="crm-input crm-select w-auto">
+              <option value="ALL">{t.leads.allBrokers}</option>
+              <option value="UNASSIGNED">{t.leads.unassigned}</option>
+              {brokerOptions.map((b) => <option key={b.id} value={b.id}>{b.fullName}</option>)}
+            </select>
+          </div>
+        )}
         <div className="flex items-center rounded-xl p-1 md:ml-auto border crm-bd" style={{ background: "var(--crm-input-bg)" }}>
           <button onClick={() => setViewMode("kanban")} className={`p-2 rounded-lg transition-all cursor-pointer ${viewMode === "kanban" ? "bg-[#c8a15a] text-[#08080a]" : "crm-muted"}`}>
             <KanbanSquare className="w-4 h-4" />
