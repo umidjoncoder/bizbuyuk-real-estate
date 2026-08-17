@@ -45,6 +45,7 @@ export type Dict = {
     name: string;
     phone: string;
     email: string;
+    emailHint: string;
     contactPref: string;
     contactCall: string;
     contactWhatsApp: string;
@@ -133,6 +134,7 @@ export const dictionary: Record<Locale, Dict> = {
       name: "Your name",
       phone: "Phone number",
       email: "Email",
+      emailHint: 'Just the name is enough - "@gmail.com" is added for you.',
       contactPref: "Preferred way to reach you",
       contactCall: "Call",
       contactWhatsApp: "WhatsApp",
@@ -219,6 +221,7 @@ export const dictionary: Record<Locale, Dict> = {
       name: "Ваше имя",
       phone: "Номер телефона",
       email: "Email",
+      emailHint: "Достаточно имени - «@gmail.com» подставится сам.",
       contactPref: "Удобный способ связи",
       contactCall: "Звонок",
       contactWhatsApp: "WhatsApp",

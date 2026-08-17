@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { phoneKey } from "@/lib/format";
 import { normalizePref } from "@/lib/contact";
+import { isValidEmail, normalizeEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -56,14 +57,16 @@ export async function POST(req: Request) {
 
   const name = (body.name || "").trim().slice(0, 120);
   const phone = (body.phone || "").trim().slice(0, 40);
-  const email = (body.email || "").trim().slice(0, 160);
+  // A visitor may type just "john"; complete it the same way the form preview
+  // does so what they were shown is what gets stored.
+  const email = normalizeEmail((body.email || "").slice(0, 160));
   const preferredContact = normalizePref(body.preferredContact);
   const locale = (body.locale || "—").slice(0, 5);
 
   // honeypot: silently accept & drop
   if (body.company) return NextResponse.json({ ok: true });
 
-  const emailValid = !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const emailValid = !email || isValidEmail(email);
   if (!name || phone.replace(/\D/g, "").length < 7 || !emailValid) {
     return NextResponse.json({ ok: false, error: "validation" }, { status: 422 });
   }

@@ -6,6 +6,7 @@ import { useLang } from "./LanguageProvider";
 import { Reveal } from "./Reveal";
 import { CONTACT } from "@/lib/i18n";
 import { PhoneField } from "./PhoneField";
+import { isValidEmail, normalizeEmail } from "@/lib/email";
 
 type Status = "idle" | "sending" | "success" | "error";
 
@@ -27,13 +28,20 @@ export function LeadForm() {
     { value: "Email", label: t.lead.contactEmail, icon: <MailGlyph /> },
   ];
 
+  // Shown under the field while typing so nobody is surprised by the domain we
+  // filled in for them. Empty once the value already carries its own domain.
+  const resolvedEmail = normalizeEmail(email);
+  const emailPreview = resolvedEmail && resolvedEmail !== email.trim().toLowerCase() ? resolvedEmail : "";
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-    if (!name.trim() || phone.replace(/\D/g, "").length < 7 || !emailValid) {
+    // Submitting with Enter never fires the field's blur, so complete it here too.
+    const cleanEmail = normalizeEmail(email);
+    if (!name.trim() || phone.replace(/\D/g, "").length < 7 || !isValidEmail(cleanEmail)) {
       setStatus("error");
       return;
     }
+    setEmail(cleanEmail);
     setStatus("sending");
     try {
       // Capture where this lead came from (ad campaign / referrer) so the CRM
@@ -50,7 +58,7 @@ export function LeadForm() {
         body: JSON.stringify({
           name,
           phone,
-          email,
+          email: cleanEmail,
           preferredContact: preferred,
           locale,
           company,
@@ -133,7 +141,26 @@ export function LeadForm() {
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-bold text-coal">{t.lead.email}</label>
-                    <input className="field" type="email" value={email} onChange={(e) => { setEmail(e.target.value); if (status === "error") setStatus("idle"); }} autoComplete="email" required />
+                    {/* Not type="email": browsers reject a bare "john" before we
+                        get to complete it to "john@gmail.com". */}
+                    <input
+                      className="field"
+                      type="text"
+                      inputMode="email"
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      spellCheck={false}
+                      value={email}
+                      onChange={(e) => { setEmail(e.target.value); if (status === "error") setStatus("idle"); }}
+                      onBlur={() => setEmail(normalizeEmail(email))}
+                      autoComplete="email"
+                      required
+                    />
+                    <p className="mt-2 text-xs leading-relaxed">
+                      {emailPreview
+                        ? <span className="font-semibold text-bronze">{emailPreview}</span>
+                        : <span className="text-muted-dark/70">{t.lead.emailHint}</span>}
+                    </p>
                   </div>
 
                   <div>
