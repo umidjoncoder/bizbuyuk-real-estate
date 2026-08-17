@@ -7,7 +7,9 @@ import { useRouter } from "next/navigation";
 import { crmTranslations } from "@/lib/crmTranslations";
 import { formatMoney, formatPhone } from "@/lib/format";
 import { DEFAULT_SOURCES, DEFAULT_STATUSES, mergeOptions } from "@/lib/options";
+import { normalizeEmail } from "@/lib/email";
 import { PhoneField } from "@/components/PhoneField";
+import { GmailField } from "@/components/GmailField";
 import {
   Plus,
   Search,
@@ -302,7 +304,7 @@ export default function LeadsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: newLeadName, phone: newLeadPhone, email: newLeadEmail, hotel: newLeadHotel,
+          name: newLeadName, phone: newLeadPhone, email: normalizeEmail(newLeadEmail), hotel: newLeadHotel,
           budget: newLeadBudget, source: newLeadSource, preferredContact: newLeadPref || null,
           propertyIds: newLeadProps, force,
         }),
@@ -399,7 +401,7 @@ export default function LeadsPage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: editName, phone: editPhone, email: editEmail, hotel: editHotel,
+          name: editName, phone: editPhone, email: normalizeEmail(editEmail), hotel: editHotel,
           budget: editBudget, source: editSource, preferredContact: editPref || null,
         }),
       });
@@ -766,7 +768,7 @@ export default function LeadsPage() {
                 <input required value={newLeadHotel} onChange={(e) => setNewLeadHotel(e.target.value)} placeholder={t.leads.leadHotelPlaceholder} className="crm-input" />
               </Field>
               <div className="grid grid-cols-2 gap-4">
-                <Field label={t.leads.leadEmail}><input type="email" value={newLeadEmail} onChange={(e) => setNewLeadEmail(e.target.value)} placeholder="mail@example.com" className="crm-input" /></Field>
+                <Field label={t.leads.leadEmail}><GmailField value={newLeadEmail} onChange={setNewLeadEmail} hint={t.leads.emailHint} invalidHint={t.leads.emailInvalid} /></Field>
                 <Field label={t.leads.leadBudget}><input type="number" value={newLeadBudget} onChange={(e) => setNewLeadBudget(e.target.value)} placeholder="2000000" className="crm-input" /></Field>
               </div>
               <Field label={t.leads.leadSource}>
@@ -879,7 +881,7 @@ export default function LeadsPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <Field label={t.leads.leadName}><input value={editName} onChange={(e) => setEditName(e.target.value)} className="crm-input" /></Field>
                     <Field label={t.leads.leadPhone}><PhoneField theme="crm" value={editPhone} onChange={setEditPhone} /></Field>
-                    <Field label={t.leads.leadEmail}><input value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="crm-input" /></Field>
+                    <Field label={t.leads.leadEmail}><GmailField value={editEmail} onChange={setEditEmail} hint={t.leads.emailHint} invalidHint={t.leads.emailInvalid} /></Field>
                     <Field label={t.leads.leadBudget}><input type="number" value={editBudget} onChange={(e) => setEditBudget(e.target.value)} className="crm-input" /></Field>
                   </div>
                   <Field label={t.leads.leadHotel}>
