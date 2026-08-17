@@ -21,7 +21,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id } = await params;
-    const { status, lostReason, brokerId, name, phone, email, budget, source, preferredContact, propertyIds, archived } = await req.json();
+    const { status, lostReason, brokerId, name, phone, email, hotel, budget, source, preferredContact, propertyIds, archived } = await req.json();
 
     const existingLead = await prisma.lead.findUnique({
       where: { id },
@@ -85,6 +85,19 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       if (newBudget !== existingLead.budget) {
         updateData.budget = newBudget;
         track("budget", existingLead.budget, newBudget);
+      }
+    }
+    if (hotel !== undefined) {
+      const newHotel = typeof hotel === "string" && hotel.trim() ? hotel.trim() : null;
+      // Leads created before this field existed (and website leads) have no
+      // hotel, so an empty value is tolerated for them. Once a lead has one it
+      // cannot be wiped, matching the "required" rule on the create form.
+      if (!newHotel && existingLead.hotel) {
+        return NextResponse.json({ error: "Hotel name is required" }, { status: 400 });
+      }
+      if (newHotel !== existingLead.hotel) {
+        updateData.hotel = newHotel;
+        track("hotel", existingLead.hotel, newHotel);
       }
     }
     if (source !== undefined && source !== existingLead.source) {

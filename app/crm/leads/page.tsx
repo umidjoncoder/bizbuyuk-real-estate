@@ -35,6 +35,7 @@ import {
   Send,
   PhoneCall,
   Users2,
+  Hotel,
 } from "lucide-react";
 
 type Comment = {
@@ -70,6 +71,7 @@ type Lead = {
   name: string;
   phone: string;
   email: string | null;
+  hotel: string | null;
   budget: number | null;
   status: string;
   lostReason: string | null;
@@ -143,6 +145,7 @@ export default function LeadsPage() {
   const [editName, setEditName] = useState("");
   const [editPhone, setEditPhone] = useState("");
   const [editEmail, setEditEmail] = useState("");
+  const [editHotel, setEditHotel] = useState("");
   const [editBudget, setEditBudget] = useState("");
   const [editSource, setEditSource] = useState("");
   const [editPref, setEditPref] = useState("");
@@ -170,6 +173,7 @@ export default function LeadsPage() {
   const [newLeadName, setNewLeadName] = useState("");
   const [newLeadPhone, setNewLeadPhone] = useState("");
   const [newLeadEmail, setNewLeadEmail] = useState("");
+  const [newLeadHotel, setNewLeadHotel] = useState("");
   const [newLeadBudget, setNewLeadBudget] = useState("");
   const [newLeadSource, setNewLeadSource] = useState("Manual");
   const [newLeadPref, setNewLeadPref] = useState("");
@@ -272,9 +276,9 @@ export default function LeadsPage() {
   // ---------- Export (Owner only) ----------
   const handleExport = () => {
     if (user?.role !== "OWNER") return;
-    const headers = ["ID", "Name", "Phone", "E-mail", "Preferred Contact", "Budget", "Status", "Lost Reason", "Source", "Broker", "Created"];
+    const headers = ["ID", "Name", "Phone", "E-mail", "Hotel", "Preferred Contact", "Budget", "Status", "Lost Reason", "Source", "Broker", "Created"];
     const rows = leads.map((l) => [
-      l.id, l.name, l.phone, l.email || "", prefLabel(l.preferredContact, lang), l.budget || "", l.status, l.lostReason || "",
+      l.id, l.name, l.phone, l.email || "", l.hotel || "", prefLabel(l.preferredContact, lang), l.budget || "", l.status, l.lostReason || "",
       l.source, l.broker?.fullName || "—", new Date(l.createdAt).toLocaleString(),
     ]);
     const csv = "data:text/csv;charset=utf-8,﻿" +
@@ -298,7 +302,7 @@ export default function LeadsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: newLeadName, phone: newLeadPhone, email: newLeadEmail,
+          name: newLeadName, phone: newLeadPhone, email: newLeadEmail, hotel: newLeadHotel,
           budget: newLeadBudget, source: newLeadSource, preferredContact: newLeadPref || null,
           propertyIds: newLeadProps, force,
         }),
@@ -321,7 +325,7 @@ export default function LeadsPage() {
   };
 
   const resetNewLeadForm = () => {
-    setNewLeadName(""); setNewLeadPhone(""); setNewLeadEmail("");
+    setNewLeadName(""); setNewLeadPhone(""); setNewLeadEmail(""); setNewLeadHotel("");
     setNewLeadBudget(""); setNewLeadSource("Manual"); setNewLeadPref(""); setNewLeadProps([]);
     setDuplicateWarning(null); setErrorMsg("");
   };
@@ -380,6 +384,7 @@ export default function LeadsPage() {
     setEditName(lead.name);
     setEditPhone(lead.phone);
     setEditEmail(lead.email || "");
+    setEditHotel(lead.hotel || "");
     setEditBudget(lead.budget ? String(lead.budget) : "");
     setEditSource(lead.source);
     setEditPref(lead.preferredContact || "");
@@ -394,7 +399,7 @@ export default function LeadsPage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: editName, phone: editPhone, email: editEmail,
+          name: editName, phone: editPhone, email: editEmail, hotel: editHotel,
           budget: editBudget, source: editSource, preferredContact: editPref || null,
         }),
       });
@@ -756,6 +761,10 @@ export default function LeadsPage() {
                 <Field label={t.leads.leadName}><input required value={newLeadName} onChange={(e) => setNewLeadName(e.target.value)} placeholder={lang === "en" ? "Name..." : "Имя..."} className="crm-input" /></Field>
                 <Field label={t.leads.leadPhone}><PhoneField theme="crm" required value={newLeadPhone} onChange={setNewLeadPhone} /></Field>
               </div>
+              {/* Sits with the other required fields, above the optional ones. */}
+              <Field label={t.leads.leadHotel}>
+                <input required value={newLeadHotel} onChange={(e) => setNewLeadHotel(e.target.value)} placeholder={t.leads.leadHotelPlaceholder} className="crm-input" />
+              </Field>
               <div className="grid grid-cols-2 gap-4">
                 <Field label={t.leads.leadEmail}><input type="email" value={newLeadEmail} onChange={(e) => setNewLeadEmail(e.target.value)} placeholder="mail@example.com" className="crm-input" /></Field>
                 <Field label={t.leads.leadBudget}><input type="number" value={newLeadBudget} onChange={(e) => setNewLeadBudget(e.target.value)} placeholder="2000000" className="crm-input" /></Field>
@@ -860,6 +869,7 @@ export default function LeadsPage() {
                     </div>
                   </div>
                   <Info icon={<Mail className="w-4 h-4 crm-gold" />} label="E-mail" value={selectedLead.email || "—"} />
+                  <Info icon={<Hotel className="w-4 h-4 crm-gold" />} label={t.leads.fields.hotel} value={selectedLead.hotel || "—"} />
                   <Info icon={prefIcon(selectedLead.preferredContact)} label={t.leads.fields.preferredContact} value={prefLabel(selectedLead.preferredContact, lang)} />
                   <Info icon={<DollarSign className="w-4 h-4 crm-gold" />} label={lang === "en" ? "Budget" : "Бюджет"} value={formatMoney(selectedLead.budget)} gold />
                   <Info icon={<Clock className="w-4 h-4 crm-gold" />} label={lang === "en" ? "Created" : "Создан"} value={new Date(selectedLead.createdAt).toLocaleDateString()} />
@@ -872,6 +882,11 @@ export default function LeadsPage() {
                     <Field label={t.leads.leadEmail}><input value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="crm-input" /></Field>
                     <Field label={t.leads.leadBudget}><input type="number" value={editBudget} onChange={(e) => setEditBudget(e.target.value)} className="crm-input" /></Field>
                   </div>
+                  <Field label={t.leads.leadHotel}>
+                    {/* Only enforced for leads that already have one — website and
+                        pre-existing leads have no hotel and stay editable. */}
+                    <input required={!!selectedLead.hotel} aria-required={!!selectedLead.hotel} value={editHotel} onChange={(e) => setEditHotel(e.target.value)} placeholder={t.leads.leadHotelPlaceholder} className="crm-input" />
+                  </Field>
                   <Field label={t.leads.leadSource}>
                     <select value={editSource} onChange={(e) => setEditSource(e.target.value)} className="crm-input crm-select">
                       {sourceOptions.map((s) => <option key={s} value={s}>{s === "Manual" ? t.leads.manualSource : s}</option>)}

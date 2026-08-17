@@ -112,6 +112,10 @@ model Lead {
   name       String
   phone      String // For duplicate checks
   email      String?
+  // Which hotel the client is staying at. Required by the CRM "add lead" form,
+  // but nullable in the DB: leads that arrive from the public website form have
+  // no hotel, and rows created before this field existed have none either.
+  hotel      String?
   budget     Float?
   status     String     @default("NEW") // configurable pipeline stage
   lostReason String? // Required if status is LOST

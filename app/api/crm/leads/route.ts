@@ -90,10 +90,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { name, phone, email, budget, source, preferredContact, propertyIds, force } = await req.json();
+    const { name, phone, email, hotel, budget, source, preferredContact, propertyIds, force } = await req.json();
 
     if (!name || !phone) {
       return NextResponse.json({ error: "Name and phone are required" }, { status: 400 });
+    }
+
+    // Hotel is mandatory for leads entered through the CRM. Website leads come
+    // in via /api/lead, which has no hotel to ask for, so the column stays
+    // nullable and the rule lives here rather than in the schema.
+    const cleanHotel = typeof hotel === "string" ? hotel.trim() : "";
+    if (!cleanHotel) {
+      return NextResponse.json({ error: "Hotel name is required" }, { status: 400 });
     }
 
     const cleanPhone = phone.trim();
@@ -128,6 +136,7 @@ export async function POST(req: Request) {
         name: name.trim(),
         phone: cleanPhone,
         email: email ? email.trim() : null,
+        hotel: cleanHotel,
         budget: budget ? parseFloat(budget) : null,
         source: source || "Manual",
         preferredContact: normalizePref(preferredContact),
