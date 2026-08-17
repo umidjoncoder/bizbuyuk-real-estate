@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
 import bcrypt from "bcryptjs";
 import { Role } from "@prisma/client";
+import { isValidEmail, normalizeEmail } from "@/lib/email";
 
 async function getSessionUser() {
   const cookieStore = await cookies();
@@ -68,6 +69,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
     }
 
+    // A bare "sardor" becomes "sardor@gmail.com"; own domains pass through.
+    // Done here as well as in the form so the rule holds for any API caller.
+    const normalizedEmail = normalizeEmail(email);
+    if (!isValidEmail(normalizedEmail)) {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+    }
+
     // Privilege guard: only an Owner can create another Owner.
     if (role === Role.OWNER && user.role !== Role.OWNER) {
       return NextResponse.json({ error: "Forbidden: only an Owner can create an Owner" }, { status: 403 });
@@ -82,7 +90,7 @@ export async function POST(req: Request) {
     }
 
     const existingEmail = await prisma.user.findUnique({
-      where: { email: email.toLowerCase().trim() },
+      where: { email: normalizedEmail },
     });
     if (existingEmail) {
       return NextResponse.json({ error: "Email already in use" }, { status: 400 });
@@ -96,7 +104,7 @@ export async function POST(req: Request) {
         username: username.toLowerCase().trim(),
         password: hashedPassword,
         fullName: fullName.trim(),
-        email: email.toLowerCase().trim(),
+        email: normalizedEmail,
         role: role as Role,
         position: position ? String(position).trim() : null,
         phone: phone ? String(phone).trim() : null,

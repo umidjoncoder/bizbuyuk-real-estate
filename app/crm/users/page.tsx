@@ -5,6 +5,7 @@ import { useCrm } from "@/components/CrmSecurityWrapper";
 import { useRouter } from "next/navigation";
 import { crmTranslations } from "@/lib/crmTranslations";
 import { DEFAULT_POSITIONS, mergeOptions } from "@/lib/options";
+import { isValidEmail, normalizeEmail } from "@/lib/email";
 import { Plus, X, AlertCircle, Loader2, Pencil, Trash2, Power, PowerOff, ShieldCheck } from "lucide-react";
 
 type StaffUser = {
@@ -115,7 +116,9 @@ export default function UsersPage() {
       const res = await fetch("/api/crm/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: cUsername, password: cPassword, fullName: cFullName, email: cEmail, role: cRole, position: cPosition, phone: cPhone, telegramChatId: cTelegram }),
+        // Submitting with Enter never fires the field's blur, so complete the
+        // address here too rather than trusting the raw input value.
+        body: JSON.stringify({ username: cUsername, password: cPassword, fullName: cFullName, email: normalizeEmail(cEmail), role: cRole, position: cPosition, phone: cPhone, telegramChatId: cTelegram }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error creating profile");
@@ -152,7 +155,7 @@ export default function UsersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fullName: eFullName,
-          email: eEmail,
+          email: normalizeEmail(eEmail),
           role: eRole,
           position: ePosition,
           phone: ePhone,
@@ -294,7 +297,7 @@ export default function UsersPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <FieldU label={t.users.password}><input type="password" required value={cPassword} onChange={(e) => setCPassword(e.target.value)} placeholder="••••••••" className="crm-input" /></FieldU>
-                <FieldU label={t.users.gmail}><input type="email" required value={cEmail} onChange={(e) => setCEmail(e.target.value)} placeholder="sardor@gmail.com" className="crm-input" /></FieldU>
+                <FieldU label={t.users.gmail}><GmailInput value={cEmail} onChange={setCEmail} hint={t.users.gmailHint} invalidHint={t.users.gmailInvalid} /></FieldU>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <FieldU label={lang === "en" ? "Role (access level) *" : "Роль (доступ) *"}>
@@ -338,7 +341,7 @@ export default function UsersPage() {
             <form onSubmit={handleSaveEdit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <FieldU label={t.users.fullName}><input required value={eFullName} onChange={(e) => setEFullName(e.target.value)} className="crm-input" /></FieldU>
-                <FieldU label={t.users.gmail}><input type="email" required value={eEmail} onChange={(e) => setEEmail(e.target.value)} className="crm-input" /></FieldU>
+                <FieldU label={t.users.gmail}><GmailInput value={eEmail} onChange={setEEmail} hint={t.users.gmailHint} invalidHint={t.users.gmailInvalid} /></FieldU>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <FieldU label={lang === "en" ? "Role (access level)" : "Роль (доступ)"}>
@@ -384,5 +387,46 @@ function FieldU({ label, children }: { label: string; children: React.ReactNode 
       <label className="text-xs font-semibold uppercase crm-muted">{label}</label>
       {children}
     </div>
+  );
+}
+
+// Staff Gmail field. People type just "sardor" — the "@gmail.com" is previewed
+// live underneath and committed into the field on blur, so what they see before
+// saving is exactly what gets stored. Deliberately not type="email": browsers
+// reject a bare "sardor" as invalid before we ever get to complete it.
+function GmailInput({ value, onChange, hint, invalidHint }: { value: string; onChange: (v: string) => void; hint: string; invalidHint: string }) {
+  const typed = value.trim();
+  const resolved = normalizeEmail(value);
+  const completed = resolved !== "" && resolved !== typed.toLowerCase();
+  // Dropping type="email" also drops the browser's own check, so flag a
+  // malformed address here rather than only on the server's reply.
+  const invalid = typed !== "" && !isValidEmail(resolved);
+
+  return (
+    <>
+      <input
+        type="text"
+        inputMode="email"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        required
+        aria-invalid={invalid}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={() => onChange(resolved)}
+        placeholder="sardor"
+        className={`crm-input ${invalid ? "is-invalid" : ""}`}
+      />
+      <p className="text-[10px] mt-1 truncate">
+        {invalid ? (
+          <span className="text-red-500">{invalidHint}</span>
+        ) : completed ? (
+          <span className="crm-gold font-medium">{resolved}</span>
+        ) : (
+          <span className="crm-faint">{hint}</span>
+        )}
+      </p>
+    </>
   );
 }

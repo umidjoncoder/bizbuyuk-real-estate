@@ -347,6 +347,12 @@ html.light {
   border-color: var(--crm-gold);
   box-shadow: 0 0 0 3px rgba(200, 161, 90, 0.16);
 }
+/* Same reason as .pl-icon: needs to outrank .crm-input's border shorthand. */
+.crm-input.is-invalid { border-color: #ef4444; }
+.crm-input.is-invalid:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+}
 
 .crm-btn-primary {
   display: inline-flex;

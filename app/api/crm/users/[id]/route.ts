@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
 import bcrypt from "bcryptjs";
 import { Role } from "@prisma/client";
+import { isValidEmail, normalizeEmail } from "@/lib/email";
 
 async function getSessionUser() {
   const cookieStore = await cookies();
@@ -44,8 +45,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (phone !== undefined) data.phone = phone ? String(phone).trim() : null;
     if (telegramChatId !== undefined) data.telegramChatId = telegramChatId ? String(telegramChatId).trim() : null;
 
-    if (email !== undefined && email.trim()) {
-      const normalized = email.toLowerCase().trim();
+    if (email !== undefined && String(email).trim()) {
+      // "sardor" -> "sardor@gmail.com"; an own domain is kept as typed.
+      const normalized = normalizeEmail(email);
+      if (!isValidEmail(normalized)) {
+        return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+      }
       if (normalized !== target.email) {
         const clash = await prisma.user.findUnique({ where: { email: normalized } });
         if (clash) return NextResponse.json({ error: "Email already in use" }, { status: 400 });
