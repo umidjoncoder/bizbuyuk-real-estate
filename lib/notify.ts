@@ -109,15 +109,18 @@ export function leadAssignedMessage(opts: {
   brokerName: string;
   leadName: string;
   leadPhone: string;
+  hotel?: string | null;
   assignedBy: string;
   appUrl?: string;
 }): string {
   const link = `${opts.appUrl || ""}/crm/leads`;
+  const hotel = typeof opts.hotel === "string" ? opts.hotel.trim() : "";
   return (
     `🎯 <b>Yangi mijoz / New Lead</b>\n\n` +
     `👤 <b>Broker:</b> ${escapeHtml(opts.brokerName)}\n` +
     `🙋 <b>Mijoz:</b> ${escapeHtml(opts.leadName)}\n` +
     `📞 <b>Telefon:</b> ${escapeHtml(opts.leadPhone)}\n` +
+    (hotel ? `🏨 <b>Mehmonxona / Hotel:</b> ${escapeHtml(hotel)}\n` : "") +
     `🧑‍💼 <b>Biriktirgan:</b> ${escapeHtml(opts.assignedBy)}\n\n` +
     `🔗 ${escapeHtml(link)}`
   );

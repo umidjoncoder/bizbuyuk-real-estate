@@ -173,6 +173,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
           brokerName: notifyBroker?.fullName || "Broker",
           leadName: updatedLead.name,
           leadPhone: updatedLead.phone,
+          hotel: updatedLead.hotel,
           assignedBy: user.fullName,
           appUrl: process.env.NEXT_PUBLIC_APP_URL || "",
         }),

@@ -662,7 +662,13 @@ export default function LeadsPage() {
                             </span>
                           )}
                         </p>
-                        {lead.budget && <p className="text-xs crm-gold font-bold mt-2">{formatMoney(lead.budget)}</p>}
+                        {lead.hotel && (
+                          <p className="text-[11px] mt-1.5 flex items-center gap-1 crm-text" title={lead.hotel}>
+                            <Hotel className="w-3 h-3 crm-gold flex-shrink-0" />
+                            <span className="truncate">{lead.hotel}</span>
+                          </p>
+                        )}
+                        {lead.budget ? <p className="text-xs crm-gold font-bold mt-2">{formatMoney(lead.budget)}</p> : null}
                         <div className="mt-3 pt-2.5 border-t crm-bd flex items-center justify-between gap-2">
                           <span className="text-[9px] crm-faint uppercase font-semibold">{lead.source}</span>
                           <div className="flex items-center gap-1.5">
@@ -696,6 +702,7 @@ export default function LeadsPage() {
                 <tr className="border-b crm-bd text-xs uppercase font-semibold crm-muted">
                   <th className="p-4">{lang === "en" ? "Lead" : "Клиент"}</th>
                   <th className="p-4">{lang === "en" ? "Phone" : "Телефон"}</th>
+                  <th className="p-4">{t.leads.fields.hotel}</th>
                   <th className="p-4">Status</th>
                   <th className="p-4">{lang === "en" ? "Budget" : "Бюджет"}</th>
                   <th className="p-4">{lang === "en" ? "Broker" : "Брокер"}</th>
@@ -718,6 +725,7 @@ export default function LeadsPage() {
                         </div>
                       </td>
                       <td className="p-4 crm-muted">{formatPhone(lead.phone)}</td>
+                      <td className="p-4 crm-text">{lead.hotel || "—"}</td>
                       <td className="p-4"><span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase ${meta.chip}`}>{statusLabel(lead.status)}</span></td>
                       <td className="p-4 crm-gold font-bold">{formatMoney(lead.budget)}</td>
                       <td className="p-4 crm-text">{lead.broker?.fullName || "—"}</td>
@@ -737,7 +745,7 @@ export default function LeadsPage() {
                   );
                 })}
                 {filteredLeads.length === 0 && (
-                  <tr><td colSpan={8} className="p-10 text-center crm-muted">{t.leads.noLeads}</td></tr>
+                  <tr><td colSpan={9} className="p-10 text-center crm-muted">{t.leads.noLeads}</td></tr>
                 )}
               </tbody>
             </table>
