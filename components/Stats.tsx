@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { animate, useInView } from "motion/react";
+import { animate, useInView, useReducedMotion } from "motion/react";
 import { useLang } from "./LanguageProvider";
 import { Reveal } from "./Reveal";
 import { img, IMAGES } from "@/lib/images";
@@ -54,9 +54,10 @@ export function Stats() {
   );
 }
 
-function Counter({ value }: { value: string }) {
+export function Counter({ value }: { value: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
+  const reduce = useReducedMotion();
   const [display, setDisplay] = useState("0");
 
   const num = parseFloat(value);
@@ -65,13 +66,19 @@ function Counter({ value }: { value: string }) {
 
   useEffect(() => {
     if (!inView || isNaN(num)) return;
+    // MotionConfig only governs declarative components, so the imperative
+    // animate() call has to check the preference itself.
+    if (reduce) {
+      setDisplay(num.toFixed(decimals));
+      return;
+    }
     const controls = animate(0, num, {
       duration: 1.6,
       ease: [0.16, 1, 0.3, 1],
       onUpdate: (v) => setDisplay(v.toFixed(decimals)),
     });
     return () => controls.stop();
-  }, [inView, num, decimals]);
+  }, [inView, num, decimals, reduce]);
 
   return (
     <span ref={ref} className="display block text-[clamp(2.6rem,6vw,4rem)] text-gold-foil">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { LogoImage } from "./Logo";
 import { useLang } from "./LanguageProvider";
@@ -8,6 +9,11 @@ import { localeNames, locales } from "@/lib/i18n";
 
 export function Nav() {
   const { t, locale, setLocale } = useLang();
+  const pathname = usePathname();
+  // The section anchors only exist on the home page, so off-home they need to
+  // point back at it rather than at a fragment that isn't there.
+  const onHome = pathname === "/";
+  const anchor = (hash: string) => (onHome ? hash : `/${hash}`);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -19,10 +25,10 @@ export function Nav() {
   }, []);
 
   const links = [
-    { href: "#services", label: t.nav.services },
-    { href: "#why", label: t.nav.why },
-    { href: "#partners", label: t.nav.partners },
-    { href: "#contact", label: t.nav.contact },
+    { href: "/services", label: t.nav.services },
+    { href: anchor("#why"), label: t.nav.why },
+    { href: anchor("#partners"), label: t.nav.partners },
+    { href: anchor("#contact"), label: t.nav.contact },
   ];
 
   return (
@@ -35,7 +41,7 @@ export function Nav() {
       }`}
     >
       <nav className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-5 sm:px-8">
-        <a href="#top" className="flex items-center gap-3 group">
+        <a href={onHome ? "#top" : "/"} className="flex items-center gap-3 group">
           <LogoImage
             height={48}
             priority
@@ -71,7 +77,7 @@ export function Nav() {
             ))}
           </div>
 
-          <a href="#contact" className="btn-gold hidden lg:inline-flex !px-5 !py-2.5 !text-[0.72rem]">
+          <a href={anchor("#contact")} className="btn-gold hidden lg:inline-flex !px-5 !py-2.5 !text-[0.72rem]">
             {t.nav.cta}
           </a>
 

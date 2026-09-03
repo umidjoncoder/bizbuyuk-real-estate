@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { MotionConfig } from "motion/react";
 import { defaultLocale, dictionary, type Dict, type Locale, locales } from "@/lib/i18n";
 
 type Ctx = { locale: Locale; setLocale: (l: Locale) => void; t: Dict };
@@ -20,17 +21,26 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (locales.includes(nav as Locale)) setLocaleState(nav as Locale);
   }, []);
 
+  // Keep <html lang> in step with the active locale. Doing it here rather than
+  // only inside setLocale also covers the locale restored from storage or from
+  // the browser's own language on first load.
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
+
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
     try {
       localStorage.setItem("bb-locale", l);
-      document.documentElement.lang = l;
     } catch {}
   }, []);
 
   return (
     <LanguageContext.Provider value={{ locale, setLocale, t: dictionary[locale] }}>
-      {children}
+      {/* This is the app's client root, so it is also where motion picks up the
+          visitor's reduced-motion setting. Without it every scroll reveal,
+          parallax and count-up plays regardless of that preference. */}
+      <MotionConfig reducedMotion="user">{children}</MotionConfig>
     </LanguageContext.Provider>
   );
 }

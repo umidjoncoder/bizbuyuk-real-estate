@@ -13,6 +13,8 @@ const serviceAlt = [
 
 export function Services() {
   const { t } = useLang();
+  // The teaser cards line up with the first three blocks of the services page.
+  const targets = t.servicesPage.blocks.map((b) => `/services#${b.id}`);
 
   return (
     <section id="services" className="surface-light">
@@ -27,8 +29,8 @@ export function Services() {
             </Reveal>
           </div>
           <Reveal delay={0.16}>
-            <a href="#contact" className="btn-outline text-coal shrink-0">
-              <span>{t.nav.cta}</span>
+            <a href="/services" className="btn-outline text-coal shrink-0">
+              <span>{t.hero.ctaAlt}</span>
             </a>
           </Reveal>
         </div>
@@ -36,7 +38,9 @@ export function Services() {
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {t.services.items.map((s, i) => (
             <Reveal key={s.tag} delay={0.1 + i * 0.12}>
-              <article className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] bg-sand-2 shadow-[0_2px_30px_-12px_rgba(21,18,13,0.18)] ring-1 ring-line-dark transition-all duration-500 hover:shadow-[0_30px_60px_-24px_rgba(21,18,13,0.35)]">
+              <a
+                href={targets[i]}
+                className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] bg-sand-2 shadow-[0_2px_30px_-12px_rgba(21,18,13,0.18)] ring-1 ring-line-dark transition-all duration-500 hover:shadow-[0_30px_60px_-24px_rgba(21,18,13,0.35)]">
                 <div className="card-img relative aspect-[4/3]">
                   <img
                     src={img(serviceImages[i], 700, 525)}
@@ -58,7 +62,7 @@ export function Services() {
                     </svg>
                   </span>
                 </div>
-              </article>
+              </a>
             </Reveal>
           ))}
         </div>

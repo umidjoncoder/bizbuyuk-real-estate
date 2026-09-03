@@ -73,7 +73,7 @@ export function Hero() {
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
           </MagneticButton>
-          <a href="#services" className="btn-outline text-cream">
+          <a href="/services" className="btn-outline text-cream">
             <span>{t.hero.ctaAlt}</span>
           </a>
         </motion.div>

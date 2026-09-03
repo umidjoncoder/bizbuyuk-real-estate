@@ -1,17 +1,21 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useLang } from "./LanguageProvider";
 import { LogoImage } from "./Logo";
 import { CONTACT } from "@/lib/i18n";
 
 export function Footer() {
   const { t } = useLang();
+  const pathname = usePathname();
+  const onHome = pathname === "/";
+  const anchor = (hash: string) => (onHome ? hash : `/${hash}`);
 
   const nav = [
-    { href: "#services", label: t.nav.services },
-    { href: "#why", label: t.nav.why },
-    { href: "#partners", label: t.nav.partners },
-    { href: "#contact", label: t.nav.contact },
+    { href: "/services", label: t.nav.services },
+    { href: anchor("#why"), label: t.nav.why },
+    { href: anchor("#partners"), label: t.nav.partners },
+    { href: anchor("#contact"), label: t.nav.contact },
   ];
 
   return (
@@ -19,7 +23,7 @@ export function Footer() {
       <div className="mx-auto max-w-[1280px] px-5 py-16 sm:px-8">
         <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>
-            <a href="#top" className="inline-flex">
+            <a href={onHome ? "#top" : "/"} className="inline-flex">
               <LogoImage height={72} className="rounded-lg" />
             </a>
             <p className="mt-5 max-w-[40ch] text-sm leading-relaxed text-muted">{t.footer.blurb}</p>
