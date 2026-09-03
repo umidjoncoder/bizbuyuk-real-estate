@@ -31,9 +31,11 @@ export function Hero() {
         />
       </motion.div>
 
-      {/* legibility overlays */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-ink via-ink/88 to-ink/30" />
-      <div className="absolute inset-0 z-[1] bg-gradient-to-t from-ink via-ink/40 to-ink/55" />
+      {/* Legibility overlays. The horizontal scrim carries the headline on the
+          left; the vertical one only needs to settle the top and bottom edges,
+          so it stays light enough for the photo to read on the right. */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-ink via-ink/85 to-ink/15" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-t from-ink/85 via-transparent to-ink/45" />
 
       <motion.div style={{ opacity: fade }} className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1280px] flex-col justify-center px-5 pt-28 pb-28 sm:px-8">
         <motion.div
