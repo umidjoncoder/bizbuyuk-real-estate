@@ -19,9 +19,13 @@ type Stat = { value: string; label: string };
 type Step = { title: string; body: string };
 type SubService = { title: string; body: string };
 type ServiceBlock = { id: string; nav: string; title: string; intro: string; items: SubService[] };
+type RenoStep = { n: string; title: string; lead: string; body: string };
+type NamedCard = { title: string; body: string };
+type ListGroup = { title: string; items: string[] };
+type FaqItem = { q: string; a: string };
 
 export type Dict = {
-  nav: { services: string; partners: string; why: string; contact: string; cta: string };
+  nav: { services: string; renovation: string; partners: string; why: string; contact: string; cta: string };
   hero: {
     eyebrow: string;
     titleA: string;
@@ -88,11 +92,53 @@ export type Dict = {
     askWhatsApp: string;
     cta: { title: string; body: string };
   };
+  renovationPage: {
+    metaTitle: string;
+    metaDescription: string;
+    home: string;
+    current: string;
+    hero: { eyebrow: string; l1: string; l2: string; l3: string; sub: string; cta: string; ctaAlt: string };
+    scope: { title: string; lead: string; groups: ListGroup[]; closing: string };
+    process: { eyebrow: string; title: string; steps: RenoStep[] };
+    design: { title: string; lead: string; body: string; styles: string[] };
+    beforeAfter: { title: string; lead: string; before: string; after: string; hint: string; empty: string };
+    fullService: { title: string; lead: string; cards: NamedCard[] };
+    furniture: { title: string; lead: string; groups: ListGroup[]; cta: string };
+    investor: { title: string; lead: string; items: string[]; cta: string };
+    portfolio: { title: string; lead: string; filters: string[]; empty: string };
+    quote: {
+      title: string;
+      lead: string;
+      name: string;
+      phone: string;
+      email: string;
+      location: string;
+      propertyType: string;
+      propertyTypes: string[];
+      size: string;
+      condition: string;
+      conditions: string[];
+      style: string;
+      budget: string;
+      budgets: string[];
+      message: string;
+      messagePlaceholder: string;
+      photosNote: string;
+      submit: string;
+      sending: string;
+      success: string;
+      error: string;
+      consent: string;
+    };
+    why: { title: string; cards: NamedCard[] };
+    faq: { title: string; lead: string; items: FaqItem[] };
+    finalCta: { title: string; lead: string; cta: string; ctaAlt: string };
+  };
 };
 
 export const dictionary: Record<Locale, Dict> = {
   en: {
-    nav: { services: "Services", partners: "Developers", why: "Why Us", contact: "Contact", cta: "Get a consultation" },
+    nav: { services: "Services", renovation: "Renovation", partners: "Developers", why: "Why Us", contact: "Contact", cta: "Get a consultation" },
     hero: {
       eyebrow: "UAE · Real Estate · Est. 2020",
       titleA: "Your trusted partner in the",
@@ -279,9 +325,268 @@ export const dictionary: Record<Locale, Dict> = {
         body: "Describe your situation in two sentences. We will tell you where to start and what you need at each step.",
       },
     },
+    renovationPage: {
+      metaTitle: "Turnkey Renovation in Dubai",
+      metaDescription:
+        "BIZBUYUK provides complete turnkey renovation in Dubai: interior design and 3D visualisation, full renovation, custom furniture and final furnishing. One team, one contract, a move-in ready property.",
+      home: "Home",
+      current: "Turnkey Renovation",
+      hero: {
+        eyebrow: "Turnkey Renovation",
+        l1: "Your property.",
+        l2: "Our vision.",
+        l3: "Move-in ready.",
+        sub: "From an empty space to a fully furnished home. We handle the entire process, from design and renovation to furniture and final installation.",
+        cta: "Get a free consultation",
+        ctaAlt: "View our projects",
+      },
+      scope: {
+        title: "Everything. From zero to move-in ready.",
+        lead: "You do not need to coordinate a dozen contractors. The whole renovation runs under one roof, one schedule and one contract.",
+        groups: [
+          {
+            title: "Design and planning",
+            items: ["Interior design", "Architectural planning", "3D visualisation"],
+          },
+          {
+            title: "Construction",
+            items: [
+              "Full renovation",
+              "Electrical works",
+              "Plumbing",
+              "Flooring",
+              "Painting",
+              "Ceiling and lighting",
+              "Kitchen",
+              "Bathrooms",
+              "Custom carpentry",
+              "Wardrobes",
+            ],
+          },
+          {
+            title: "Furnishing and handover",
+            items: [
+              "Curtains",
+              "Furniture",
+              "Decorative elements",
+              "Appliances",
+              "Final installation",
+              "Final cleaning",
+            ],
+          },
+        ],
+        closing: "You give us the keys. We give you a ready-to-live property.",
+      },
+      process: {
+        eyebrow: "How it works",
+        title: "Six stages, one team",
+        steps: [
+          {
+            n: "01",
+            title: "Consultation",
+            lead: "We understand your property, lifestyle and budget.",
+            body: "We visit the property, measure it, go through how you intend to use it and agree what the budget has to cover.",
+          },
+          {
+            n: "02",
+            title: "Design",
+            lead: "Your space gets a complete design concept.",
+            body: "Floor plans, materials, colour palette and furniture layout, developed around your taste and the way the property will be used.",
+          },
+          {
+            n: "03",
+            title: "3D visualisation",
+            lead: "See your future home before renovation begins.",
+            body: "Photorealistic renders of every room. Nothing is demolished until you have seen the result and approved it.",
+          },
+          {
+            n: "04",
+            title: "Renovation",
+            lead: "Our team transforms the space.",
+            body: "Demolition, electrics, plumbing, finishes and carpentry, run to the schedule agreed with the design, with progress reported as it goes.",
+          },
+          {
+            n: "05",
+            title: "Furnishing",
+            lead: "We furnish every detail.",
+            body: "Furniture, lighting, curtains, kitchen, wardrobes, appliances and decor, procured, delivered and installed.",
+          },
+          {
+            n: "06",
+            title: "Move in",
+            lead: "Your property is ready.",
+            body: "Final inspection, deep clean and handover. You bring a suitcase.",
+          },
+        ],
+      },
+      design: {
+        title: "Designed for your lifestyle",
+        lead: "Every property is different. Every client is different.",
+        body: "Our designers build a concept around how you actually live, the property type and, for investors, what the unit needs to earn. The style is your decision, not a template we reuse.",
+        styles: [
+          "Modern",
+          "Minimalist",
+          "Luxury",
+          "Contemporary",
+          "Japandi",
+          "Classic",
+          "Hotel-style",
+          "Custom design",
+        ],
+      },
+      beforeAfter: {
+        title: "From empty to extraordinary",
+        lead: "Drag the handle to see the same room before and after.",
+        before: "Before",
+        after: "After",
+        hint: "Drag to compare",
+        empty: "Project comparisons are being prepared.",
+      },
+      fullService: {
+        title: "One team. One contract. One result.",
+        lead: "No separate designers, contractors, carpenters, electricians and furniture suppliers to manage. BIZBUYUK coordinates the project from concept to completion.",
+        cards: [
+          { title: "Design", body: "Interior design and 3D visualisation." },
+          { title: "Renovation", body: "Complete construction and renovation works." },
+          { title: "Carpentry", body: "Custom-made furniture and wardrobes." },
+          { title: "Kitchen", body: "Complete kitchen design and installation." },
+          { title: "Bathroom", body: "Full bathroom renovation and fit-out." },
+          { title: "Lighting", body: "Lighting concept and installation." },
+          { title: "Furniture", body: "Selection, procurement and delivery." },
+          { title: "Decor", body: "Curtains, mirrors, artwork and accessories." },
+          { title: "Appliances", body: "Complete appliance package, installed." },
+        ],
+      },
+      furniture: {
+        title: "From walls to furniture",
+        lead: "We do not stop at the renovation. The property is handed over complete.",
+        groups: [
+          {
+            title: "Living and dining",
+            items: ["Sofas", "Dining tables", "Chairs", "TV units", "Coffee tables"],
+          },
+          {
+            title: "Bedroom and storage",
+            items: ["Beds", "Mattresses", "Wardrobes", "Kitchen cabinets"],
+          },
+          {
+            title: "Soft furnishing and decor",
+            items: ["Curtains", "Lighting", "Mirrors", "Rugs", "Artwork", "Accessories"],
+          },
+        ],
+        cta: "Furnish my property",
+      },
+      investor: {
+        title: "Renovation that adds value",
+        lead: "A professionally designed and fully furnished property is easier to let, easier to sell and photographs better than an empty one.",
+        items: [
+          "Property renovation",
+          "Interior design",
+          "Full furnishing",
+          "Long-term rental preparation",
+          "Short-term rental preparation",
+          "Property handover",
+          "Investment-focused design",
+        ],
+        cta: "Talk to an investment specialist",
+      },
+      portfolio: {
+        title: "Our work",
+        lead: "Completed renovations across the Emirates.",
+        filters: ["All", "Apartments", "Villas", "Studio", "1BR", "2BR", "3BR+"],
+        empty: "Project photography is being prepared. Ask us for the current portfolio and we will send it directly.",
+      },
+      quote: {
+        title: "Every property deserves a custom plan",
+        lead: "Renovation cost depends on the size, the condition, the design concept, the materials and how far the furnishing goes. Tell us about the property and you get a written quote.",
+        name: "Your name",
+        phone: "WhatsApp number",
+        email: "Email",
+        location: "Property location",
+        propertyType: "Property type",
+        propertyTypes: ["Apartment", "Villa", "Townhouse", "Studio", "Office"],
+        size: "Size, sq ft",
+        condition: "Current condition",
+        conditions: ["Brand new, handed over", "Lived in, needs a refresh", "Old, needs a full strip-out", "Under construction"],
+        style: "Desired style",
+        budget: "Estimated budget, AED",
+        budgets: ["Up to 100k", "100k - 250k", "250k - 500k", "500k - 1M", "Over 1M", "Not sure yet"],
+        message: "Anything else we should know",
+        messagePlaceholder: "Handover date, what you want kept, how you plan to use the property.",
+        photosNote: "Have photos of the property? Send them on WhatsApp after you submit and we will attach them to your file.",
+        submit: "Request a quote",
+        sending: "Sending…",
+        success: "Thank you. We will come back with questions or a quote within one business day.",
+        error: "Something went wrong. Please try again or message us on WhatsApp.",
+        consent: "By submitting you agree to be contacted about this property.",
+      },
+      why: {
+        title: "Why choose BIZBUYUK",
+        cards: [
+          { title: "One point of contact", body: "One team manages the entire project. You have one person to call." },
+          { title: "Complete service", body: "Design, renovation, furniture and installation under a single contract." },
+          { title: "Transparent process", body: "Agreed scope, agreed timeline, and progress you can actually see." },
+          { title: "Professional design", body: "A custom interior created for your property, not a reused template." },
+          { title: "Quality control", body: "Every stage is checked before it is signed off and before handover." },
+          { title: "Move-in ready", body: "We do not just renovate the property. We prepare it for living." },
+        ],
+      },
+      faq: {
+        title: "Frequently asked questions",
+        lead: "If your question is not here, ask us on WhatsApp.",
+        items: [
+          {
+            q: "How long does a renovation take?",
+            a: "It depends on the size and the scope. A studio or one-bedroom refresh is usually measured in weeks; a full villa strip-out and rebuild in months. You receive a dated schedule together with the design proposal, before any work starts.",
+          },
+          {
+            q: "Do you provide interior design?",
+            a: "Yes. Design is where every project starts: floor plans, materials, colour and furniture layout, followed by 3D renders so you approve the result before anything is demolished.",
+          },
+          {
+            q: "Can you renovate a property that is currently empty?",
+            a: "That is the simplest case. An empty unit means no furniture to protect and no household to work around, so the schedule is shorter.",
+          },
+          {
+            q: "Do you provide furniture?",
+            a: "Yes. We select it, procure it, deliver it and install it. You approve every piece at the design stage.",
+          },
+          {
+            q: "Can you furnish the entire apartment?",
+            a: "Yes, down to mattresses, curtains, mirrors and artwork. At handover it is a property you can sleep in that night.",
+          },
+          {
+            q: "Do you work with villas?",
+            a: "Yes. Apartments, townhouses and villas, in Dubai and across the Emirates.",
+          },
+          {
+            q: "Can I choose the design style and materials?",
+            a: "Yes. The concept is built around your taste and budget, and you sign off the material list before anything is purchased.",
+          },
+          {
+            q: "Do you provide 3D renders before renovation?",
+            a: "Always. Nothing is demolished before you have seen the renders and approved them.",
+          },
+          {
+            q: "Can you manage the project while I am outside the UAE?",
+            a: "Yes, and many owners are abroad for the whole project. You receive scheduled progress updates with photos and video, and approvals are handled remotely.",
+          },
+          {
+            q: "Do you provide a custom quotation?",
+            a: "Yes. Every property gets its own quote based on size, condition, the design concept, the materials and the level of furnishing.",
+          },
+        ],
+      },
+      finalCta: {
+        title: "Ready to transform your property?",
+        lead: "Let us turn your space into a home.",
+        cta: "Start your project",
+        ctaAlt: "WhatsApp us",
+      },
+    },
   },
   ru: {
-    nav: { services: "Услуги", partners: "Застройщики", why: "Почему мы", contact: "Контакты", cta: "Консультация" },
+    nav: { services: "Услуги", renovation: "Ремонт", partners: "Застройщики", why: "Почему мы", contact: "Контакты", cta: "Консультация" },
     hero: {
       eyebrow: "ОАЭ · Недвижимость · с 2020",
       titleA: "Ваш надёжный партнёр на рынке",
@@ -468,9 +773,268 @@ export const dictionary: Record<Locale, Dict> = {
         body: "Опишите ситуацию в двух предложениях. Мы скажем, с чего начать и что понадобится на каждом шаге.",
       },
     },
+    renovationPage: {
+      metaTitle: "Ремонт под ключ в Дубае",
+      metaDescription:
+        "BIZBUYUK выполняет ремонт под ключ в Дубае: дизайн-проект и 3D-визуализация, полный ремонт, мебель на заказ и финальная комплектация. Одна команда, один договор, готовая к заселению недвижимость.",
+      home: "Главная",
+      current: "Ремонт под ключ",
+      hero: {
+        eyebrow: "Ремонт под ключ",
+        l1: "Ваша недвижимость.",
+        l2: "Наш дизайн.",
+        l3: "Готовый дом.",
+        sub: "От дизайн-проекта и полного ремонта до мебели и финальной комплектации: весь процесс мы берём на себя.",
+        cta: "Бесплатная консультация",
+        ctaAlt: "Смотреть проекты",
+      },
+      scope: {
+        title: "Всё. От нуля до готового дома.",
+        lead: "Не нужно координировать десяток подрядчиков. Весь ремонт идёт под одной крышей, по одному графику и одному договору.",
+        groups: [
+          {
+            title: "Дизайн и планирование",
+            items: ["Дизайн интерьера", "Архитектурное планирование", "3D-визуализация"],
+          },
+          {
+            title: "Строительные работы",
+            items: [
+              "Полный ремонт",
+              "Электрика",
+              "Сантехника",
+              "Полы",
+              "Малярные работы",
+              "Потолки и освещение",
+              "Кухня",
+              "Санузлы",
+              "Столярные изделия на заказ",
+              "Шкафы",
+            ],
+          },
+          {
+            title: "Комплектация и сдача",
+            items: [
+              "Шторы",
+              "Мебель",
+              "Декор",
+              "Бытовая техника",
+              "Финальная установка",
+              "Финальная уборка",
+            ],
+          },
+        ],
+        closing: "Вы отдаёте нам ключи. Мы возвращаем готовую к жизни недвижимость.",
+      },
+      process: {
+        eyebrow: "Как это происходит",
+        title: "Шесть этапов, одна команда",
+        steps: [
+          {
+            n: "01",
+            title: "Консультация",
+            lead: "Разбираемся в объекте, образе жизни и бюджете.",
+            body: "Приезжаем на объект, делаем замеры, обсуждаем, как вы будете им пользоваться, и определяем, что должен покрыть бюджет.",
+          },
+          {
+            n: "02",
+            title: "Дизайн",
+            lead: "Ваше пространство получает полноценную концепцию.",
+            body: "Планировки, материалы, цветовая палитра и расстановка мебели, собранные под ваш вкус и способ использования объекта.",
+          },
+          {
+            n: "03",
+            title: "3D-визуализация",
+            lead: "Вы видите будущий дом до начала ремонта.",
+            body: "Фотореалистичные рендеры каждой комнаты. Ничего не демонтируется, пока вы не увидели результат и не согласовали его.",
+          },
+          {
+            n: "04",
+            title: "Ремонт",
+            lead: "Команда преображает пространство.",
+            body: "Демонтаж, электрика, сантехника, отделка и столярка по графику, согласованному вместе с дизайном, с отчётами о ходе работ.",
+          },
+          {
+            n: "05",
+            title: "Комплектация",
+            lead: "Комплектуем каждую деталь.",
+            body: "Мебель, свет, шторы, кухня, шкафы, техника и декор: закупка, доставка и установка.",
+          },
+          {
+            n: "06",
+            title: "Заселение",
+            lead: "Объект готов.",
+            body: "Финальная проверка, генеральная уборка и передача ключей. Вам остаётся привезти чемодан.",
+          },
+        ],
+      },
+      design: {
+        title: "Дизайн под ваш образ жизни",
+        lead: "Каждый объект разный. Каждый клиент разный.",
+        body: "Дизайнеры строят концепцию вокруг того, как вы действительно живёте, типа объекта и, для инвесторов, того, что юнит должен приносить. Стиль выбираете вы, а не шаблон, который мы переиспользуем.",
+        styles: [
+          "Modern",
+          "Минимализм",
+          "Luxury",
+          "Contemporary",
+          "Japandi",
+          "Классика",
+          "Hotel-style",
+          "Индивидуальный проект",
+        ],
+      },
+      beforeAfter: {
+        title: "Из пустой коробки в готовый интерьер",
+        lead: "Потяните ползунок, чтобы увидеть одну и ту же комнату до и после.",
+        before: "До",
+        after: "После",
+        hint: "Потяните для сравнения",
+        empty: "Сравнения по проектам готовятся.",
+      },
+      fullService: {
+        title: "Одна команда. Один договор. Один результат.",
+        lead: "Не нужно отдельно вести дизайнеров, подрядчиков, столяров, электриков и поставщиков мебели. BIZBUYUK ведёт проект от концепции до завершения.",
+        cards: [
+          { title: "Дизайн", body: "Дизайн интерьера и 3D-визуализация." },
+          { title: "Ремонт", body: "Полный комплекс строительных и отделочных работ." },
+          { title: "Столярка", body: "Мебель и шкафы на заказ." },
+          { title: "Кухня", body: "Проект кухни и установка под ключ." },
+          { title: "Санузлы", body: "Полный ремонт и комплектация ванных комнат." },
+          { title: "Освещение", body: "Световая концепция и монтаж." },
+          { title: "Мебель", body: "Подбор, закупка и доставка." },
+          { title: "Декор", body: "Шторы, зеркала, картины и аксессуары." },
+          { title: "Техника", body: "Полный пакет бытовой техники с установкой." },
+        ],
+      },
+      furniture: {
+        title: "От стен до мебели",
+        lead: "Мы не останавливаемся на ремонте. Объект передаётся полностью укомплектованным.",
+        groups: [
+          {
+            title: "Гостиная и столовая",
+            items: ["Диваны", "Обеденные столы", "Стулья", "ТВ-зоны", "Журнальные столы"],
+          },
+          {
+            title: "Спальня и хранение",
+            items: ["Кровати", "Матрасы", "Шкафы", "Кухонные гарнитуры"],
+          },
+          {
+            title: "Текстиль и декор",
+            items: ["Шторы", "Свет", "Зеркала", "Ковры", "Картины", "Аксессуары"],
+          },
+        ],
+        cta: "Укомплектовать объект",
+      },
+      investor: {
+        title: "Ремонт, который добавляет стоимость",
+        lead: "Профессионально спроектированный и полностью укомплектованный объект легче сдать, легче продать и лучше снять для объявления, чем пустой.",
+        items: [
+          "Ремонт объекта",
+          "Дизайн интерьера",
+          "Полная комплектация",
+          "Подготовка к долгосрочной аренде",
+          "Подготовка к краткосрочной аренде",
+          "Передача объекта",
+          "Дизайн с расчётом на доходность",
+        ],
+        cta: "Обсудить с инвест-специалистом",
+      },
+      portfolio: {
+        title: "Наши работы",
+        lead: "Завершённые проекты по Эмиратам.",
+        filters: ["Все", "Квартиры", "Виллы", "Студии", "1BR", "2BR", "3BR+"],
+        empty: "Съёмка проектов готовится. Напишите нам, и мы пришлём актуальное портфолио напрямую.",
+      },
+      quote: {
+        title: "Каждому объекту нужен свой расчёт",
+        lead: "Стоимость ремонта зависит от площади, состояния, концепции, материалов и глубины комплектации. Расскажите об объекте, и вы получите письменный расчёт.",
+        name: "Ваше имя",
+        phone: "Номер WhatsApp",
+        email: "Email",
+        location: "Локация объекта",
+        propertyType: "Тип объекта",
+        propertyTypes: ["Квартира", "Вилла", "Таунхаус", "Студия", "Офис"],
+        size: "Площадь, кв. футов",
+        condition: "Текущее состояние",
+        conditions: ["Новый, после передачи", "Жилой, нужно обновить", "Старый, нужен полный демонтаж", "В стройке"],
+        style: "Желаемый стиль",
+        budget: "Ориентировочный бюджет, AED",
+        budgets: ["До 100k", "100k - 250k", "250k - 500k", "500k - 1M", "Более 1M", "Пока не определён"],
+        message: "Что ещё важно знать",
+        messagePlaceholder: "Дата передачи, что нужно сохранить, как планируете использовать объект.",
+        photosNote: "Есть фотографии объекта? Пришлите их в WhatsApp после отправки формы, и мы приложим их к вашей заявке.",
+        submit: "Запросить расчёт",
+        sending: "Отправляем…",
+        success: "Спасибо. Вернёмся с вопросами или расчётом в течение рабочего дня.",
+        error: "Что-то пошло не так. Попробуйте ещё раз или напишите нам в WhatsApp.",
+        consent: "Отправляя форму, вы соглашаетесь на связь по этому объекту.",
+      },
+      why: {
+        title: "Почему BIZBUYUK",
+        cards: [
+          { title: "Одна точка контакта", body: "Проект ведёт одна команда. У вас один человек, которому можно позвонить." },
+          { title: "Полный цикл", body: "Дизайн, ремонт, мебель и установка по одному договору." },
+          { title: "Прозрачный процесс", body: "Согласованный объём, согласованные сроки и видимый прогресс." },
+          { title: "Профессиональный дизайн", body: "Индивидуальный интерьер под ваш объект, а не переиспользованный шаблон." },
+          { title: "Контроль качества", body: "Каждый этап проверяется до приёмки и до передачи объекта." },
+          { title: "Готово к заселению", body: "Мы не просто делаем ремонт. Мы готовим объект к жизни." },
+        ],
+      },
+      faq: {
+        title: "Частые вопросы",
+        lead: "Если вашего вопроса здесь нет, напишите нам в WhatsApp.",
+        items: [
+          {
+            q: "Сколько длится ремонт?",
+            a: "Зависит от площади и объёма работ. Обновление студии или однокомнатной квартиры считается неделями, полный демонтаж и восстановление виллы — месяцами. График с датами вы получаете вместе с дизайн-проектом, до начала работ.",
+          },
+          {
+            q: "Вы делаете дизайн интерьера?",
+            a: "Да. С дизайна начинается каждый проект: планировки, материалы, цвет и расстановка мебели, затем 3D-рендеры, чтобы вы согласовали результат до демонтажа.",
+          },
+          {
+            q: "Можно ли отремонтировать пустой объект?",
+            a: "Это самый простой случай. В пустом юните нечего защищать и не нужно подстраиваться под жильцов, поэтому сроки короче.",
+          },
+          {
+            q: "Вы предоставляете мебель?",
+            a: "Да. Подбираем, закупаем, доставляем и устанавливаем. Каждый предмет вы согласовываете на этапе дизайна.",
+          },
+          {
+            q: "Можете укомплектовать квартиру полностью?",
+            a: "Да, вплоть до матрасов, штор, зеркал и картин. На передаче это объект, в котором можно ночевать в тот же день.",
+          },
+          {
+            q: "Вы работаете с виллами?",
+            a: "Да. Квартиры, таунхаусы и виллы, в Дубае и по Эмиратам.",
+          },
+          {
+            q: "Могу ли я выбрать стиль и материалы?",
+            a: "Да. Концепция строится вокруг вашего вкуса и бюджета, а список материалов вы утверждаете до начала закупок.",
+          },
+          {
+            q: "Делаете ли вы 3D-рендеры до ремонта?",
+            a: "Всегда. Ничего не демонтируется, пока вы не увидели рендеры и не согласовали их.",
+          },
+          {
+            q: "Можете вести проект, пока я за пределами ОАЭ?",
+            a: "Да, и многие собственники находятся за границей весь проект. Вы получаете плановые отчёты с фото и видео, а согласования проходят удалённо.",
+          },
+          {
+            q: "Вы делаете индивидуальный расчёт?",
+            a: "Да. Каждый объект получает свой расчёт по площади, состоянию, концепции, материалам и уровню комплектации.",
+          },
+        ],
+      },
+      finalCta: {
+        title: "Готовы преобразить свой объект?",
+        lead: "Превратим ваше пространство в дом.",
+        cta: "Начать проект",
+        ctaAlt: "Написать в WhatsApp",
+      },
+    },
   },
   uz: {
-    nav: { services: "Xizmatlar", partners: "Quruvchilar", why: "Nega biz", contact: "Aloqa", cta: "Konsultatsiya" },
+    nav: { services: "Xizmatlar", renovation: "Taʼmir", partners: "Quruvchilar", why: "Nega biz", contact: "Aloqa", cta: "Konsultatsiya" },
     hero: {
       eyebrow: "BAA · Koʻchmas mulk · 2020 yildan",
       titleA: "BAA koʻchmas mulk bozoridagi",
@@ -655,6 +1219,265 @@ export const dictionary: Record<Locale, Dict> = {
       cta: {
         title: "Qaysi xizmat aynan sizga kerakligini bilmayapsizmi?",
         body: "Vaziyatingizni ikki gapda yozing. Nimadan boshlash va har bir qadamda nima kerakligini aytamiz.",
+      },
+    },
+    renovationPage: {
+      metaTitle: "Dubayda kalit topshirish taʼmiri",
+      metaDescription:
+        "BIZBUYUK Dubayda kalit topshirish taʼmirini bajaradi: dizayn-loyiha va 3D vizualizatsiya, toʻliq taʼmir, buyurtma mebel va yakuniy jihozlash. Bitta jamoa, bitta shartnoma, yashashga tayyor obyekt.",
+      home: "Bosh sahifa",
+      current: "Kalit topshirish taʼmiri",
+      hero: {
+        eyebrow: "Kalit topshirish taʼmiri",
+        l1: "Sizning obyektingiz.",
+        l2: "Bizning dizaynimiz.",
+        l3: "Yashashga tayyor.",
+        sub: "Boʻsh xonadondan toʻliq jihozlangan uygacha. Dizayn va taʼmirdan mebel va yakuniy oʻrnatishgacha butun jarayonni oʻz zimmamizga olamiz.",
+        cta: "Bepul konsultatsiya",
+        ctaAlt: "Loyihalarni koʻrish",
+      },
+      scope: {
+        title: "Hammasi. Noldan yashashga tayyor holatgacha.",
+        lead: "Oʻnlab pudratchini muvofiqlashtirish shart emas. Butun taʼmir bitta tom ostida, bitta jadval va bitta shartnoma boʻyicha boradi.",
+        groups: [
+          {
+            title: "Dizayn va rejalashtirish",
+            items: ["Interyer dizayni", "Arxitektura rejalashtirish", "3D vizualizatsiya"],
+          },
+          {
+            title: "Qurilish ishlari",
+            items: [
+              "Toʻliq taʼmir",
+              "Elektr ishlari",
+              "Santexnika",
+              "Pol qoplamalari",
+              "Boʻyoq ishlari",
+              "Shift va yoritish",
+              "Oshxona",
+              "Hammomlar",
+              "Buyurtma duradgorlik",
+              "Shkaflar",
+            ],
+          },
+          {
+            title: "Jihozlash va topshirish",
+            items: [
+              "Pardalar",
+              "Mebel",
+              "Dekor elementlari",
+              "Maishiy texnika",
+              "Yakuniy oʻrnatish",
+              "Yakuniy tozalash",
+            ],
+          },
+        ],
+        closing: "Siz bizga kalitni berasiz. Biz sizga yashashga tayyor obyektni qaytaramiz.",
+      },
+      process: {
+        eyebrow: "Bu qanday kechadi",
+        title: "Olti bosqich, bitta jamoa",
+        steps: [
+          {
+            n: "01",
+            title: "Konsultatsiya",
+            lead: "Obyektingiz, turmush tarzingiz va byudjetingizni oʻrganamiz.",
+            body: "Obyektga boramiz, oʻlchov olamiz, undan qanday foydalanishingizni muhokama qilamiz va byudjet nimani qoplashi kerakligini belgilaymiz.",
+          },
+          {
+            n: "02",
+            title: "Dizayn",
+            lead: "Xonadoningiz toʻliq dizayn konsepsiyasini oladi.",
+            body: "Rejalar, materiallar, rang palitrasi va mebel joylashuvi: didingiz va obyektdan foydalanish usulingizga moslab ishlab chiqiladi.",
+          },
+          {
+            n: "03",
+            title: "3D vizualizatsiya",
+            lead: "Taʼmir boshlanishidan oldin kelajakdagi uyingizni koʻrasiz.",
+            body: "Har bir xonaning fotorealistik renderi. Siz natijani koʻrib tasdiqlamaguningizcha hech narsa buzilmaydi.",
+          },
+          {
+            n: "04",
+            title: "Taʼmir",
+            lead: "Jamoa xonadonni oʻzgartiradi.",
+            body: "Demontaj, elektr, santexnika, pardoz va duradgorlik: dizayn bilan kelishilgan jadval boʻyicha, jarayon hisoboti bilan.",
+          },
+          {
+            n: "05",
+            title: "Jihozlash",
+            lead: "Har bir detalni jihozlaymiz.",
+            body: "Mebel, yorugʻlik, pardalar, oshxona, shkaflar, texnika va dekor: xarid, yetkazib berish va oʻrnatish.",
+          },
+          {
+            n: "06",
+            title: "Koʻchib kirish",
+            lead: "Obyekt tayyor.",
+            body: "Yakuniy tekshiruv, chuqur tozalash va kalit topshirish. Sizga faqat chamadon olib kelish qoladi.",
+          },
+        ],
+      },
+      design: {
+        title: "Turmush tarzingizga moslangan dizayn",
+        lead: "Har bir obyekt boshqacha. Har bir mijoz boshqacha.",
+        body: "Dizaynerlar konsepsiyani siz qanday yashashingiz, obyekt turi va investorlar uchun yunit qancha daromad keltirishi kerakligiga qarab quradi. Uslubni siz tanlaysiz, biz qayta ishlatadigan shablon emas.",
+        styles: [
+          "Modern",
+          "Minimalizm",
+          "Luxury",
+          "Contemporary",
+          "Japandi",
+          "Klassika",
+          "Hotel-style",
+          "Individual loyiha",
+        ],
+      },
+      beforeAfter: {
+        title: "Boʻsh xonadondan mukammal interyergacha",
+        lead: "Bir xil xonani oldin va keyin koʻrish uchun tutqichni suring.",
+        before: "Oldin",
+        after: "Keyin",
+        hint: "Solishtirish uchun suring",
+        empty: "Loyihalar boʻyicha taqqoslashlar tayyorlanmoqda.",
+      },
+      fullService: {
+        title: "Bitta jamoa. Bitta shartnoma. Bitta natija.",
+        lead: "Dizayner, pudratchi, duradgor, elektrik va mebel yetkazib beruvchilarni alohida boshqarish shart emas. BIZBUYUK loyihani konsepsiyadan yakunigacha olib boradi.",
+        cards: [
+          { title: "Dizayn", body: "Interyer dizayni va 3D vizualizatsiya." },
+          { title: "Taʼmir", body: "Toʻliq qurilish va pardoz ishlari." },
+          { title: "Duradgorlik", body: "Buyurtma mebel va shkaflar." },
+          { title: "Oshxona", body: "Oshxona loyihasi va toʻliq oʻrnatish." },
+          { title: "Hammom", body: "Hammomning toʻliq taʼmiri va jihozlanishi." },
+          { title: "Yoritish", body: "Yorugʻlik konsepsiyasi va montaj." },
+          { title: "Mebel", body: "Tanlash, xarid qilish va yetkazib berish." },
+          { title: "Dekor", body: "Pardalar, koʻzgular, rasmlar va aksessuarlar." },
+          { title: "Texnika", body: "Maishiy texnikaning toʻliq paketi, oʻrnatilgan holda." },
+        ],
+      },
+      furniture: {
+        title: "Devordan mebelgacha",
+        lead: "Biz taʼmir bilan toʻxtamaymiz. Obyekt toʻliq jihozlangan holda topshiriladi.",
+        groups: [
+          {
+            title: "Mehmonxona va ovqatlanish zonasi",
+            items: ["Divanlar", "Ovqat stollari", "Stullar", "TV zonalari", "Jurnal stollari"],
+          },
+          {
+            title: "Yotoqxona va saqlash",
+            items: ["Karavotlar", "Matraslar", "Shkaflar", "Oshxona garnituralari"],
+          },
+          {
+            title: "Tekstil va dekor",
+            items: ["Pardalar", "Yorugʻlik", "Koʻzgular", "Gilamlar", "Rasmlar", "Aksessuarlar"],
+          },
+        ],
+        cta: "Obyektimni jihozlash",
+      },
+      investor: {
+        title: "Qiymat qoʻshadigan taʼmir",
+        lead: "Professional dizayn qilingan va toʻliq jihozlangan obyektni ijaraga berish ham, sotish ham osonroq, eʼlon uchun suratga olish esa yaxshiroq chiqadi.",
+        items: [
+          "Obyekt taʼmiri",
+          "Interyer dizayni",
+          "Toʻliq jihozlash",
+          "Uzoq muddatli ijaraga tayyorlash",
+          "Qisqa muddatli ijaraga tayyorlash",
+          "Obyektni topshirish",
+          "Daromadga yoʻnaltirilgan dizayn",
+        ],
+        cta: "Investitsiya mutaxassisi bilan gaplashish",
+      },
+      portfolio: {
+        title: "Bizning ishlarimiz",
+        lead: "Amirliklar boʻylab yakunlangan loyihalar.",
+        filters: ["Hammasi", "Kvartiralar", "Villalar", "Studiya", "1BR", "2BR", "3BR+"],
+        empty: "Loyihalar suratga olinmoqda. Bizga yozing, joriy portfolioni toʻgʻridan-toʻgʻri yuboramiz.",
+      },
+      quote: {
+        title: "Har bir obyektga oʻz hisobi kerak",
+        lead: "Taʼmir narxi maydon, holat, dizayn konsepsiyasi, materiallar va jihozlash darajasiga bogʻliq. Obyekt haqida aytib bering, yozma hisob olasiz.",
+        name: "Ismingiz",
+        phone: "WhatsApp raqami",
+        email: "Email",
+        location: "Obyekt lokatsiyasi",
+        propertyType: "Obyekt turi",
+        propertyTypes: ["Kvartira", "Villa", "Taunxaus", "Studiya", "Ofis"],
+        size: "Maydon, kv. fut",
+        condition: "Hozirgi holati",
+        conditions: ["Yangi, topshirilgan", "Yashalgan, yangilash kerak", "Eski, toʻliq demontaj kerak", "Qurilishda"],
+        style: "Istalgan uslub",
+        budget: "Taxminiy byudjet, AED",
+        budgets: ["100k gacha", "100k - 250k", "250k - 500k", "500k - 1M", "1M dan yuqori", "Hali aniq emas"],
+        message: "Yana nima bilishimiz kerak",
+        messagePlaceholder: "Topshirish sanasi, nimani saqlab qolish kerak, obyektdan qanday foydalanmoqchisiz.",
+        photosNote: "Obyekt suratlari bormi? Formani yuborgach WhatsApp orqali joʻnating, arizangizga biriktiramiz.",
+        submit: "Hisob soʻrash",
+        sending: "Yuborilmoqda…",
+        success: "Rahmat. Bir ish kuni ichida savollar yoki hisob bilan qaytamiz.",
+        error: "Nimadir xato ketdi. Qayta urinib koʻring yoki WhatsApp orqali yozing.",
+        consent: "Formani yuborish orqali ushbu obyekt yuzasidan bogʻlanishga rozilik bildirasiz.",
+      },
+      why: {
+        title: "Nega BIZBUYUK",
+        cards: [
+          { title: "Bitta aloqa nuqtasi", body: "Loyihani bitta jamoa olib boradi. Qoʻngʻiroq qiladigan bitta odamingiz bor." },
+          { title: "Toʻliq sikl", body: "Dizayn, taʼmir, mebel va oʻrnatish bitta shartnoma boʻyicha." },
+          { title: "Shaffof jarayon", body: "Kelishilgan hajm, kelishilgan muddat va koʻrinadigan jarayon." },
+          { title: "Professional dizayn", body: "Obyektingiz uchun individual interyer, qayta ishlatilgan shablon emas." },
+          { title: "Sifat nazorati", body: "Har bir bosqich qabul qilishdan va topshirishdan oldin tekshiriladi." },
+          { title: "Yashashga tayyor", body: "Biz shunchaki taʼmir qilmaymiz. Obyektni yashashga tayyorlaymiz." },
+        ],
+      },
+      faq: {
+        title: "Koʻp beriladigan savollar",
+        lead: "Savolingiz bu yerda boʻlmasa, WhatsApp orqali yozing.",
+        items: [
+          {
+            q: "Taʼmir qancha vaqt oladi?",
+            a: "Maydon va ish hajmiga bogʻliq. Studiya yoki bir xonali kvartirani yangilash haftalar bilan, villani toʻliq buzib qayta qurish oylar bilan oʻlchanadi. Sanalari bilan jadvalni dizayn-loyiha bilan birga, ishlar boshlanishidan oldin olasiz.",
+          },
+          {
+            q: "Interyer dizaynini qilasizmi?",
+            a: "Ha. Har bir loyiha dizayndan boshlanadi: rejalar, materiallar, rang va mebel joylashuvi, keyin 3D renderlar, toki siz demontajdan oldin natijani tasdiqlaysiz.",
+          },
+          {
+            q: "Boʻsh obyektni taʼmirlash mumkinmi?",
+            a: "Bu eng oddiy holat. Boʻsh yunitda himoyalanadigan mebel ham, moslashadigan xonadon aholisi ham yoʻq, shuning uchun muddat qisqaroq.",
+          },
+          {
+            q: "Mebelni ham beradsizmi?",
+            a: "Ha. Tanlaymiz, xarid qilamiz, yetkazamiz va oʻrnatamiz. Har bir buyumni dizayn bosqichida siz tasdiqlaysiz.",
+          },
+          {
+            q: "Kvartirani toʻliq jihozlay olasizmi?",
+            a: "Ha, matras, parda, koʻzgu va rasmlargacha. Topshirishda bu oʻsha kuniyoq tunab qolish mumkin boʻlgan obyekt.",
+          },
+          {
+            q: "Villalar bilan ishlaysizmi?",
+            a: "Ha. Kvartiralar, taunxauslar va villalar, Dubayda va Amirliklar boʻylab.",
+          },
+          {
+            q: "Uslub va materiallarni oʻzim tanlay olamanmi?",
+            a: "Ha. Konsepsiya sizning didingiz va byudjetingiz atrofida quriladi, materiallar roʻyxatini esa xarid boshlanishidan oldin siz tasdiqlaysiz.",
+          },
+          {
+            q: "Taʼmirdan oldin 3D render beradsizmi?",
+            a: "Doim. Siz renderlarni koʻrib tasdiqlamaguningizcha hech narsa buzilmaydi.",
+          },
+          {
+            q: "Men BAAdan tashqarida boʻlsam, loyihani olib bora olasizmi?",
+            a: "Ha, koʻp egalar butun loyiha davomida chet elda boʻladi. Surat va video bilan rejali hisobotlar olasiz, tasdiqlashlar esa masofadan boradi.",
+          },
+          {
+            q: "Individual hisob tuzasizmi?",
+            a: "Ha. Har bir obyekt maydon, holat, konsepsiya, materiallar va jihozlash darajasi boʻyicha oʻz hisobini oladi.",
+          },
+        ],
+      },
+      finalCta: {
+        title: "Obyektingizni oʻzgartirishga tayyormisiz?",
+        lead: "Xonadoningizni uyga aylantiramiz.",
+        cta: "Loyihani boshlash",
+        ctaAlt: "WhatsApp orqali yozish",
       },
     },
   },

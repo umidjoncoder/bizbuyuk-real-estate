@@ -8,7 +8,7 @@ import { ProtectionSection } from "@/components/services/ProtectionSection";
 import { RelocationSection } from "@/components/services/RelocationSection";
 import { ManagementSection } from "@/components/services/ManagementSection";
 import { ServicesCta } from "@/components/services/ServicesCta";
-import { HashScroll } from "@/components/services/HashScroll";
+import { HashScroll } from "@/components/HashScroll";
 import { dictionary } from "@/lib/i18n";
 
 const SITE = "https://bizbuyuk.com";

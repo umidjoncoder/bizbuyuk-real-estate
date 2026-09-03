@@ -23,6 +23,9 @@ export const BRAND = {
   rental: "/brand/rental.webp",
   resale: "/brand/resale.webp",
   cta: "/brand/cta.webp",
+  renoHero: "/brand/reno-hero.webp",
+  renoDesign: "/brand/reno-design.webp",
+  renoCta: "/brand/reno-cta.webp",
 } as const;
 
 export function img(id: string, w = 1200, h?: number) {

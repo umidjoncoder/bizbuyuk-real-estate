@@ -81,7 +81,7 @@ export function LeadForm() {
   return (
     <section id="contact" className="surface-light">
       <div className="mx-auto grid max-w-[1180px] items-center gap-12 px-5 py-24 sm:px-8 sm:py-32 lg:grid-cols-2 lg:gap-20">
-        <div>
+        <div className="min-w-0">
           <Reveal>
             <p className="eyebrow mb-4">{t.lead.eyebrow}</p>
           </Reveal>
@@ -106,7 +106,7 @@ export function LeadForm() {
           </Reveal>
         </div>
 
-        <Reveal delay={0.2}>
+        <Reveal delay={0.2} className="min-w-0">
           <div className="relative rounded-[1.6rem] bg-white p-7 shadow-[0_30px_70px_-30px_rgba(21,18,13,0.4)] ring-1 ring-line-dark sm:p-9">
             <AnimatePresence mode="wait">
               {status === "success" ? (
@@ -165,7 +165,7 @@ export function LeadForm() {
 
                   <div>
                     <label className="mb-2 block text-sm font-bold text-coal">{t.lead.contactPref}</label>
-                    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                    <div className="grid min-w-0 grid-cols-2 gap-2.5 sm:grid-cols-4">
                       {contactOptions.map((opt) => {
                         const active = preferred === opt.value;
                         return (

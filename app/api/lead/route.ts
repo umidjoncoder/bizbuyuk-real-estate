@@ -15,9 +15,21 @@ type LeadBody = {
   page?: string;
   utm?: { source?: string; medium?: string; campaign?: string };
   referrer?: string;
+  /** Extra qualifying answers, e.g. the renovation quote brief. Free-form
+      label/value pairs so a new form can add a field without a schema change. */
+  details?: { label?: string; value?: string }[];
   /** honeypot — bots fill this, humans don't */
   company?: string;
 };
+
+/** Trim the submitted brief down to something safe to store and send on. */
+function cleanDetails(raw: LeadBody["details"]): { label: string; value: string }[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((d) => ({ label: String(d?.label ?? "").trim().slice(0, 60), value: String(d?.value ?? "").trim().slice(0, 600) }))
+    .filter((d) => d.label && d.value)
+    .slice(0, 20);
+}
 
 // Work out a human-friendly lead source from UTM params or the referrer host,
 // so the CRM shows "Facebook" / "Instagram" / "Google" instead of a blank.
@@ -78,6 +90,8 @@ export async function POST(req: Request) {
   }).format(new Date());
 
   const source = deriveSource(body.utm, body.referrer);
+  const details = cleanDetails(body.details);
+  const detailsText = details.map((d) => `${d.label}: ${d.value}`).join("\n");
 
   // Save to CRM database — but don't create duplicates. A repeat inquiry from the
   // same phone is logged as a comment on the existing lead instead.
@@ -93,19 +107,30 @@ export async function POST(req: Request) {
 
     if (dup) {
       await prisma.comment.create({
-        data: { leadId: dup.id, author: "Website", text: `Repeat website inquiry (${source})${preferredContact ? ` · prefers ${preferredContact}` : ""}${email ? ` · ${email}` : ""}` },
+        data: {
+          leadId: dup.id,
+          text:
+            `Repeat website inquiry (${source})${preferredContact ? ` · prefers ${preferredContact}` : ""}${email ? ` · ${email}` : ""}` +
+            (detailsText ? `\n\n${detailsText}` : ""),
+          author: "Website",
+        },
       });
       await prisma.auditLog.create({
         data: { action: "WEBSITE_LEAD", details: JSON.stringify({ name, phone, source, preferredContact, duplicate: true, mergedInto: dup.id }) },
       });
     } else {
-      await prisma.lead.create({
+      const created = await prisma.lead.create({
         data: { name, phone, email: email || null, source, status: "NEW", preferredContact },
       });
+      if (detailsText) {
+        await prisma.comment.create({
+          data: { leadId: created.id, author: "Website", text: detailsText },
+        });
+      }
       await prisma.auditLog.create({
         data: {
           action: "WEBSITE_LEAD",
-          details: JSON.stringify({ name, phone, email, preferredContact, locale, source, utm: body.utm || null, referrer: body.referrer || null, page: body.page || null }),
+          details: JSON.stringify({ name, phone, email, preferredContact, locale, source, utm: body.utm || null, referrer: body.referrer || null, page: body.page || null, brief: details.length ? details : null }),
         },
       });
     }
@@ -114,8 +139,8 @@ export async function POST(req: Request) {
   }
 
   const results = await Promise.allSettled([
-    sendTelegram({ name, phone, email, preferredContact, locale, when, source }),
-    sendEmail({ name, phone, email, preferredContact, locale, when, source }),
+    sendTelegram({ name, phone, email, preferredContact, locale, when, source, details }),
+    sendEmail({ name, phone, email, preferredContact, locale, when, source, details }),
   ]);
 
   const configured = results.filter((r) => r.status === "fulfilled" && r.value !== "skipped");
@@ -137,7 +162,16 @@ export async function POST(req: Request) {
 }
 
 
-type Lead = { name: string; phone: string; email: string; preferredContact: string | null; locale: string; when: string; source: string };
+type Lead = {
+  name: string;
+  phone: string;
+  email: string;
+  preferredContact: string | null;
+  locale: string;
+  when: string;
+  source: string;
+  details: { label: string; value: string }[];
+};
 
 // Emoji + label for the preferred channel, used in the Telegram alert.
 function prefBadge(pref: string | null): string {
@@ -169,7 +203,11 @@ async function sendTelegram(lead: Lead): Promise<"sent" | "skipped"> {
     `💬 <b>Prefers:</b> ${escapeHtml(prefBadge(lead.preferredContact))}\n` +
     `📍 <b>Source:</b> ${escapeHtml(lead.source)}\n` +
     `🌐 <b>Language:</b> ${lead.locale.toUpperCase()}\n` +
-    `🕒 <b>Time (Dubai):</b> ${escapeHtml(lead.when)}`;
+    `🕒 <b>Time (Dubai):</b> ${escapeHtml(lead.when)}` +
+    (lead.details.length
+      ? `\n\n📋 <b>Brief</b>\n` +
+        lead.details.map((d) => `• <b>${escapeHtml(d.label)}:</b> ${escapeHtml(d.value)}`).join("\n")
+      : "");
 
   const sends = await Promise.allSettled(
     chatIds.map(async (chatId) => {
@@ -213,6 +251,12 @@ async function sendEmail(lead: Lead): Promise<"sent" | "skipped"> {
         <tr><td style="padding:8px 0;color:#9c9488">Source</td><td style="padding:8px 0">${escapeHtml(lead.source)}</td></tr>
         <tr><td style="padding:8px 0;color:#9c9488">Language</td><td style="padding:8px 0">${lead.locale.toUpperCase()}</td></tr>
         <tr><td style="padding:8px 0;color:#9c9488">Time (Dubai)</td><td style="padding:8px 0">${escapeHtml(lead.when)}</td></tr>
+        ${lead.details
+          .map(
+            (d) =>
+              `<tr><td style="padding:8px 0;color:#9c9488;vertical-align:top">${escapeHtml(d.label)}</td><td style="padding:8px 0">${escapeHtml(d.value)}</td></tr>`
+          )
+          .join("")}
       </table>
     </div>`;
 

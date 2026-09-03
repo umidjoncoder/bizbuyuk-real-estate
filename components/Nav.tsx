@@ -26,6 +26,7 @@ export function Nav() {
 
   const links = [
     { href: "/services", label: t.nav.services },
+    { href: "/renovation", label: t.nav.renovation },
     { href: anchor("#why"), label: t.nav.why },
     { href: anchor("#partners"), label: t.nav.partners },
     { href: anchor("#contact"), label: t.nav.contact },
@@ -49,7 +50,7 @@ export function Nav() {
           />
         </a>
 
-        <div className="hidden items-center gap-9 md:flex">
+        <div className="hidden items-center gap-7 md:flex">
           {links.map((l) => (
             <a
               key={l.href}
