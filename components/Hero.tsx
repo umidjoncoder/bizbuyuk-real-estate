@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { useLang } from "./LanguageProvider";
 import { MagneticButton } from "./MagneticButton";
-import { img, IMAGES } from "@/lib/images";
+import { BRAND } from "@/lib/images";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -21,8 +21,9 @@ export function Hero() {
       {/* parallax image */}
       <motion.div style={{ y, scale }} className="absolute inset-0 z-0">
         <img
-          src={img(IMAGES.heroSkyline, 2000)}
-          srcSet={`${img(IMAGES.heroSkyline, 1100)} 1100w, ${img(IMAGES.heroSkyline, 2000)} 2000w`}
+          src={BRAND.homeHero}
+          width={1900}
+          height={1100}
           sizes="100vw"
           alt="Dubai skyline at dusk with the Burj Khalifa"
           fetchPriority="high"

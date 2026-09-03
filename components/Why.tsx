@@ -2,7 +2,7 @@
 
 import { useLang } from "./LanguageProvider";
 import { Reveal } from "./Reveal";
-import { img, IMAGES } from "@/lib/images";
+import { BRAND } from "@/lib/images";
 
 export function Why() {
   const { t } = useLang();
@@ -35,7 +35,9 @@ export function Why() {
           <Reveal delay={0.24}>
             <div className="card-img group mt-10 aspect-[16/11] overflow-hidden rounded-[1.6rem] ring-1 ring-line">
               <img
-                src={img(IMAGES.livingGold, 900, 620)}
+                src={BRAND.homeWhy}
+                width={900}
+                height={620}
                 alt="Premium Dubai apartment interior"
                 loading="lazy"
                 className="h-full w-full object-cover"

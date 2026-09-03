@@ -152,22 +152,32 @@ export const dictionary: Record<Locale, Dict> = {
     marqueeIntro: "Trusted by the developers building the UAE",
     services: {
       eyebrow: "What we do",
-      title: "Three ways we move your goals forward",
+      title: "Everything we handle in the UAE",
       items: [
         {
           tag: "01",
           title: "Real Estate",
-          body: "Off-plan launches and ready homes from the UAE's largest developers. We handle search, negotiation and acquisition — at 0% commission to the buyer.",
+          body: "Off-plan launches and ready homes from the UAE's largest developers. Search, negotiation and acquisition, at 0% commission to the buyer.",
         },
         {
           tag: "02",
           title: "Investment Protection",
-          body: "Legal counsel on the safety of your capital in the UAE, due diligence on every deal, and clear resolutions when situations get complicated.",
+          body: "Due diligence on the developer and the project, escrow and contract checks, and registration with the Dubai Land Department.",
         },
         {
           tag: "03",
           title: "Tourism & Relocation",
-          body: "Visiting, residing or moving to the UAE — full support with residence permits, settling in, and everything in between.",
+          body: "Visiting, residing or moving to the UAE: residence visas, Emirates ID, banking, schools and settling in.",
+        },
+        {
+          tag: "04",
+          title: "Property Management",
+          body: "After the purchase: finding tenants, collecting rent, maintenance and resale when the time is right.",
+        },
+        {
+          tag: "05",
+          title: "Turnkey Renovation",
+          body: "From an empty space to a furnished home: design, 3D renders, full renovation, furniture and final installation.",
         },
       ],
     },
@@ -600,22 +610,32 @@ export const dictionary: Record<Locale, Dict> = {
     marqueeIntro: "Нам доверяют застройщики, которые строят ОАЭ",
     services: {
       eyebrow: "Чем мы занимаемся",
-      title: "Три направления для ваших целей",
+      title: "Всё, что мы берём на себя в ОАЭ",
       items: [
         {
           tag: "01",
           title: "Недвижимость",
-          body: "Старты off-plan и готовые объекты от крупнейших застройщиков ОАЭ. Подбор, переговоры и сделка — с 0% комиссии для покупателя.",
+          body: "Старты off-plan и готовые объекты от крупнейших застройщиков ОАЭ. Подбор, переговоры и сделка, с 0% комиссии для покупателя.",
         },
         {
           tag: "02",
           title: "Защита инвестиций",
-          body: "Юридическое сопровождение по безопасности вашего капитала в ОАЭ, проверка каждой сделки и чёткие решения в сложных ситуациях.",
+          body: "Проверка застройщика и проекта, escrow и график платежей, разбор договора и регистрация в Dubai Land Department.",
         },
         {
           tag: "03",
-          title: "Туризм и релокация",
-          body: "Поездка, проживание или переезд в ОАЭ — полное сопровождение по резидентским визам и обустройству.",
+          title: "Туризм и переезд",
+          body: "Поездка, проживание или переезд в ОАЭ: резидентские визы, Emirates ID, банк, школы и обустройство.",
+        },
+        {
+          tag: "04",
+          title: "Управление недвижимостью",
+          body: "После покупки: поиск арендаторов, сбор платежей, обслуживание объекта и перепродажа, когда это выгодно.",
+        },
+        {
+          tag: "05",
+          title: "Ремонт под ключ",
+          body: "От пустой коробки до готового дома: дизайн, 3D-рендеры, полный ремонт, мебель и финальная комплектация.",
         },
       ],
     },
@@ -1048,7 +1068,7 @@ export const dictionary: Record<Locale, Dict> = {
     marqueeIntro: "BAAni quradigan kompaniyalar bizga ishonadi",
     services: {
       eyebrow: "Nima bilan shugʻullanamiz",
-      title: "Maqsadingiz uchun uchta yoʻnalish",
+      title: "BAAda oʻz zimmamizga oladigan hamma narsa",
       items: [
         {
           tag: "01",
@@ -1058,12 +1078,22 @@ export const dictionary: Record<Locale, Dict> = {
         {
           tag: "02",
           title: "Investitsiya himoyasi",
-          body: "BAAdagi kapitalingiz xavfsizligi boʻyicha yuridik hamrohlik, har bir bitimni tekshirish va murakkab vaziyatlarda aniq yechim.",
+          body: "Quruvchi va loyihani tekshirish, escrow va toʻlov jadvali, shartnoma tahlili va Dubai Land Department'da roʻyxat.",
         },
         {
           tag: "03",
           title: "Turizm va koʻchish",
-          body: "BAAga safar, yashash yoki koʻchib oʻtish: rezident vizasi va joylashishda toʻliq yordam.",
+          body: "BAAga safar, yashash yoki koʻchib oʻtish: rezident vizasi, Emirates ID, bank, maktab va joylashuv.",
+        },
+        {
+          tag: "04",
+          title: "Koʻchmas mulk boshqaruvi",
+          body: "Xariddan soʻng: ijarachi topish, toʻlovlarni yigʻish, obyektga xizmat koʻrsatish va foydali paytda qayta sotish.",
+        },
+        {
+          tag: "05",
+          title: "Kalit topshirish taʼmiri",
+          body: "Boʻsh xonadondan tayyor uygacha: dizayn, 3D render, toʻliq taʼmir, mebel va yakuniy oʻrnatish.",
         },
       ],
     },

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { animate, useInView, useReducedMotion } from "motion/react";
 import { useLang } from "./LanguageProvider";
 import { Reveal } from "./Reveal";
-import { img, IMAGES } from "@/lib/images";
+import { BRAND } from "@/lib/images";
 
 export function Stats() {
   const { t } = useLang();
@@ -16,8 +16,10 @@ export function Stats() {
         <Reveal className="order-2 lg:order-1">
           <div className="card-img group relative aspect-[5/6] overflow-hidden rounded-[1.75rem] ring-1 ring-line sm:aspect-[4/3] lg:aspect-[5/6]">
             <img
-              src={img(IMAGES.downtown, 900)}
-              alt="Downtown Dubai skyline"
+              src={BRAND.homeStats}
+              width={900}
+              height={1080}
+              alt="The UAE coastline lit up at night, from the air"
               loading="lazy"
               className="h-full w-full object-cover"
             />

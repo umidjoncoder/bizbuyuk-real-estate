@@ -26,6 +26,14 @@ export const BRAND = {
   renoHero: "/brand/reno-hero.webp",
   renoDesign: "/brand/reno-design.webp",
   renoCta: "/brand/reno-cta.webp",
+  dirRealEstate: "/brand/dir-realestate.webp",
+  dirProtection: "/brand/dir-protection.webp",
+  dirTourism: "/brand/dir-tourism.webp",
+  dirManagement: "/brand/dir-management.webp",
+  dirRenovation: "/brand/dir-renovation.webp",
+  homeHero: "/brand/home-hero.webp",
+  homeStats: "/brand/home-stats.webp",
+  homeWhy: "/brand/home-why.webp",
 } as const;
 
 export function img(id: string, w = 1200, h?: number) {

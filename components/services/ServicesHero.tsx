@@ -67,7 +67,7 @@ export function ServicesHero() {
                   src={BRAND.hero}
                   width={1200}
                   height={900}
-                  alt="Downtown Dubai and the Burj Khalifa from the air at dusk"
+                  alt="Abu Dhabi skyline at dusk, seen across the water"
                   className="h-full w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/60 to-transparent" />

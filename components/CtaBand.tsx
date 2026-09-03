@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { useLang } from "./LanguageProvider";
 import { Reveal } from "./Reveal";
-import { img, IMAGES } from "@/lib/images";
+import { BRAND } from "@/lib/images";
 
 export function CtaBand() {
   const { t } = useLang();
@@ -16,7 +16,9 @@ export function CtaBand() {
     <section ref={ref} className="relative overflow-hidden">
       <motion.div style={{ y }} className="absolute inset-0 z-0 scale-110">
         <img
-          src={img(IMAGES.sunset, 1900)}
+          src={BRAND.cta}
+          width={1900}
+          height={800}
           alt="Dubai skyline at sunset"
           loading="lazy"
           className="h-full w-full object-cover"
