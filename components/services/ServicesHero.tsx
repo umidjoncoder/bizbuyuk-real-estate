@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { useLang } from "../LanguageProvider";
 import { Reveal } from "../Reveal";
 import { Counter } from "../Stats";
-import { img, IMAGES } from "@/lib/images";
+import { BRAND } from "@/lib/images";
 import { waLink } from "./shared";
 
 export function ServicesHero() {
@@ -64,8 +64,10 @@ export function ServicesHero() {
             <Reveal delay={0.12}>
               <div className="card-img group relative aspect-[4/3] overflow-hidden rounded-[1.75rem] ring-1 ring-line">
                 <img
-                  src={img(IMAGES.burjAlArab, 1000, 750)}
-                  alt="Burj Al Arab on the Dubai coastline"
+                  src={BRAND.hero}
+                  width={1200}
+                  height={900}
+                  alt="Downtown Dubai and the Burj Khalifa from the air at dusk"
                   className="h-full w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/60 to-transparent" />

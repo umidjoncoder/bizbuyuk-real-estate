@@ -3,7 +3,7 @@
 import { ShieldCheck, Lock, FileSearch, Stamp, Scale, Check } from "lucide-react";
 import { useLang } from "../LanguageProvider";
 import { Reveal } from "../Reveal";
-import { img, IMAGES } from "@/lib/images";
+import { BRAND } from "@/lib/images";
 import { AskLine, IconChip } from "./shared";
 
 const icons = [ShieldCheck, Lock, FileSearch, Stamp, Scale];
@@ -46,8 +46,10 @@ export function ProtectionSection() {
             <aside className="overflow-hidden rounded-[1.6rem] ring-1 ring-line lg:sticky lg:top-[150px]">
               <div className="card-img relative h-40">
                 <img
-                  src={img(IMAGES.heroSkyline, 700, 340)}
-                  alt="Dubai skyline at dusk"
+                  src={BRAND.protection}
+                  width={900}
+                  height={450}
+                  alt="Tower facade catching the late afternoon light"
                   loading="lazy"
                   className="h-full w-full object-cover"
                 />

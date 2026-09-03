@@ -3,17 +3,17 @@
 import { Users, Settings, PaintRoller, TrendingUp } from "lucide-react";
 import { useLang } from "../LanguageProvider";
 import { Reveal } from "../Reveal";
-import { img, IMAGES } from "@/lib/images";
+import { BRAND } from "@/lib/images";
 import { AskLine, IconChip } from "./shared";
 
 const icons = [Users, Settings, PaintRoller, TrendingUp];
 /** Two of the four tiles carry a photo so the grid is not four text boxes. */
-const photos: (string | null)[] = [IMAGES.livingGold, null, null, IMAGES.sunset];
+const photos: (string | null)[] = [BRAND.rental, null, null, BRAND.resale];
 const photoAlt = [
-  "Luxury living room in a Dubai apartment",
+  "Sheikh Zayed Road and the Dubai skyline at dusk",
   "",
   "",
-  "UAE waterfront homes at sunset",
+  "Waterfront villas on a UAE island at sunset",
 ];
 
 export function ManagementSection() {
@@ -40,7 +40,9 @@ export function ManagementSection() {
                   <article className="group relative flex min-h-[280px] flex-col justify-end overflow-hidden rounded-[1.6rem] ring-1 ring-line">
                     <div className="card-img absolute inset-0">
                       <img
-                        src={img(photo, 760, 560)}
+                        src={photo}
+                        width={1000}
+                        height={740}
                         alt={photoAlt[i]}
                         loading="lazy"
                         className="h-full w-full object-cover"

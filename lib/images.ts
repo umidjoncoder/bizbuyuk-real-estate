@@ -13,6 +13,18 @@ export const IMAGES = {
   bedroom: "1638454668466-e8dbd5462f20",       // bright modern bedroom
 } as const;
 
+/* BIZBUYUK's own photography, graded ivory / graphite / champagne to match the
+   brand. Served from /public/brand and already cropped to the aspect each slot
+   renders at, so no query-string sizing is needed. */
+export const BRAND = {
+  hero: "/brand/hero.webp",
+  realEstate: "/brand/realestate.webp",
+  protection: "/brand/protection.webp",
+  rental: "/brand/rental.webp",
+  resale: "/brand/resale.webp",
+  cta: "/brand/cta.webp",
+} as const;
+
 export function img(id: string, w = 1200, h?: number) {
   const crop = h ? `&h=${h}&fit=crop` : "&fit=max";
   return `${BASE}${id}?auto=format&q=72&w=${w}${crop}`;

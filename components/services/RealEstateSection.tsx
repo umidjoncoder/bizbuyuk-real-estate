@@ -3,7 +3,7 @@
 import { Building2, KeyRound, TrendingUp, ListChecks, FileSignature } from "lucide-react";
 import { useLang } from "../LanguageProvider";
 import { Reveal } from "../Reveal";
-import { img, IMAGES } from "@/lib/images";
+import { BRAND } from "@/lib/images";
 import { AskLine, IconChip } from "./shared";
 import { ProcessStepper } from "./ProcessStepper";
 
@@ -30,8 +30,10 @@ export function RealEstateSection() {
             <article className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] bg-sand-2 ring-1 ring-line-dark transition-shadow duration-500 hover:shadow-[0_30px_60px_-24px_rgba(21,18,13,0.35)]">
               <div className="card-img relative min-h-[220px] flex-1">
                 <img
-                  src={img(IMAGES.livingBright, 820, 620)}
-                  alt="Bright modern apartment interior in the UAE"
+                  src={BRAND.realEstate}
+                  width={900}
+                  height={700}
+                  alt="Living room of a UAE apartment overlooking the Burj Khalifa"
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
