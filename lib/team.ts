@@ -25,7 +25,7 @@ export const LANG_FLAG: Record<LangId, string | null> = {
   az: "az",
   ar: "ae",
   zh: "cn",
-  af: null,
+  af: "af",   // African Union flag: the continent has no state flag of its own
 };
 
 export type Member = {

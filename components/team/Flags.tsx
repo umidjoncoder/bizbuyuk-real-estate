@@ -88,6 +88,17 @@ export function FlagSprite() {
     <use href="#star5" transform="translate(8.5 7.6) rotate(23) scale(.68)"/>
     </g>
     </symbol>
+<symbol id="f-af" viewBox="0 0 24 16">
+    <rect width="24" height="16" fill="#046A38"/>
+    <g fill="#F5C400">
+    <use href="#star5" transform="translate(12.00 2.65) scale(.42)"/><use href="#star5" transform="translate(13.38 2.83) scale(.42)"/><use href="#star5" transform="translate(14.68 3.37) scale(.42)"/><use href="#star5" transform="translate(15.78 4.22) scale(.42)"/><use href="#star5" transform="translate(16.63 5.33) scale(.42)"/><use href="#star5" transform="translate(17.17 6.62) scale(.42)"/>
+    <use href="#star5" transform="translate(17.35 8.00) scale(.42)"/><use href="#star5" transform="translate(17.17 9.38) scale(.42)"/><use href="#star5" transform="translate(16.63 10.67) scale(.42)"/><use href="#star5" transform="translate(15.78 11.78) scale(.42)"/><use href="#star5" transform="translate(14.68 12.63) scale(.42)"/><use href="#star5" transform="translate(13.38 13.17) scale(.42)"/>
+    <use href="#star5" transform="translate(12.00 13.35) scale(.42)"/><use href="#star5" transform="translate(10.62 13.17) scale(.42)"/><use href="#star5" transform="translate(9.33 12.63) scale(.42)"/><use href="#star5" transform="translate(8.22 11.78) scale(.42)"/><use href="#star5" transform="translate(7.37 10.67) scale(.42)"/><use href="#star5" transform="translate(6.83 9.38) scale(.42)"/>
+    <use href="#star5" transform="translate(6.65 8.00) scale(.42)"/><use href="#star5" transform="translate(6.83 6.62) scale(.42)"/><use href="#star5" transform="translate(7.37 5.32) scale(.42)"/><use href="#star5" transform="translate(8.22 4.22) scale(.42)"/><use href="#star5" transform="translate(9.32 3.37) scale(.42)"/><use href="#star5" transform="translate(10.62 2.83) scale(.42)"/>
+    </g>
+    <circle cx="12" cy="8" r="3.9" fill="#fff"/>
+    <path d="M9.30 5.50 10.70 5.02 13.30 5.15 13.78 6.30 14.92 7.35 13.72 7.95 13.26 9.15 12.56 10.58 12.05 11.45 11.45 10.30 11.05 9.05 10.50 8.45 9.75 8.30 9.20 7.40 8.95 6.40 Z" fill="#046A38"/>
+    </symbol>
     <symbol id="f-az" viewBox="0 0 24 16">
     <rect width="24" height="16" fill="#EF3340"/>
     <rect width="24" height="5.333" fill="#00B5E2"/>
