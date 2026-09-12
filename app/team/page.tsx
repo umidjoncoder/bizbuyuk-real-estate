@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { TeamMasthead } from "@/components/team/TeamMasthead";
-import { TeamStrip } from "@/components/team/TeamStrip";
+import { TeamGrid } from "@/components/team/TeamGrid";
+import { TeamCta } from "@/components/team/TeamCta";
 import { dictionary } from "@/lib/i18n";
 import { TEAM } from "@/lib/team";
 
@@ -52,7 +53,8 @@ export default function TeamRoute() {
       <Nav />
       <main id="top" className="pb-24">
         <TeamMasthead />
-        <TeamStrip />
+        <TeamGrid />
+        <TeamCta />
       </main>
       <Footer />
       <script
