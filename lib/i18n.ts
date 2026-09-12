@@ -4,6 +4,8 @@
    `dictionary`, and it appears in the switcher automatically.
    ============================================================ */
 
+import type { LangId } from "./team";
+
 export const locales = ["en", "ru", "uz"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "en";
@@ -25,7 +27,7 @@ type ListGroup = { title: string; items: string[] };
 type FaqItem = { q: string; a: string };
 
 export type Dict = {
-  nav: { services: string; renovation: string; partners: string; why: string; contact: string; cta: string };
+  nav: { services: string; renovation: string; team: string; partners: string; why: string; contact: string; cta: string };
   hero: {
     eyebrow: string;
     titleA: string;
@@ -134,11 +136,99 @@ export type Dict = {
     faq: { title: string; lead: string; items: FaqItem[] };
     finalCta: { title: string; lead: string; cta: string; ctaAlt: string };
   };
+  propertyTypes: Record<string, string>;
+  realEstatePage: {
+    metaTitle: string;
+    metaDescription: string;
+    home: string;
+    current: string;
+    hero: { eyebrow: string; title: string; sub: string; cta: string; ctaAlt: string };
+    stats: Stat[];
+    types: { title: string; lead: string; groups: { title: string; items: NamedCard[] }[] };
+    paths: {
+      title: string;
+      lead: string;
+      offplan: { title: string; body: string; cta: string };
+      ready: { title: string; body: string; cta: string };
+    };
+    districts: {
+      title: string;
+      lead: string;
+      filters: { all: string; established: string; prestige: string; emerging: string };
+      typesLabel: string;
+      note: string;
+      ask: string;
+    };
+    why: { title: string; cards: NamedCard[] };
+    cta: { title: string; body: string };
+    offplan: {
+      metaTitle: string;
+      metaDescription: string;
+      current: string;
+      hero: { eyebrow: string; title: string; sub: string; cta: string };
+      what: { title: string; lead: string; points: NamedCard[] };
+      payment: { title: string; lead: string; plans: NamedCard[]; note: string };
+      process: { title: string; lead: string; steps: RenoStep[] };
+      checks: { title: string; items: string[] };
+      cta: { title: string; body: string };
+    };
+    ready: {
+      metaTitle: string;
+      metaDescription: string;
+      current: string;
+      hero: { eyebrow: string; title: string; sub: string; cta: string };
+      what: { title: string; lead: string; points: NamedCard[] };
+      process: { title: string; lead: string; steps: RenoStep[] };
+      checks: { title: string; items: string[] };
+      cta: { title: string; body: string };
+    };
+  };
+  teamPage: {
+    metaTitle: string;
+    metaDescription: string;
+    eyebrow: string;
+    titleA: string;
+    titleEm: string;
+    lead: string;
+    bandLabel: string;
+    hint: string;
+    reset: string;
+    peopleWord: string;
+    /** `{name}` is replaced with the colleague the visitor picked. */
+    waIntro: string;
+    langs: Record<LangId, string>;
+    langsShort: { af: string };
+    ctaTitle: string;
+    ctaBody: string;
+    ctaButton: string;
+  };
 };
 
 export const dictionary: Record<Locale, Dict> = {
   en: {
-    nav: { services: "Services", renovation: "Renovation", partners: "Developers", why: "Why Us", contact: "Contact", cta: "Get a consultation" },
+    nav: { services: "Services", renovation: "Renovation", team: "Team", partners: "Developers", why: "Why Us", contact: "Contact", cta: "Get a consultation" },
+    teamPage: {
+      metaTitle: "Our team in Dubai",
+      metaDescription:
+        "The BIZBUYUK Real Estate team in Dubai. Seven brokers and directors speaking Russian, English, Uzbek, Kazakh, Tajik, Azerbaijani, Arabic and Chinese. Find the colleague who speaks your language.",
+      eyebrow: "Team",
+      titleA: "You will be heard",
+      titleEm: "in your own language",
+      lead: "The BIZBUYUK office in Dubai. Pick the language you are comfortable in and see who will be looking after you.",
+      bandLabel: "We speak",
+      hint: "Pick a language",
+      reset: "Reset",
+      peopleWord: "on the team",
+      waIntro: "Hello! I am on the BIZBUYUK site and would like to reach {name}.",
+      langs: {
+        ru: "Russian", en: "English", uz: "Uzbek", kz: "Kazakh", tj: "Tajik",
+        az: "Azerbaijani", ar: "Arabic", zh: "Chinese", af: "African languages",
+      },
+      langsShort: { af: "Africa" },
+      ctaTitle: "Not sure who to ask for?",
+      ctaBody: "Write to us and we will put you with the person who speaks your language and covers the part of the market you need.",
+      ctaButton: "Get a consultation",
+    },
     hero: {
       eyebrow: "UAE · Real Estate · Est. 2020",
       titleA: "Your trusted partner in the",
@@ -594,9 +684,249 @@ export const dictionary: Record<Locale, Dict> = {
         ctaAlt: "WhatsApp us",
       },
     },
+    propertyTypes: {
+      studio: "Studio",
+      apartment: "Apartment",
+      penthouse: "Penthouse",
+      villa: "Villa",
+      townhouse: "Townhouse",
+      branded: "Branded residence",
+      luxury: "Luxury",
+      investment: "Investment",
+      offplan: "Off-plan",
+    },
+    realEstatePage: {
+      metaTitle: "Real Estate in Dubai",
+      metaDescription:
+        "Buy property in Dubai with BIZBUYUK: off-plan and ready homes, studios to villas and branded residences, across seventeen districts. 0% commission to the buyer.",
+      home: "Home",
+      current: "Real Estate",
+      hero: {
+        eyebrow: "Real Estate",
+        title: "Every property type, across Dubai.",
+        sub: "We do not sell one building in one district. We start from your budget, your goal and your horizon, then shortlist what actually fits.",
+        cta: "Get a consultation",
+        ctaAlt: "See the districts",
+      },
+      stats: [
+        { value: "17", label: "Districts we work in" },
+        { value: "0%", label: "Commission to the buyer" },
+        { value: "2", label: "Ways to buy: off-plan or ready" },
+      ],
+      types: {
+        title: "What you can buy",
+        lead: "The right type depends on whether you are buying to live, to let or to hold. These are the options we work with, and what each one is usually chosen for.",
+        groups: [
+          {
+            title: "By size",
+            items: [
+              { title: "Studio", body: "The lowest entry price and the highest yield per dirham. Popular with short-let operators and single tenants." },
+              { title: "1 bedroom", body: "The deepest rental market in Dubai. Easy to let, easy to sell on." },
+              { title: "2 bedrooms", body: "The step where couples and small families start looking. Slower to let than a 1BR, longer tenancies." },
+              { title: "3 bedrooms and above", body: "Family stock. Fewer tenants, but they stay for years, which cuts vacancy and turnover cost." },
+              { title: "Penthouse", body: "Top-floor units with private terraces. A thin market, driven by view and finish rather than yield." },
+            ],
+          },
+          {
+            title: "By form",
+            items: [
+              { title: "Apartment", body: "Tower and mid-rise stock. Service charge covers the building, so ownership is close to hands-off." },
+              { title: "Villa", body: "Standalone homes with a plot. Higher entry, higher maintenance, and the strongest capital growth in family communities." },
+              { title: "Townhouse", body: "A villa layout at an apartment budget. The usual compromise for families who want space without a plot." },
+            ],
+          },
+          {
+            title: "By segment",
+            items: [
+              { title: "Luxury property", body: "Prime addresses, larger floor plates, and buyers who care about the view and the neighbours more than the yield." },
+              { title: "Branded residence", body: "Managed by a hotel or fashion brand. Higher price per square foot, and a rental premium that usually follows it." },
+              { title: "Investment property", body: "Chosen on the numbers first: yield, service charge, tenant demand and how easily it sells on." },
+            ],
+          },
+        ],
+      },
+      paths: {
+        title: "Two ways to buy",
+        lead: "Almost every decision comes down to this: pay in instalments while it is built, or buy something that exists today.",
+        offplan: {
+          title: "Off-plan",
+          body: "Bought from the developer before or during construction. Launch pricing, a payment plan spread over the build, and often post-handover instalments. You wait, and you carry construction risk.",
+          cta: "How off-plan works",
+        },
+        ready: {
+          title: "Ready property",
+          body: "Bought from an existing owner. You can view the exact unit, check the building, and let it the month after the transfer. You pay today's price, usually in full.",
+          cta: "How buying ready works",
+        },
+      },
+      districts: {
+        title: "Where we work",
+        lead: "Seventeen districts, each with a different reason to buy there. Filter by how settled the area is, then ask us which projects are open right now.",
+        filters: {
+          all: "All districts",
+          established: "Established",
+          prestige: "Prestige",
+          emerging: "Emerging",
+        },
+        typesLabel: "Typical stock",
+        note: "We also work in districts that are not on this list. If you have one in mind, ask.",
+        ask: "Ask about this district",
+      },
+      why: {
+        title: "How we work",
+        cards: [
+          { title: "0% commission to you", body: "On developer sales our fee is paid by the developer, not added to your price." },
+          { title: "A shortlist, not a catalogue", body: "Two or three units matched to your brief, each with the numbers behind it." },
+          { title: "The whole market", body: "We are not tied to one developer, so the shortlist is chosen on merit." },
+          { title: "Numbers before feelings", body: "Yield, service charge, payment plan and exit are on the table before you decide." },
+          { title: "Checked before you sign", body: "Developer, project status, escrow and contract are all verified first." },
+          { title: "After the purchase", body: "Furnishing, tenants, management and resale, if and when you want them." },
+        ],
+      },
+      cta: {
+        title: "Tell us the budget and the goal.",
+        body: "That is enough to start. We will come back with two or three properties that fit, and the reasoning behind each one.",
+      },
+      offplan: {
+        metaTitle: "Off-plan Property in Dubai",
+        metaDescription:
+          "How buying off-plan in Dubai works: payment plans, down payment, post-handover instalments, developer and escrow checks, and the full process to handover.",
+        current: "Off-plan",
+        hero: {
+          eyebrow: "Off-plan",
+          title: "Buy at launch, pay as it is built.",
+          sub: "Off-plan is the cheapest way into a new Dubai project and the one with the most moving parts. Here is exactly how it works.",
+          cta: "Discuss an off-plan purchase",
+        },
+        what: {
+          title: "What off-plan actually means",
+          lead: "You are buying a unit that does not exist yet, directly from the developer, on a contract that sets both the price and the build schedule.",
+          points: [
+            { title: "Launch pricing", body: "The first release of a project is usually its cheapest. Later phases are priced against demand." },
+            { title: "Payment spread over the build", body: "You pay in instalments tied to construction milestones rather than all at once." },
+            { title: "Capital appreciation", body: "If the area and the project perform, the unit can be worth more at handover than you contracted for. It can also not." },
+            { title: "Construction risk", body: "Handover dates move. The contract, the escrow account and the developer's record are what protect you." },
+          ],
+        },
+        payment: {
+          title: "How payment plans are built",
+          lead: "Almost every plan is a variation on these four parts. The split is what separates an easy purchase from a stretched one.",
+          plans: [
+            { title: "Down payment", body: "Paid at booking, on signing the reservation. This is the number that decides whether a project is within reach." },
+            { title: "During construction", body: "Instalments released against build milestones, or on fixed dates, through to completion." },
+            { title: "On handover", body: "The balance due when the unit is ready and the keys are issued." },
+            { title: "Post-handover", body: "Some developers let part of the price run on after you have the keys, so rent can help carry it." },
+          ],
+          note: "Plans differ by developer and by project, and they change between phases. We compare the actual plans open at the time you are buying.",
+        },
+        process: {
+          title: "The process, start to finish",
+          lead: "Eight stages. You are involved in the first five; we carry the rest.",
+          steps: [
+            { n: "01", title: "Consultation", lead: "Budget, goal, horizon.", body: "We establish what you want the property to do, and what you can commit each year." },
+            { n: "02", title: "Property selection", lead: "Type, size, district.", body: "We narrow to the property type and the areas that match the brief, and rule out the rest." },
+            { n: "03", title: "Project selection", lead: "Developer and phase.", body: "We compare open projects on price, plan, delivery record and what the district supports." },
+            { n: "04", title: "Booking", lead: "The unit is reserved.", body: "Reservation form and booking payment. The unit comes off the market in your name." },
+            { n: "05", title: "SPA", lead: "The contract is signed.", body: "We read the sale and purchase agreement with you before signature: dates, penalties, and what happens if either side slips." },
+            { n: "06", title: "Registration", lead: "Oqood with the DLD.", body: "The purchase is registered with the Dubai Land Department and your interest is recorded." },
+            { n: "07", title: "Construction", lead: "Instalments and progress.", body: "We track milestones and payment calls so nothing is missed and no penalty is triggered." },
+            { n: "08", title: "Handover", lead: "Keys and snagging.", body: "Inspection, snagging list, final payment and title. From here we can furnish it or let it." },
+          ],
+        },
+        checks: {
+          title: "What we verify before you commit",
+          items: [
+            "The developer's delivery record on previous projects",
+            "The project's registration and status with RERA",
+            "That payments go to the project's escrow account",
+            "That the payment schedule in the contract matches what you were shown",
+            "Handover dates, penalty clauses and termination terms",
+            "What the district actually supports in rent and resale",
+          ],
+        },
+        cta: {
+          title: "Which projects are open right now?",
+          body: "Launch phases open and close quickly. Tell us your budget and we will send what is genuinely available this week.",
+        },
+      },
+      ready: {
+        metaTitle: "Ready Property in Dubai",
+        metaDescription:
+          "Buying ready property in Dubai: search, viewings, negotiation, document checks, transfer at the Dubai Land Department and handover.",
+        current: "Ready property",
+        hero: {
+          eyebrow: "Ready property",
+          title: "See it, check it, then buy it.",
+          sub: "A completed unit you can walk through, inspect and let the month after transfer. No build risk, no waiting.",
+          cta: "Discuss a ready purchase",
+        },
+        what: {
+          title: "Why buyers choose ready",
+          lead: "Off-plan is cheaper on paper. Ready is certain.",
+          points: [
+            { title: "You see the actual unit", body: "The view, the floor, the finish and the neighbours are facts, not renders." },
+            { title: "Income from month one", body: "It can be let as soon as the transfer completes, so the asset starts working immediately." },
+            { title: "The building has a track record", body: "Service charge, management quality and rental history are all visible before you buy." },
+            { title: "No construction risk", body: "There is no handover date to slip and no build to monitor." },
+          ],
+        },
+        process: {
+          title: "The process, start to finish",
+          lead: "Nine stages from the first brief to the keys.",
+          steps: [
+            { n: "01", title: "Search", lead: "The brief becomes a list.", body: "We work the market against your budget, district and property type, including units not publicly listed." },
+            { n: "02", title: "Shortlist", lead: "Two or three, not thirty.", body: "We cut the list to what genuinely fits and explain why the rest were dropped." },
+            { n: "03", title: "Analysis", lead: "The numbers per unit.", body: "Asking price against recent transactions, service charge, achievable rent and net yield." },
+            { n: "04", title: "Viewing", lead: "In person or on video.", body: "We walk the unit and the building with you, or record it properly if you are abroad." },
+            { n: "05", title: "Negotiation", lead: "Price and terms.", body: "We negotiate on your side: price, what stays in the unit, and the transfer timeline." },
+            { n: "06", title: "Document check", lead: "Before any money moves.", body: "Title deed, service charge history, outstanding mortgage, NOC position and any restrictions on the unit." },
+            { n: "07", title: "Transaction", lead: "MOU and deposit.", body: "The memorandum of understanding is signed and the deposit is placed under the standard protections." },
+            { n: "08", title: "Registration", lead: "Transfer at the DLD.", body: "Developer NOC, then transfer at the Dubai Land Department and the title deed issued in your name." },
+            { n: "09", title: "Handover", lead: "Keys and utilities.", body: "Keys, access cards, DEWA and cooling transferred. From here we can furnish it or find a tenant." },
+          ],
+        },
+        checks: {
+          title: "What we check on the unit",
+          items: [
+            "Title deed and that the seller is the registered owner",
+            "Any mortgage on the property and how it will be cleared",
+            "Service charge history and whether anything is outstanding",
+            "The building's own management and maintenance record",
+            "Recent transaction prices in the same building, not the asking prices",
+            "Rental history and what the unit realistically achieves",
+          ],
+        },
+        cta: {
+          title: "Looking for something ready?",
+          body: "Tell us the district and the budget. We will come back with what is on the market and what it is actually worth.",
+        },
+      },
+    },
   },
   ru: {
-    nav: { services: "Услуги", renovation: "Ремонт", partners: "Застройщики", why: "Почему мы", contact: "Контакты", cta: "Консультация" },
+    nav: { services: "Услуги", renovation: "Ремонт", team: "Команда", partners: "Застройщики", why: "Почему мы", contact: "Контакты", cta: "Консультация" },
+    teamPage: {
+      metaTitle: "\u041d\u0430\u0448\u0430 \u043a\u043e\u043c\u0430\u043d\u0434\u0430 \u0432 \u0414\u0443\u0431\u0430\u0435",
+      metaDescription:
+        "\u041a\u043e\u043c\u0430\u043d\u0434\u0430 BIZBUYUK Real Estate \u0432 \u0414\u0443\u0431\u0430\u0435. \u0421\u0435\u043c\u044c \u0431\u0440\u043e\u043a\u0435\u0440\u043e\u0432 \u0438 \u0434\u0438\u0440\u0435\u043a\u0442\u043e\u0440\u043e\u0432 \u0433\u043e\u0432\u043e\u0440\u044f\u0442 \u043d\u0430 \u0440\u0443\u0441\u0441\u043a\u043e\u043c, \u0430\u043d\u0433\u043b\u0438\u0439\u0441\u043a\u043e\u043c, \u0443\u0437\u0431\u0435\u043a\u0441\u043a\u043e\u043c, \u043a\u0430\u0437\u0430\u0445\u0441\u043a\u043e\u043c, \u0442\u0430\u0434\u0436\u0438\u043a\u0441\u043a\u043e\u043c, \u0430\u0437\u0435\u0440\u0431\u0430\u0439\u0434\u0436\u0430\u043d\u0441\u043a\u043e\u043c, \u0430\u0440\u0430\u0431\u0441\u043a\u043e\u043c \u0438 \u043a\u0438\u0442\u0430\u0439\u0441\u043a\u043e\u043c.",
+      eyebrow: "\u041a\u043e\u043c\u0430\u043d\u0434\u0430",
+      titleA: "\u0412\u0430\u0441 \u0432\u044b\u0441\u043b\u0443\u0448\u0430\u044e\u0442",
+      titleEm: "\u043d\u0430 \u0432\u0430\u0448\u0435\u043c \u044f\u0437\u044b\u043a\u0435",
+      lead: "\u0414\u0443\u0431\u0430\u0439\u0441\u043a\u0438\u0439 \u043e\u0444\u0438\u0441 BIZBUYUK. \u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u044f\u0437\u044b\u043a, \u043d\u0430 \u043a\u043e\u0442\u043e\u0440\u043e\u043c \u0432\u0430\u043c \u0443\u0434\u043e\u0431\u043d\u043e \u0433\u043e\u0432\u043e\u0440\u0438\u0442\u044c, \u0438 \u0443\u0432\u0438\u0434\u0438\u0442\u0435, \u043a\u0442\u043e \u0438\u0437 \u043d\u0430\u0441 \u0431\u0443\u0434\u0435\u0442 \u0441 \u0432\u0430\u043c\u0438 \u043d\u0430 \u0441\u0432\u044f\u0437\u0438.",
+      bandLabel: "\u0413\u043e\u0432\u043e\u0440\u0438\u043c \u043d\u0430",
+      hint: "\u041d\u0430\u0436\u043c\u0438\u0442\u0435 \u043d\u0430 \u044f\u0437\u044b\u043a",
+      reset: "\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c",
+      peopleWord: "\u0432 \u043a\u043e\u043c\u0430\u043d\u0434\u0435",
+      waIntro: "\u0417\u0434\u0440\u0430\u0432\u0441\u0442\u0432\u0443\u0439\u0442\u0435! \u042f \u043d\u0430 \u0441\u0430\u0439\u0442\u0435 BIZBUYUK \u0438 \u0445\u043e\u0442\u0435\u043b(\u0430) \u0431\u044b \u0441\u0432\u044f\u0437\u0430\u0442\u044c\u0441\u044f \u0441 {name}.",
+      langs: {
+        ru: "\u0420\u0443\u0441\u0441\u043a\u0438\u0439", en: "\u0410\u043d\u0433\u043b\u0438\u0439\u0441\u043a\u0438\u0439", uz: "\u0423\u0437\u0431\u0435\u043a\u0441\u043a\u0438\u0439", kz: "\u041a\u0430\u0437\u0430\u0445\u0441\u043a\u0438\u0439", tj: "\u0422\u0430\u0434\u0436\u0438\u043a\u0441\u043a\u0438\u0439",
+        az: "\u0410\u0437\u0435\u0440\u0431\u0430\u0439\u0434\u0436\u0430\u043d\u0441\u043a\u0438\u0439", ar: "\u0410\u0440\u0430\u0431\u0441\u043a\u0438\u0439", zh: "\u041a\u0438\u0442\u0430\u0439\u0441\u043a\u0438\u0439", af: "\u0410\u0444\u0440\u0438\u043a\u0430\u043d\u0441\u043a\u0438\u0435 \u044f\u0437\u044b\u043a\u0438",
+      },
+      langsShort: { af: "\u0410\u0444\u0440\u0438\u043a\u0430" },
+      ctaTitle: "\u041d\u0435 \u0443\u0432\u0435\u0440\u0435\u043d\u044b, \u043a \u043a\u043e\u043c\u0443 \u043e\u0431\u0440\u0430\u0442\u0438\u0442\u044c\u0441\u044f?",
+      ctaBody: "\u041d\u0430\u043f\u0438\u0448\u0438\u0442\u0435 \u043d\u0430\u043c, \u0438 \u043c\u044b \u043f\u043e\u0434\u0431\u0435\u0440\u0451\u043c \u0447\u0435\u043b\u043e\u0432\u0435\u043a\u0430, \u043a\u043e\u0442\u043e\u0440\u044b\u0439 \u0433\u043e\u0432\u043e\u0440\u0438\u0442 \u043d\u0430 \u0432\u0430\u0448\u0435\u043c \u044f\u0437\u044b\u043a\u0435 \u0438 \u0432\u0435\u0434\u0451\u0442 \u043d\u0443\u0436\u043d\u044b\u0439 \u0432\u0430\u043c \u0441\u0435\u0433\u043c\u0435\u043d\u0442 \u0440\u044b\u043d\u043a\u0430.",
+      ctaButton: "\u041f\u043e\u043b\u0443\u0447\u0438\u0442\u044c \u043a\u043e\u043d\u0441\u0443\u043b\u044c\u0442\u0430\u0446\u0438\u044e",
+    },
     hero: {
       eyebrow: "ОАЭ · Недвижимость · с 2020",
       titleA: "Ваш надёжный партнёр на рынке",
@@ -1052,9 +1382,249 @@ export const dictionary: Record<Locale, Dict> = {
         ctaAlt: "Написать в WhatsApp",
       },
     },
+    propertyTypes: {
+      studio: "Студия",
+      apartment: "Квартира",
+      penthouse: "Пентхаус",
+      villa: "Вилла",
+      townhouse: "Таунхаус",
+      branded: "Branded residence",
+      luxury: "Luxury",
+      investment: "Инвестиционный",
+      offplan: "Off-plan",
+    },
+    realEstatePage: {
+      metaTitle: "Недвижимость в Дубае",
+      metaDescription:
+        "Покупка недвижимости в Дубае с BIZBUYUK: off-plan и готовые объекты, от студий до вилл и branded residences, в семнадцати районах. 0% комиссии для покупателя.",
+      home: "Главная",
+      current: "Недвижимость",
+      hero: {
+        eyebrow: "Недвижимость",
+        title: "Любой тип объекта по всему Дубаю.",
+        sub: "Мы не продаём один дом в одном районе. Начинаем с вашего бюджета, цели и горизонта, а затем собираем короткий список того, что действительно подходит.",
+        cta: "Получить консультацию",
+        ctaAlt: "Смотреть районы",
+      },
+      stats: [
+        { value: "17", label: "Районов в работе" },
+        { value: "0%", label: "Комиссия для покупателя" },
+        { value: "2", label: "Способа купить: off-plan или готовое" },
+      ],
+      types: {
+        title: "Что можно купить",
+        lead: "Тип объекта зависит от того, покупаете вы для жизни, для сдачи или для удержания. Вот варианты, с которыми мы работаем, и для чего обычно выбирают каждый.",
+        groups: [
+          {
+            title: "По размеру",
+            items: [
+              { title: "Студия", body: "Самый низкий вход и самая высокая доходность на вложенный дирхам. Популярна у операторов краткосрочной аренды и одиночных арендаторов." },
+              { title: "1 спальня", body: "Самый ёмкий рынок аренды в Дубае. Легко сдаётся, легко перепродаётся." },
+              { title: "2 спальни", body: "Уровень, с которого начинают смотреть пары и небольшие семьи. Сдаётся медленнее, чем 1BR, но сроки аренды длиннее." },
+              { title: "3 спальни и больше", body: "Семейный формат. Арендаторов меньше, но живут годами, что снижает простой и издержки на смену жильцов." },
+              { title: "Пентхаус", body: "Верхние этажи с собственными террасами. Узкий рынок, где решают вид и отделка, а не доходность." },
+            ],
+          },
+          {
+            title: "По формату",
+            items: [
+              { title: "Квартира", body: "Башни и среднеэтажная застройка. Service charge закрывает здание, поэтому владение почти не требует участия." },
+              { title: "Вилла", body: "Отдельный дом с участком. Выше вход и выше обслуживание, но лучший рост стоимости в семейных комьюнити." },
+              { title: "Таунхаус", body: "Планировка виллы за бюджет квартиры. Обычный компромисс для семей, которым нужно пространство без участка." },
+            ],
+          },
+          {
+            title: "По сегменту",
+            items: [
+              { title: "Luxury", body: "Премиальные адреса, большие площади и покупатели, для которых вид и соседи важнее доходности." },
+              { title: "Branded residence", body: "Под управлением отельного или модного бренда. Выше цена за квадратный фут и, как правило, премия в аренде." },
+              { title: "Инвестиционный объект", body: "Выбирается по цифрам: доходность, service charge, спрос арендаторов и то, насколько легко объект продать." },
+            ],
+          },
+        ],
+      },
+      paths: {
+        title: "Два способа купить",
+        lead: "Почти всё решение сводится к этому: платить в рассрочку, пока объект строится, или купить то, что существует сегодня.",
+        offplan: {
+          title: "Off-plan",
+          body: "Покупка у застройщика до или во время строительства. Стартовая цена, рассрочка на период стройки, часто платежи после передачи. Вы ждёте и берёте на себя строительный риск.",
+          cta: "Как работает off-plan",
+        },
+        ready: {
+          title: "Готовая недвижимость",
+          body: "Покупка у текущего собственника. Можно посмотреть конкретный юнит, проверить здание и сдать его через месяц после перерегистрации. Цена сегодняшняя, обычно оплата целиком.",
+          cta: "Как покупают готовое",
+        },
+      },
+      districts: {
+        title: "Где мы работаем",
+        lead: "Семнадцать районов, у каждого своя причина купить именно там. Отфильтруйте по зрелости района и спросите, какие проекты открыты прямо сейчас.",
+        filters: {
+          all: "Все районы",
+          established: "Сложившиеся",
+          prestige: "Премиальные",
+          emerging: "Развивающиеся",
+        },
+        typesLabel: "Что здесь есть",
+        note: "Мы работаем и в районах, которых нет в этом списке. Если у вас есть конкретный на примете, спросите.",
+        ask: "Спросить про район",
+      },
+      why: {
+        title: "Как мы работаем",
+        cards: [
+          { title: "0% комиссии с вас", body: "На сделках с застройщиком наше вознаграждение платит застройщик, а не добавляется к вашей цене." },
+          { title: "Шорт-лист, а не каталог", body: "Два-три объекта под ваш запрос, у каждого расчёт за спиной." },
+          { title: "Весь рынок", body: "Мы не привязаны к одному застройщику, поэтому список собран по существу." },
+          { title: "Сначала цифры", body: "Доходность, service charge, график платежей и выход обсуждаются до решения." },
+          { title: "Проверка до подписи", body: "Застройщик, статус проекта, escrow и договор проверяются заранее." },
+          { title: "После покупки", body: "Меблировка, арендаторы, управление и перепродажа, когда это понадобится." },
+        ],
+      },
+      cta: {
+        title: "Назовите бюджет и цель.",
+        body: "Этого достаточно для старта. Мы вернёмся с двумя-тремя подходящими объектами и обоснованием по каждому.",
+      },
+      offplan: {
+        metaTitle: "Off-plan недвижимость в Дубае",
+        metaDescription:
+          "Как работает покупка off-plan в Дубае: рассрочка, первоначальный взнос, платежи после передачи, проверка застройщика и escrow, весь процесс до handover.",
+        current: "Off-plan",
+        hero: {
+          eyebrow: "Off-plan",
+          title: "Купить на старте, платить по мере стройки.",
+          sub: "Off-plan — самый доступный вход в новый проект Дубая и одновременно самый сложный по механике. Разбираем, как это устроено.",
+          cta: "Обсудить покупку off-plan",
+        },
+        what: {
+          title: "Что такое off-plan на практике",
+          lead: "Вы покупаете юнит, которого ещё нет, напрямую у застройщика, по договору, который фиксирует и цену, и график строительства.",
+          points: [
+            { title: "Стартовая цена", body: "Первая очередь проекта обычно самая дешёвая. Последующие фазы стоят дороже по мере спроса." },
+            { title: "Рассрочка на период стройки", body: "Вы платите частями, привязанными к этапам строительства, а не всю сумму сразу." },
+            { title: "Рост стоимости", body: "Если район и проект показывают себя, к передаче юнит может стоить дороже, чем по договору. Может и не стоить." },
+            { title: "Строительный риск", body: "Сроки сдачи сдвигаются. Защищают вас договор, escrow-счёт и история застройщика." },
+          ],
+        },
+        payment: {
+          title: "Из чего состоит рассрочка",
+          lead: "Почти любой план — вариация этих четырёх частей. Именно их соотношение отличает комфортную покупку от натянутой.",
+          plans: [
+            { title: "Первоначальный взнос", body: "Платится при бронировании, вместе с подписанием резервации. Именно эта цифра решает, доступен ли проект." },
+            { title: "В период строительства", body: "Платежи по этапам стройки или по фиксированным датам, вплоть до завершения." },
+            { title: "При передаче", body: "Остаток, который вносится, когда объект готов и выдаются ключи." },
+            { title: "После передачи", body: "Часть застройщиков позволяет продолжать платить уже с ключами на руках, чтобы аренда помогала закрывать платежи." },
+          ],
+          note: "Планы отличаются по застройщикам и проектам и меняются между фазами. Мы сравниваем те планы, что реально открыты на момент вашей покупки.",
+        },
+        process: {
+          title: "Процесс от начала до конца",
+          lead: "Восемь этапов. В первых пяти участвуете вы, остальное ведём мы.",
+          steps: [
+            { n: "01", title: "Консультация", lead: "Бюджет, цель, горизонт.", body: "Определяем, что объект должен вам давать и какую сумму вы готовы вносить ежегодно." },
+            { n: "02", title: "Выбор типа объекта", lead: "Тип, площадь, район.", body: "Сужаем до типа недвижимости и районов, которые отвечают запросу, остальное отсекаем." },
+            { n: "03", title: "Выбор проекта", lead: "Застройщик и фаза.", body: "Сравниваем открытые проекты по цене, рассрочке, истории сдачи и тому, что вытягивает район." },
+            { n: "04", title: "Бронирование", lead: "Юнит резервируется.", body: "Форма резервации и booking-платёж. Юнит снимается с продажи на ваше имя." },
+            { n: "05", title: "SPA", lead: "Подписание договора.", body: "Разбираем договор купли-продажи вместе с вами до подписи: сроки, штрафы и что будет, если одна из сторон нарушит условия." },
+            { n: "06", title: "Регистрация", lead: "Oqood в DLD.", body: "Покупка регистрируется в Dubai Land Department, ваше право фиксируется." },
+            { n: "07", title: "Строительство", lead: "Платежи и прогресс.", body: "Следим за этапами и требованиями по платежам, чтобы ничего не пропустить и не поймать штраф." },
+            { n: "08", title: "Передача", lead: "Ключи и приёмка.", body: "Осмотр, список замечаний, финальный платёж и title deed. Дальше можем меблировать или сдать." },
+          ],
+        },
+        checks: {
+          title: "Что проверяем до вашего решения",
+          items: [
+            "Историю сдачи объектов застройщиком по прошлым проектам",
+            "Регистрацию и статус проекта в RERA",
+            "Что платежи идут на escrow-счёт проекта",
+            "Что график платежей в договоре совпадает с тем, что вам показали",
+            "Сроки передачи, штрафные условия и порядок расторжения",
+            "Что район реально вытягивает по аренде и перепродаже",
+          ],
+        },
+        cta: {
+          title: "Какие проекты открыты прямо сейчас?",
+          body: "Стартовые фазы открываются и закрываются быстро. Назовите бюджет, и мы пришлём то, что действительно доступно на этой неделе.",
+        },
+      },
+      ready: {
+        metaTitle: "Готовая недвижимость в Дубае",
+        metaDescription:
+          "Покупка готовой недвижимости в Дубае: поиск, просмотры, переговоры, проверка документов, перерегистрация в Dubai Land Department и передача объекта.",
+        current: "Готовая недвижимость",
+        hero: {
+          eyebrow: "Готовая недвижимость",
+          title: "Посмотреть, проверить и купить.",
+          sub: "Готовый юнит, по которому можно пройти, который можно осмотреть и сдать через месяц после перерегистрации. Без строительного риска и без ожидания.",
+          cta: "Обсудить покупку готового",
+        },
+        what: {
+          title: "Почему выбирают готовое",
+          lead: "На бумаге off-plan дешевле. Готовое — определённее.",
+          points: [
+            { title: "Вы видите конкретный юнит", body: "Вид, этаж, отделка и соседи — это факты, а не рендеры." },
+            { title: "Доход с первого месяца", body: "Объект можно сдавать сразу после перерегистрации, актив начинает работать немедленно." },
+            { title: "У здания есть история", body: "Service charge, качество управления и история аренды видны ещё до покупки." },
+            { title: "Нет строительного риска", body: "Нет срока сдачи, который может сдвинуться, и нет стройки, за которой нужно следить." },
+          ],
+        },
+        process: {
+          title: "Процесс от начала до конца",
+          lead: "Девять этапов от первого брифа до ключей.",
+          steps: [
+            { n: "01", title: "Поиск", lead: "Бриф превращается в список.", body: "Прорабатываем рынок по бюджету, району и типу объекта, включая юниты вне открытых площадок." },
+            { n: "02", title: "Шорт-лист", lead: "Два-три, а не тридцать.", body: "Сокращаем список до того, что действительно подходит, и объясняем, почему остальное отпало." },
+            { n: "03", title: "Анализ", lead: "Цифры по каждому юниту.", body: "Цена продавца против реальных сделок, service charge, достижимая аренда и чистая доходность." },
+            { n: "04", title: "Просмотр", lead: "Лично или по видео.", body: "Проходим юнит и здание вместе с вами или снимаем всё подробно, если вы за границей." },
+            { n: "05", title: "Переговоры", lead: "Цена и условия.", body: "Ведём переговоры на вашей стороне: цена, что остаётся в юните и сроки перерегистрации." },
+            { n: "06", title: "Проверка документов", lead: "До любых платежей.", body: "Title deed, история service charge, непогашенная ипотека, позиция по NOC и любые ограничения на юните." },
+            { n: "07", title: "Сделка", lead: "MOU и депозит.", body: "Подписывается меморандум, депозит размещается по стандартным правилам защиты сторон." },
+            { n: "08", title: "Регистрация", lead: "Перерегистрация в DLD.", body: "NOC застройщика, затем перерегистрация в Dubai Land Department и title deed на ваше имя." },
+            { n: "09", title: "Передача", lead: "Ключи и коммунальные.", body: "Ключи, карты доступа, переоформление DEWA и охлаждения. Дальше можем меблировать или найти арендатора." },
+          ],
+        },
+        checks: {
+          title: "Что проверяем по объекту",
+          items: [
+            "Title deed и что продавец действительно зарегистрированный собственник",
+            "Есть ли на объекте ипотека и как она будет закрыта",
+            "Историю service charge и нет ли задолженности",
+            "Как здание управляется и обслуживается",
+            "Реальные цены сделок в этом же здании, а не цены предложений",
+            "Историю аренды и что юнит реально показывает",
+          ],
+        },
+        cta: {
+          title: "Ищете что-то готовое?",
+          body: "Назовите район и бюджет. Мы вернёмся с тем, что есть на рынке, и с тем, сколько это стоит на самом деле.",
+        },
+      },
+    },
   },
   uz: {
-    nav: { services: "Xizmatlar", renovation: "Taʼmir", partners: "Quruvchilar", why: "Nega biz", contact: "Aloqa", cta: "Konsultatsiya" },
+    nav: { services: "Xizmatlar", renovation: "Taʼmir", team: "Jamoa", partners: "Quruvchilar", why: "Nega biz", contact: "Aloqa", cta: "Konsultatsiya" },
+    teamPage: {
+      metaTitle: "Dubaydagi jamoamiz",
+      metaDescription:
+        "BIZBUYUK Real Estate Dubay jamoasi. Yetti broker va direktor rus, ingliz, o\u02bbzbek, qozoq, tojik, ozarbayjon, arab va xitoy tillarida gaplashadi.",
+      eyebrow: "Jamoa",
+      titleA: "Siz bilan",
+      titleEm: "o\u02bbz tilingizda gaplashamiz",
+      lead: "BIZBUYUK\u02bcning Dubay ofisi. O\u02bbzingizga qulay tilni tanlang va kim siz bilan aloqada bo\u02bblishini ko\u02bbring.",
+      bandLabel: "Gaplashamiz",
+      hint: "Tilni tanlang",
+      reset: "Tozalash",
+      peopleWord: "kishi",
+      waIntro: "Assalomu alaykum! BIZBUYUK saytidaman, {name} bilan bog\u02bblanmoqchiman.",
+      langs: {
+        ru: "Rus", en: "Ingliz", uz: "O\u02bbzbek", kz: "Qozoq", tj: "Tojik",
+        az: "Ozarbayjon", ar: "Arab", zh: "Xitoy", af: "Afrika tillari",
+      },
+      langsShort: { af: "Afrika" },
+      ctaTitle: "Kimga murojaat qilishni bilmayapsizmi?",
+      ctaBody: "Bizga yozing, o\u02bbz tilingizda gaplashadigan va sizga kerakli yo\u02bbnalishni yurituvchi hamkasbni tanlab beramiz.",
+      ctaButton: "Konsultatsiya olish",
+    },
     hero: {
       eyebrow: "BAA · Koʻchmas mulk · 2020 yildan",
       titleA: "BAA koʻchmas mulk bozoridagi",
@@ -1508,6 +2078,224 @@ export const dictionary: Record<Locale, Dict> = {
         lead: "Xonadoningizni uyga aylantiramiz.",
         cta: "Loyihani boshlash",
         ctaAlt: "WhatsApp orqali yozish",
+      },
+    },
+    propertyTypes: {
+      studio: "Studiya",
+      apartment: "Kvartira",
+      penthouse: "Penthaus",
+      villa: "Villa",
+      townhouse: "Taunxaus",
+      branded: "Branded residence",
+      luxury: "Luxury",
+      investment: "Investitsion",
+      offplan: "Off-plan",
+    },
+    realEstatePage: {
+      metaTitle: "Dubayda koʻchmas mulk",
+      metaDescription:
+        "BIZBUYUK bilan Dubayda koʻchmas mulk xaridi: off-plan va tayyor obyektlar, studiyadan villa va branded residences'gacha, oʻn yetti tumanda. Xaridor uchun 0% komissiya.",
+      home: "Bosh sahifa",
+      current: "Koʻchmas mulk",
+      hero: {
+        eyebrow: "Koʻchmas mulk",
+        title: "Dubay boʻylab har qanday obyekt turi.",
+        sub: "Biz bitta tumandagi bitta binoni sotmaymiz. Byudjetingiz, maqsadingiz va muddatingizdan boshlaymiz, keyin haqiqatan mos keladiganini qisqa roʻyxatga olamiz.",
+        cta: "Konsultatsiya olish",
+        ctaAlt: "Tumanlarni koʻrish",
+      },
+      stats: [
+        { value: "17", label: "Ishlaydigan tumanlarimiz" },
+        { value: "0%", label: "Xaridor uchun komissiya" },
+        { value: "2", label: "Xarid yoʻli: off-plan yoki tayyor" },
+      ],
+      types: {
+        title: "Nima sotib olish mumkin",
+        lead: "Obyekt turi yashash, ijaraga berish yoki ushlab turish maqsadingizga bogʻliq. Quyida biz ishlaydigan variantlar va har biri odatda nima uchun tanlanishi.",
+        groups: [
+          {
+            title: "Oʻlchami boʻyicha",
+            items: [
+              { title: "Studiya", body: "Eng past kirish narxi va har dirhamga eng yuqori daromad. Kunlik ijara operatorlari va yolgʻiz ijarachilar orasida ommabop." },
+              { title: "1 xonali", body: "Dubaydagi eng sigʻimli ijara bozori. Oson ijaraga beriladi, oson qayta sotiladi." },
+              { title: "2 xonali", body: "Juftliklar va kichik oilalar qarashni boshlaydigan daraja. 1BR'dan sekinroq ijaraga beriladi, lekin ijara muddati uzunroq." },
+              { title: "3 xonali va undan katta", body: "Oilaviy format. Ijarachi kamroq, lekin yillab yashaydi, bu boʻsh turish va almashinuv xarajatini kamaytiradi." },
+              { title: "Penthaus", body: "Shaxsiy terrasali yuqori qavatlar. Tor bozor: bu yerda daromad emas, manzara va pardoz hal qiladi." },
+            ],
+          },
+          {
+            title: "Formati boʻyicha",
+            items: [
+              { title: "Kvartira", body: "Minora va oʻrta qavatli qurilish. Service charge binoni qoplaydi, shuning uchun egalik deyarli ishtirok talab qilmaydi." },
+              { title: "Villa", body: "Yer uchastkali alohida uy. Kirish ham, xizmat koʻrsatish ham qimmatroq, lekin oilaviy jamoalarda qiymat oʻsishi eng kuchli." },
+              { title: "Taunxaus", body: "Kvartira byudjetiga villa rejasi. Yer uchastkasisiz keng joy istagan oilalar uchun odatiy murosa." },
+            ],
+          },
+          {
+            title: "Segmenti boʻyicha",
+            items: [
+              { title: "Luxury", body: "Premium manzillar, katta maydonlar va daromaddan koʻra manzara bilan qoʻshnilar muhimroq boʻlgan xaridorlar." },
+              { title: "Branded residence", body: "Mehmonxona yoki moda brendi boshqaruvida. Kvadrat futiga narx yuqoriroq va odatda ijarada ham ustama boʻladi." },
+              { title: "Investitsion obyekt", body: "Avvalo raqamlar boʻyicha tanlanadi: daromad, service charge, ijarachi talabi va qanchalik oson sotilishi." },
+            ],
+          },
+        ],
+      },
+      paths: {
+        title: "Ikki xil xarid yoʻli",
+        lead: "Deyarli butun qaror shunga borib taqaladi: qurilish davomida boʻlib toʻlash yoki bugun mavjud boʻlgan narsani sotib olish.",
+        offplan: {
+          title: "Off-plan",
+          body: "Qurilishdan oldin yoki uning davomida quruvchidan xarid. Start narxi, qurilish davriga taqsimlangan toʻlov va koʻpincha topshirishdan keyingi boʻlib toʻlash. Siz kutasiz va qurilish riskini oʻz zimmangizga olasiz.",
+          cta: "Off-plan qanday ishlaydi",
+        },
+        ready: {
+          title: "Tayyor koʻchmas mulk",
+          body: "Hozirgi egasidan xarid. Aniq yunitni koʻrish, binoni tekshirish va qayta roʻyxatdan bir oy soʻng ijaraga berish mumkin. Narx bugungi, odatda toʻliq toʻlanadi.",
+          cta: "Tayyor obyekt qanday olinadi",
+        },
+      },
+      districts: {
+        title: "Qayerda ishlaymiz",
+        lead: "Oʻn yetti tuman, har birida oʻsha yerdan sotib olishning oʻz sababi bor. Tumanning yetuklik darajasi boʻyicha filtrlang va hozir qaysi loyihalar ochiqligini soʻrang.",
+        filters: {
+          all: "Barcha tumanlar",
+          established: "Shakllangan",
+          prestige: "Premium",
+          emerging: "Rivojlanayotgan",
+        },
+        typesLabel: "Bu yerda nima bor",
+        note: "Bu roʻyxatda yoʻq tumanlarda ham ishlaymiz. Aniq bir tuman koʻnglingizda boʻlsa, soʻrang.",
+        ask: "Tuman haqida soʻrash",
+      },
+      why: {
+        title: "Qanday ishlaymiz",
+        cards: [
+          { title: "Sizdan 0% komissiya", body: "Quruvchi bilan bitimlarda haqimizni quruvchi toʻlaydi, sizning narxingizga qoʻshilmaydi." },
+          { title: "Katalog emas, shortlist", body: "Soʻrovingizga mos ikki-uchta obyekt, har birining orqasida hisob-kitob bilan." },
+          { title: "Butun bozor", body: "Biz bitta quruvchiga bogʻlanmaganmiz, shuning uchun roʻyxat mohiyat boʻyicha tuziladi." },
+          { title: "Avval raqamlar", body: "Daromad, service charge, toʻlov jadvali va chiqish yoʻli qaror qabul qilishdan oldin muhokama qilinadi." },
+          { title: "Imzodan oldin tekshiruv", body: "Quruvchi, loyiha holati, escrow va shartnoma oldindan tekshiriladi." },
+          { title: "Xariddan keyin ham", body: "Jihozlash, ijarachi, boshqaruv va qayta sotish, kerak boʻlgan paytda." },
+        ],
+      },
+      cta: {
+        title: "Byudjet va maqsadni ayting.",
+        body: "Boshlash uchun shuning oʻzi yetarli. Mos keladigan ikki-uchta obyekt va har biri boʻyicha asos bilan qaytamiz.",
+      },
+      offplan: {
+        metaTitle: "Dubayda off-plan koʻchmas mulk",
+        metaDescription:
+          "Dubayda off-plan xaridi qanday ishlaydi: toʻlov rejalari, boshlangʻich toʻlov, topshirishdan keyingi toʻlovlar, quruvchi va escrow tekshiruvi, handover'gacha butun jarayon.",
+        current: "Off-plan",
+        hero: {
+          eyebrow: "Off-plan",
+          title: "Startda sotib oling, qurilish davomida toʻlang.",
+          sub: "Off-plan Dubayning yangi loyihasiga eng arzon kirish yoʻli va ayni paytda mexanikasi eng murakkabi. Qanday ishlashini tushuntiramiz.",
+          cta: "Off-plan xaridni muhokama qilish",
+        },
+        what: {
+          title: "Off-plan amalda nima degani",
+          lead: "Siz hali mavjud boʻlmagan yunitni toʻgʻridan-toʻgʻri quruvchidan, ham narxni ham qurilish jadvalini belgilaydigan shartnoma boʻyicha sotib olasiz.",
+          points: [
+            { title: "Start narxi", body: "Loyihaning birinchi navbati odatda eng arzoni. Keyingi fazalar talabga qarab qimmatlashadi." },
+            { title: "Qurilish davriga boʻlib toʻlash", body: "Butun summani birdan emas, qurilish bosqichlariga bogʻlangan qismlarda toʻlaysiz." },
+            { title: "Qiymat oʻsishi", body: "Tuman va loyiha oʻzini koʻrsatsa, topshirishga yunit shartnomadagidan qimmatroq boʻlishi mumkin. Boʻlmasligi ham mumkin." },
+            { title: "Qurilish riski", body: "Topshirish muddatlari suriladi. Sizni shartnoma, escrow hisob va quruvchining tarixi himoya qiladi." },
+          ],
+        },
+        payment: {
+          title: "Toʻlov rejasi nimalardan tuziladi",
+          lead: "Deyarli har qanday reja shu toʻrt qismning varianti. Aynan ularning nisbati qulay xaridni tarang xariddan ajratadi.",
+          plans: [
+            { title: "Boshlangʻich toʻlov", body: "Bronlashda, rezervatsiyani imzolash bilan birga toʻlanadi. Loyiha sizga yetarlimi yoʻqmi, aynan shu raqam hal qiladi." },
+            { title: "Qurilish davrida", body: "Qurilish bosqichlariga yoki belgilangan sanalarga bogʻlangan toʻlovlar, yakunlanguncha." },
+            { title: "Topshirishda", body: "Obyekt tayyor boʻlib, kalit berilganda toʻlanadigan qoldiq." },
+            { title: "Topshirishdan keyin", body: "Ayrim quruvchilar kalit qoʻlingizda boʻlgan holda toʻlashda davom etishga ruxsat beradi, shunda ijara toʻlovni qoplashga yordam beradi." },
+          ],
+          note: "Rejalar quruvchi va loyihaga qarab farq qiladi hamda fazalar orasida oʻzgaradi. Biz aynan siz sotib olayotgan paytda ochiq boʻlgan rejalarni solishtiramiz.",
+        },
+        process: {
+          title: "Jarayon boshidan oxirigacha",
+          lead: "Sakkiz bosqich. Birinchi beshtasida siz ishtirok etasiz, qolganini biz olib boramiz.",
+          steps: [
+            { n: "01", title: "Konsultatsiya", lead: "Byudjet, maqsad, muddat.", body: "Obyekt sizga nima berishi kerakligini va yiliga qancha ajrata olishingizni aniqlaymiz." },
+            { n: "02", title: "Obyekt turini tanlash", lead: "Turi, maydoni, tumani.", body: "Soʻrovga mos obyekt turi va tumanlargacha toraytiramiz, qolganini chetga surib qoʻyamiz." },
+            { n: "03", title: "Loyihani tanlash", lead: "Quruvchi va faza.", body: "Ochiq loyihalarni narx, toʻlov rejasi, topshirish tarixi va tuman imkoniyati boʻyicha solishtiramiz." },
+            { n: "04", title: "Bronlash", lead: "Yunit rezervatsiya qilinadi.", body: "Rezervatsiya shakli va booking toʻlovi. Yunit sizning nomingizga sotuvdan olinadi." },
+            { n: "05", title: "SPA", lead: "Shartnoma imzolanadi.", body: "Oldi-sotdi shartnomasini imzodan oldin siz bilan birga koʻrib chiqamiz: muddatlar, jarimalar va tomonlardan biri shartni buzsa nima boʻlishi." },
+            { n: "06", title: "Roʻyxatdan oʻtkazish", lead: "DLD'da Oqood.", body: "Xarid Dubai Land Department'da roʻyxatdan oʻtadi, huquqingiz qayd etiladi." },
+            { n: "07", title: "Qurilish", lead: "Toʻlovlar va jarayon.", body: "Bosqichlar va toʻlov talablarini kuzatamiz, hech narsa oʻtkazib yuborilmasin va jarima tushmasin." },
+            { n: "08", title: "Topshirish", lead: "Kalit va qabul.", body: "Koʻrik, kamchiliklar roʻyxati, yakuniy toʻlov va title deed. Keyin jihozlash yoki ijaraga berish mumkin." },
+          ],
+        },
+        checks: {
+          title: "Qaroringizdan oldin nimani tekshiramiz",
+          items: [
+            "Quruvchining oldingi loyihalarni topshirish tarixi",
+            "Loyihaning RERA'dagi roʻyxati va holati",
+            "Toʻlovlar loyihaning escrow hisobiga tushishi",
+            "Shartnomadagi toʻlov jadvali sizga koʻrsatilganiga mos kelishi",
+            "Topshirish muddatlari, jarima shartlari va bekor qilish tartibi",
+            "Tuman ijara va qayta sotishda haqiqatan nimani koʻtarishi",
+          ],
+        },
+        cta: {
+          title: "Hozir qaysi loyihalar ochiq?",
+          body: "Start fazalari tez ochilib tez yopiladi. Byudjetingizni ayting, shu hafta haqiqatan mavjud boʻlganini yuboramiz.",
+        },
+      },
+      ready: {
+        metaTitle: "Dubayda tayyor koʻchmas mulk",
+        metaDescription:
+          "Dubayda tayyor koʻchmas mulk xaridi: qidiruv, koʻriklar, muzokara, hujjat tekshiruvi, Dubai Land Department'da qayta roʻyxat va obyektni topshirish.",
+        current: "Tayyor koʻchmas mulk",
+        hero: {
+          eyebrow: "Tayyor koʻchmas mulk",
+          title: "Koʻring, tekshiring, keyin sotib oling.",
+          sub: "Ichida yurib chiqish, koʻzdan kechirish va qayta roʻyxatdan bir oy soʻng ijaraga berish mumkin boʻlgan tayyor yunit. Qurilish riskisiz va kutishsiz.",
+          cta: "Tayyor obyekt xaridini muhokama qilish",
+        },
+        what: {
+          title: "Nega tayyorni tanlashadi",
+          lead: "Qogʻozda off-plan arzonroq. Tayyori esa aniqroq.",
+          points: [
+            { title: "Aniq yunitni koʻrasiz", body: "Manzara, qavat, pardoz va qoʻshnilar — bular render emas, dalil." },
+            { title: "Birinchi oydan daromad", body: "Qayta roʻyxatdan oʻtishi bilanoq ijaraga berish mumkin, aktiv darhol ishlay boshlaydi." },
+            { title: "Binoning tarixi bor", body: "Service charge, boshqaruv sifati va ijara tarixi xariddan oldin koʻrinadi." },
+            { title: "Qurilish riski yoʻq", body: "Suriladigan topshirish muddati ham, kuzatiladigan qurilish ham yoʻq." },
+          ],
+        },
+        process: {
+          title: "Jarayon boshidan oxirigacha",
+          lead: "Birinchi brifdan kalitgacha toʻqqiz bosqich.",
+          steps: [
+            { n: "01", title: "Qidiruv", lead: "Brif roʻyxatga aylanadi.", body: "Byudjet, tuman va obyekt turi boʻyicha bozorni ishlaymiz, ochiq eʼlon qilinmagan yunitlar ham kiradi." },
+            { n: "02", title: "Shortlist", lead: "Oʻttizta emas, ikki-uchta.", body: "Roʻyxatni haqiqatan mos keladiganigacha qisqartiramiz va qolgani nega chiqib ketganini tushuntiramiz." },
+            { n: "03", title: "Tahlil", lead: "Har bir yunit boʻyicha raqamlar.", body: "Sotuvchi narxi haqiqiy bitimlarga qarshi, service charge, erishish mumkin boʻlgan ijara va sof daromad." },
+            { n: "04", title: "Koʻrik", lead: "Shaxsan yoki video orqali.", body: "Yunit va binoni siz bilan birga aylanamiz, chet elda boʻlsangiz batafsil suratga olamiz." },
+            { n: "05", title: "Muzokara", lead: "Narx va shartlar.", body: "Sizning tomoningizda muzokara olib boramiz: narx, yunitda nima qolishi va qayta roʻyxat muddati." },
+            { n: "06", title: "Hujjat tekshiruvi", lead: "Har qanday toʻlovdan oldin.", body: "Title deed, service charge tarixi, yopilmagan ipoteka, NOC holati va yunitdagi har qanday cheklov." },
+            { n: "07", title: "Bitim", lead: "MOU va depozit.", body: "Memorandum imzolanadi, depozit tomonlarni himoya qiluvchi standart qoidalar boʻyicha joylashtiriladi." },
+            { n: "08", title: "Roʻyxatdan oʻtkazish", lead: "DLD'da qayta roʻyxat.", body: "Quruvchidan NOC, keyin Dubai Land Department'da qayta roʻyxat va nomingizga title deed." },
+            { n: "09", title: "Topshirish", lead: "Kalit va kommunal.", body: "Kalit, kirish kartalari, DEWA va sovutish qayta rasmiylashtiriladi. Keyin jihozlash yoki ijarachi topish mumkin." },
+          ],
+        },
+        checks: {
+          title: "Obyekt boʻyicha nimani tekshiramiz",
+          items: [
+            "Title deed va sotuvchi haqiqatan roʻyxatdan oʻtgan egami",
+            "Obyektda ipoteka bormi va u qanday yopiladi",
+            "Service charge tarixi va qarzdorlik yoʻqligi",
+            "Bino qanday boshqarilishi va xizmat koʻrsatilishi",
+            "Xuddi shu binodagi haqiqiy bitim narxlari, taklif narxlari emas",
+            "Ijara tarixi va yunit amalda nimani koʻrsatishi",
+          ],
+        },
+        cta: {
+          title: "Tayyor narsa qidiryapsizmi?",
+          body: "Tuman va byudjetni ayting. Bozorda nima borligi va uning aslida qancha turishi bilan qaytamiz.",
+        },
       },
     },
   },

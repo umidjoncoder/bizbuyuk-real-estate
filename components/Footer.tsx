@@ -14,6 +14,7 @@ export function Footer() {
   const nav = [
     { href: "/services", label: t.nav.services },
     { href: "/renovation", label: t.nav.renovation },
+    { href: "/team", label: t.nav.team },
     { href: anchor("#why"), label: t.nav.why },
     { href: anchor("#partners"), label: t.nav.partners },
     { href: anchor("#contact"), label: t.nav.contact },
