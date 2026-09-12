@@ -25,7 +25,9 @@ export const LANG_FLAG: Record<LangId, string | null> = {
   az: "az",
   ar: "ae",
   zh: "cn",
-  af: "af",   // African Union flag: the continent has no state flag of its own
+  // African Union flag. No one on the roster carries this at the moment; the
+  // entry stays so it can be switched back on without redrawing the flag.
+  af: "af",
 };
 
 export type Member = {
@@ -39,13 +41,13 @@ export type Member = {
 };
 
 export const TEAM: Member[] = [
-  { id: "shakh", name: "Shakh Mavlyanov", role: "CEO", photo: "/team/shakh-mavlyanov.webp", langs: ["ru", "en", "uz", "tj", "ar"], lead: true },
-  { id: "zarina", name: "Zarina Sultanova", role: "Sales Director", photo: "/team/zarina-sultanova.webp", langs: ["ru", "en", "kz"] },
-  { id: "umid", name: "Umid Nasrullah", role: "Marketing Director", photo: "/team/umid-nasrullah.webp", langs: ["ru", "en", "uz", "zh", "tj"] },
-  { id: "davlatbek", name: "Davlatbek Akhmedov", role: "Broker", photo: "/team/davlatbek-akhmedov.webp", langs: ["ru", "en", "uz"] },
-  { id: "anna", name: "Anna Ragozina", role: "Broker", photo: "/team/anna-ragozina.webp", langs: ["ru", "en", "ar", "tj"] },
-  { id: "dustin", name: "Dustin Fabulous", role: "Broker", photo: "/team/dustin-fabulous.webp", langs: ["en", "af"] },
-  { id: "ilkin", name: "Ilkin Bakirov", role: "Broker", photo: "/team/ilkin-bakirov.webp", langs: ["ru", "az", "en"] },
+  { id: "shakh", name: "Shakh Mavlyanov", role: "CEO", photo: "/team/shakh-mavlyanov.webp", langs: ["en", "ar", "uz", "tj", "ru"], lead: true },
+  { id: "zarina", name: "Zarina Sultanova", role: "Sales Director", photo: "/team/zarina-sultanova.webp", langs: ["en", "kz", "ru"] },
+  { id: "umid", name: "Umid Nasrullah", role: "Marketing Director", photo: "/team/umid-nasrullah.webp", langs: ["en", "uz", "zh", "tj", "ru"] },
+  { id: "davlatbek", name: "Davlatbek Akhmedov", role: "Broker", photo: "/team/davlatbek-akhmedov.webp", langs: ["en", "uz", "ru"] },
+  { id: "anna", name: "Anna Ragozina", role: "Broker", photo: "/team/anna-ragozina.webp", langs: ["ru", "ar", "en", "tj"] },
+  { id: "dustin", name: "Dustin Fabulous", role: "Broker", photo: "/team/dustin-fabulous.webp", langs: ["en"] },
+  { id: "ilkin", name: "Ilkin Bakirov", role: "Broker", photo: "/team/ilkin-bakirov.webp", langs: ["az", "en", "ru"] },
 ];
 
 /** Languages the office covers, most-spoken first, with the headcount behind each. */
