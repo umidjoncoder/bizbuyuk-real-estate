@@ -10,7 +10,11 @@ const WHATSAPP = "971554791313";
 
 /* The page argues that a visitor will be answered in their own language, so the
    language filter is the page's control, not decoration: picking one drops
-   everyone who does not speak it instead of making the visitor read all seven. */
+   everyone who does not speak it instead of making the visitor read all seven.
+
+   Seven portraits plus the closing call to action make eight cells, which is
+   why the grid is four wide and two wide and never leaves a hole or stretches
+   a last lonely cell across the row. */
 export function TeamStrip() {
   const { t } = useLang();
   const [active, setActive] = useState<LangId | null>(null);
@@ -60,9 +64,7 @@ export function TeamStrip() {
 
           <div className="ml-auto flex shrink-0 items-center gap-4 max-md:ml-0 max-md:w-full">
             <span role="status" className="text-[0.68rem] uppercase tracking-[0.18em] text-muted">
-              {active
-                ? `${label(active)}: ${hits} ${t.teamPage.peopleWord}`
-                : t.teamPage.hint}
+              {active ? `${label(active)}: ${hits} ${t.teamPage.peopleWord}` : t.teamPage.hint}
             </span>
             {active && (
               <button
@@ -77,8 +79,8 @@ export function TeamStrip() {
         </div>
       </div>
 
-      {/* ---- the register: one continuous band of portraits, not seven cards ---- */}
-      <div className="flex flex-wrap border-b border-line">
+      {/* ---- the register ---- */}
+      <div className="grid grid-cols-2 border-t border-line lg:grid-cols-4">
         {TEAM.map((m, i) => {
           const hit = active !== null && matches(m);
           const dim = active !== null && !matches(m);
@@ -92,14 +94,10 @@ export function TeamStrip() {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.85, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
-              className={`group relative flex min-w-0 flex-col border-r border-line bg-ink transition-[filter] duration-500 ease-lux
-                basis-1/2 last:border-r-0 [&:nth-child(2n)]:border-r-0
-                md:basis-1/4 md:[&:nth-child(2n)]:border-r
-                xl:flex-1 xl:basis-0
-                ${m.lead ? "max-md:!basis-full max-md:flex-row max-md:border-r-0" : ""}
-                ${dim ? "opacity-[0.16] grayscale" : ""}
-                ${!dim && active === null ? "group-hover/strip:opacity-100" : ""}`}
+              transition={{ duration: 0.85, delay: (i % 4) * 0.07, ease: [0.16, 1, 0.3, 1] }}
+              className={`group relative flex min-w-0 flex-col border-b border-r border-line bg-ink transition-[filter] duration-500 ease-lux ${
+                dim ? "opacity-[0.16] grayscale" : ""
+              }`}
             >
               {/* standing gold rule on the founder, drawn in on hover or match for the rest */}
               <span
@@ -108,27 +106,22 @@ export function TeamStrip() {
                 }`}
               />
 
-              <div
-                className={`relative overflow-hidden bg-ink-2 ${
-                  m.lead
-                    ? "max-md:aspect-3/4 max-md:h-auto max-md:basis-[42%] max-md:shrink-0"
-                    : ""
-                } h-[min(72vw,340px)] sm:h-[min(62vw,400px)] xl:h-[clamp(300px,28vw,420px)]`}
-              >
+              {/* the crop is an exact 3:4, so at this aspect the portrait is shown whole */}
+              <div className="relative aspect-3/4 overflow-hidden bg-ink-2">
                 <img
                   src={m.photo}
                   alt={`${m.name}, ${m.role}, BIZBUYUK Real Estate`}
-                  width={660}
-                  height={1100}
-                  loading={i < 3 ? "eager" : "lazy"}
+                  width={900}
+                  height={1200}
+                  loading={i < 4 ? "eager" : "lazy"}
                   fetchPriority={i === 0 ? "high" : undefined}
                   decoding="async"
-                  className="h-full w-full object-cover object-[50%_12%] transition-transform duration-1000 ease-lux group-hover:scale-[1.045]"
+                  className="h-full w-full object-cover transition-transform duration-1000 ease-lux group-hover:scale-[1.04]"
                 />
                 {/* the subjects stood in slightly different spots, so the backdrop does not
                     line up frame to frame; darkening the outer edges pushes it back */}
-                <span className="pointer-events-none absolute inset-0 z-[1] bg-linear-to-r from-ink/50 via-transparent to-ink/50" />
-                <span className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[46%] bg-linear-to-b from-transparent to-ink/70" />
+                <span className="pointer-events-none absolute inset-0 z-[1] bg-linear-to-r from-ink/45 via-transparent to-ink/45" />
+                <span className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[38%] bg-linear-to-b from-transparent to-ink/65" />
                 <span className="absolute right-3.5 top-3.5 z-[3] flex h-[30px] w-[30px] translate-y-[-5px] items-center justify-center rounded-full border border-line bg-ink/60 text-champagne opacity-0 backdrop-blur-md transition-all duration-500 ease-lux group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100">
                   <ArrowGlyph />
                 </span>
@@ -136,41 +129,28 @@ export function TeamStrip() {
 
               <div
                 className={`flex flex-1 flex-col gap-3 border-t border-line p-5 max-sm:p-3.5 ${
-                  m.lead
-                    ? "max-md:justify-center max-md:border-l max-md:border-t-0 max-md:bg-[rgba(200,161,90,0.05)] max-md:p-6"
-                    : ""
-                } ${m.lead ? "bg-linear-to-b from-[rgba(200,161,90,0.07)] to-[rgba(200,161,90,0.02)]" : ""}`}
+                  m.lead ? "bg-linear-to-b from-[rgba(200,161,90,0.07)] to-[rgba(200,161,90,0.02)]" : ""
+                }`}
               >
                 <div>
-                  {/* one surname runs to two lines at strip width; reserving both keeps
+                  {/* one surname runs to two lines at this width; reserving both keeps
                       every role line on the same baseline across the register */}
-                  <h2
-                    className={`display text-[clamp(0.94rem,1.2vw,1.16rem)] leading-[1.18] text-cream ${
-                      m.lead ? "max-md:min-h-0 max-md:text-[clamp(1.2rem,4.4vw,1.6rem)]" : ""
-                    } min-h-[2.36em] text-balance`}
-                  >
+                  <h2 className="display min-h-[2.36em] text-[clamp(0.98rem,1.35vw,1.3rem)] leading-[1.18] text-balance text-cream">
                     {m.name}
                   </h2>
                   <p className="mt-1 text-[0.62rem] font-bold uppercase tracking-[0.2em] text-gold">{m.role}</p>
                 </div>
 
-                <div className={`mt-auto flex flex-wrap gap-1.5 ${m.lead ? "max-md:mt-1" : ""}`}>
+                <div className="mt-auto flex flex-wrap gap-1.5">
                   {m.langs.map((l) => {
                     const flag = LANG_FLAG[l];
+                    const faded = active !== null && l !== active ? "opacity-30" : "";
                     return flag ? (
-                      <Flag
-                        key={l}
-                        code={flag}
-                        className={`h-[14.7px] w-[22px] transition-opacity duration-500 ${
-                          active !== null && l !== active ? "opacity-30" : ""
-                        }`}
-                      />
+                      <Flag key={l} code={flag} className={`h-[14.7px] w-[22px] transition-opacity duration-500 ${faded}`} />
                     ) : (
                       <span
                         key={l}
-                        className={`rounded-[3px] border border-line px-1.5 py-[3px] text-[0.56rem] font-semibold uppercase leading-none tracking-[0.12em] text-muted transition-opacity duration-500 ${
-                          active !== null && l !== active ? "opacity-30" : ""
-                        }`}
+                        className={`rounded-[3px] border border-line px-1.5 py-[3px] text-[0.56rem] font-semibold uppercase leading-none tracking-[0.12em] text-muted transition-opacity duration-500 ${faded}`}
                       >
                         {t.teamPage.langsShort.af}
                       </span>
@@ -182,6 +162,23 @@ export function TeamStrip() {
             </motion.a>
           );
         })}
+
+        {/* eighth cell: closes the grid exactly, and puts the action where a
+            visitor finishes reading the roster */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.85, delay: 0.21, ease: [0.16, 1, 0.3, 1] }}
+          className="relative flex flex-col justify-center gap-5 border-b border-r border-line bg-linear-to-br from-[rgba(200,161,90,0.1)] to-[rgba(200,161,90,0.02)] p-7 max-sm:p-5"
+        >
+          <span className="absolute inset-x-[-1px] top-0 h-[2px] bg-linear-to-r from-gold to-champagne" />
+          <h2 className="display text-[clamp(1.15rem,1.7vw,1.6rem)] text-balance text-cream">{t.teamPage.ctaTitle}</h2>
+          <p className="text-[0.86rem] leading-relaxed text-muted">{t.teamPage.ctaBody}</p>
+          <a href="/#contact" className="btn-gold self-start !px-6 !py-3 !text-[0.78rem]">
+            {t.teamPage.ctaButton}
+          </a>
+        </motion.div>
       </div>
     </>
   );

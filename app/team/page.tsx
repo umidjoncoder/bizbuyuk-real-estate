@@ -3,7 +3,6 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { TeamMasthead } from "@/components/team/TeamMasthead";
 import { TeamStrip } from "@/components/team/TeamStrip";
-import { TeamCta } from "@/components/team/TeamCta";
 import { dictionary } from "@/lib/i18n";
 import { TEAM } from "@/lib/team";
 
@@ -51,10 +50,9 @@ export default function TeamRoute() {
   return (
     <>
       <Nav />
-      <main id="top">
+      <main id="top" className="pb-24">
         <TeamMasthead />
         <TeamStrip />
-        <TeamCta />
       </main>
       <Footer />
       <script
