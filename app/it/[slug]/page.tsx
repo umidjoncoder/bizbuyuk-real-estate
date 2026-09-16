@@ -50,7 +50,7 @@ export default async function ITGroupPage({ params }: { params: Promise<{ slug: 
       name: group.title.en,
       itemListElement: group.items.map((item) => ({
         "@type": "Offer",
-        itemOffered: { "@type": "Service", name: item.en },
+        itemOffered: { "@type": "Service", name: item.label.en, description: item.description.en },
       })),
     },
   };
@@ -60,9 +60,9 @@ export default async function ITGroupPage({ params }: { params: Promise<{ slug: 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Nav />
       <main>
-        <ITGroupHero group={group} />
-        <ITGroupServices group={group} />
-        <ITGroupFooter group={group} />
+        <ITGroupHero slug={group.slug} />
+        <ITGroupServices slug={group.slug} />
+        <ITGroupFooter slug={group.slug} />
       </main>
       <Footer />
     </>

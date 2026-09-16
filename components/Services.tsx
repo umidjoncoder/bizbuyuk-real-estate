@@ -13,6 +13,7 @@ const DIRECTIONS = [
   { href: "/services#relocation", image: BRAND.dirTourism, alt: "Waterfront villas in the UAE at sunset" },
   { href: "/services#management", image: BRAND.dirManagement, alt: "Sheikh Zayed Road at dusk" },
   { href: "/renovation", image: BRAND.dirRenovation, alt: "A finished, furnished UAE apartment" },
+  { href: "/it", image: BRAND.dirIt, alt: "A modern developer workspace at dusk" },
 ];
 
 export function Services() {
@@ -37,23 +38,18 @@ export function Services() {
           </Reveal>
         </div>
 
-        {/* Six columns so five cards fill the grid exactly: three across on the
-            first row, two wider ones on the second. */}
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-6">
+        {/* Six directions, three across, two rows — even now that there are
+            six of them instead of five. */}
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {t.services.items.map((s, i) => {
             const dir = DIRECTIONS[i];
-            const wide = i >= 3;
             return (
-              <Reveal
-                key={s.tag}
-                delay={0.1 + i * 0.09}
-                className={wide ? "lg:col-span-3" : "lg:col-span-2"}
-              >
+              <Reveal key={s.tag} delay={0.1 + i * 0.08}>
                 <a
                   href={dir.href}
                   className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] bg-sand-2 shadow-[0_2px_30px_-12px_rgba(21,18,13,0.18)] ring-1 ring-line-dark transition-all duration-500 hover:shadow-[0_30px_60px_-24px_rgba(21,18,13,0.35)]"
                 >
-                  <div className={`card-img relative ${wide ? "aspect-[16/9]" : "aspect-[4/3]"}`}>
+                  <div className="card-img relative aspect-[4/3]">
                     <img
                       src={dir.image}
                       width={900}

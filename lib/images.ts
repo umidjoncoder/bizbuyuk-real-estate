@@ -23,6 +23,11 @@ export const BRAND = {
   rental: "/brand/rental.webp",
   resale: "/brand/resale.webp",
   cta: "/brand/cta.webp",
+  // A purpose-built banner for this one CTA — the shared cta.webp above packs
+  // its skyline into the bottom ~15% of the frame, which reads as broken on
+  // this section's shorter, wider box. Kept separate so fixing this doesn't
+  // touch the homepage and real-estate sections still using cta.webp as-is.
+  servicesCta: "/brand/services-cta.webp",
   renoHero: "/brand/reno-hero.webp",
   renoDesign: "/brand/reno-design.webp",
   renoCta: "/brand/reno-cta.webp",
@@ -31,6 +36,7 @@ export const BRAND = {
   dirTourism: "/brand/dir-tourism.webp",
   dirManagement: "/brand/dir-management.webp",
   dirRenovation: "/brand/dir-renovation.webp",
+  dirIt: "/brand/dir-it.webp",
   homeHero: "/brand/home-hero.webp",
   homeStats: "/brand/home-stats.webp",
   homeWhy: "/brand/home-why.webp",

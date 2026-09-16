@@ -14,17 +14,14 @@ export function CtaBand() {
 
   return (
     <section ref={ref} className="relative overflow-hidden">
-      {/* cta.webp is a wide skyline banner, cropped at the source to keep the
-          silhouette prominent; anchoring to the bottom is extra insurance so a
-          very short section still shows the skyline rather than the sky above it. */}
-      <motion.div style={{ y }} className="absolute inset-0 z-0 scale-105">
+      <motion.div style={{ y }} className="absolute inset-0 z-0 scale-110">
         <img
           src={BRAND.cta}
-          width={1536}
-          height={654}
+          width={1900}
+          height={800}
           alt="Dubai skyline at sunset"
           loading="lazy"
-          className="h-full w-full object-cover object-bottom"
+          className="h-full w-full object-cover"
         />
       </motion.div>
       <div className="absolute inset-0 z-[1] bg-gradient-to-r from-ink via-ink/75 to-ink/30" />

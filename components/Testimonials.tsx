@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLang } from "./LanguageProvider";
 import { Reveal } from "./Reveal";
 import { Flag, FlagSprite } from "./team/Flags";
@@ -10,12 +11,51 @@ import { TESTIMONIALS, TESTIMONIAL_LANGS, testimonialsByLang, type TestimonialLa
    words don't get run through translation just because the visitor is
    browsing the English site, the same way a Google review widget works.
    Attribution is first name + initial + city, not a portrait: see the
-   comment at the top of lib/testimonials.ts for why. */
+   comment at the top of lib/testimonials.ts for why.
+
+   A fixed grid forced every quote onto the screen at once, at a size too
+   small to read comfortably. A slider gives each one real room and reads as
+   a sequence of statements, not a wall of small print — native scroll-snap
+   for smoothness and touch/trackpad momentum, with a light pointer-drag
+   layered on for the mouse, plus arrow buttons for anyone who'd rather click. */
 export function Testimonials() {
   const { t } = useLang();
   const c = t.testimonials;
   const [active, setActive] = useState<TestimonialLang | "all">("all");
   const shown = testimonialsByLang(active);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ startX: number; startScroll: number; moved: boolean } | null>(null);
+
+  const scrollByCards = (dir: 1 | -1) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>("[data-card]");
+    const amount = (card?.getBoundingClientRect().width ?? 340) + 16;
+    el.scrollBy({ left: dir * amount, behavior: "smooth" });
+  };
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    const el = trackRef.current;
+    if (!el) return;
+    drag.current = { startX: e.clientX, startScroll: el.scrollLeft, moved: false };
+    el.setPointerCapture(e.pointerId);
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    const el = trackRef.current;
+    if (!el || !drag.current) return;
+    const dx = e.clientX - drag.current.startX;
+    if (Math.abs(dx) > 3) drag.current.moved = true;
+    el.scrollLeft = drag.current.startScroll - dx;
+  };
+  const onPointerUp = (e: React.PointerEvent) => {
+    const el = trackRef.current;
+    if (el && drag.current) el.releasePointerCapture(e.pointerId);
+    drag.current = null;
+  };
+  // A drag that moved the track shouldn't also fire the card's own click/tap.
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (drag.current?.moved) e.preventDefault();
+  };
 
   return (
     <section id="testimonials" className="bg-ink-2 py-24 sm:py-28">
@@ -68,30 +108,68 @@ export function Testimonials() {
           </Reveal>
         </div>
 
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {shown.map((item, i) => (
-            <Reveal key={item.id} delay={0.04 * (i % 6)}>
-              <figure className="flex h-full flex-col rounded-[1.3rem] border border-line bg-ink-3 p-6">
-                <Stars rating={item.rating} />
-                <blockquote
-                  dir={item.lang === "ar" ? "rtl" : "ltr"}
-                  className={`mt-4 flex-1 text-[0.92rem] leading-relaxed text-cream/90 ${item.lang === "ar" ? "text-right" : ""}`}
+        <Reveal delay={0.14}>
+          <div className="relative mt-12">
+            <div
+              ref={trackRef}
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={onPointerUp}
+              onPointerCancel={onPointerUp}
+              onClickCapture={onClickCapture}
+              className="flex touch-pan-y cursor-grab gap-4 overflow-x-auto pb-3 pr-5 [scroll-snap-type:x_mandatory] [scrollbar-width:none] active:cursor-grabbing sm:pr-8 [&::-webkit-scrollbar]:hidden"
+            >
+              {shown.map((item) => (
+                <figure
+                  key={item.id}
+                  data-card
+                  className="flex h-full w-[280px] shrink-0 flex-col rounded-[1.3rem] border border-line bg-ink-3 p-6 [scroll-snap-align:start] sm:w-[330px]"
                 >
-                  &ldquo;{item.quote}&rdquo;
-                </blockquote>
-                <figcaption className="mt-5 flex items-center gap-2.5 border-t border-line pt-4">
-                  <Flag code={item.flag} className="h-[15px] w-[22px] shrink-0" />
-                  <div className="min-w-0">
-                    <p className="truncate text-[0.86rem] font-bold text-cream">{item.name}</p>
-                    <p className="truncate text-[0.74rem] text-muted">
-                      {item.city} · {item.service}
-                    </p>
-                  </div>
-                </figcaption>
-              </figure>
-            </Reveal>
-          ))}
-        </div>
+                  <Stars rating={item.rating} />
+                  <blockquote
+                    dir={item.lang === "ar" ? "rtl" : "ltr"}
+                    className={`mt-4 flex-1 text-[0.92rem] leading-relaxed text-cream/90 ${item.lang === "ar" ? "text-right" : ""}`}
+                  >
+                    &ldquo;{item.quote}&rdquo;
+                  </blockquote>
+                  <figcaption className="mt-5 flex items-center gap-2.5 border-t border-line pt-4">
+                    <Flag code={item.flag} className="h-[15px] w-[22px] shrink-0" />
+                    <div className="min-w-0">
+                      <p className="truncate text-[0.86rem] font-bold text-cream">{item.name}</p>
+                      <p className="truncate text-[0.74rem] text-muted">
+                        {item.city} · {item.service}
+                      </p>
+                    </div>
+                  </figcaption>
+                </figure>
+              ))}
+              {/* Trailing spacer so the last card can snap flush with the edge
+                  instead of stopping short with dead space beside it. */}
+              <div className="w-px shrink-0" aria-hidden />
+            </div>
+
+            <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-16 bg-gradient-to-l from-ink-2 to-transparent sm:block" />
+
+            <div className="mt-6 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => scrollByCards(-1)}
+                aria-label="Previous"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-cream transition-colors duration-300 hover:border-gold/50 hover:text-gold"
+              >
+                <ChevronLeft size={18} strokeWidth={2.2} />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollByCards(1)}
+                aria-label="Next"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-cream transition-colors duration-300 hover:border-gold/50 hover:text-gold"
+              >
+                <ChevronRight size={18} strokeWidth={2.2} />
+              </button>
+            </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

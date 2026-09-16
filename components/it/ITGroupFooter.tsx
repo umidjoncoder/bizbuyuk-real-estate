@@ -4,13 +4,15 @@ import { ArrowRight } from "lucide-react";
 import { useLang } from "../LanguageProvider";
 import { Reveal } from "../Reveal";
 import { CONTACT } from "@/lib/i18n";
-import { IT_GROUPS, type ITGroup } from "@/lib/itServices";
+import { IT_GROUPS, itGroupBySlug } from "@/lib/itServices";
 import type { Locale } from "@/lib/i18n";
 
-export function ITGroupFooter({ group }: { group: ITGroup }) {
+export function ITGroupFooter({ slug }: { slug: string }) {
   const { t, locale } = useLang();
   const loc = locale as Locale;
   const s = t.itPage.group;
+  const group = itGroupBySlug(slug);
+  if (!group) return null;
   const others = IT_GROUPS.filter((g) => g.slug !== group.slug);
 
   return (

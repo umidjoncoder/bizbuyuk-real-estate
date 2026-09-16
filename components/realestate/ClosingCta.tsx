@@ -8,21 +8,7 @@ import { useLang } from "../LanguageProvider";
 import { Reveal } from "../Reveal";
 import { BRAND } from "@/lib/images";
 
-export function ClosingCta({
-  title,
-  body,
-  image = BRAND.cta,
-  // cta.webp packs its skyline into the bottom ~15% of the frame; a center
-  // crop on a wide, short section lands in the empty sky above it. The other
-  // banners callers pass in are framed normally, so this defaults to
-  // "center" and only the caller using the default image opts into "bottom".
-  imagePosition = "center",
-}: {
-  title: string;
-  body: string;
-  image?: string;
-  imagePosition?: "center" | "bottom";
-}) {
+export function ClosingCta({ title, body, image = BRAND.cta }: { title: string; body: string; image?: string }) {
   const { t } = useLang();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
@@ -30,14 +16,8 @@ export function ClosingCta({
 
   return (
     <section ref={ref} className="relative overflow-hidden border-t border-line">
-      <motion.div style={{ y }} className="absolute inset-0 z-0 scale-105">
-        <img
-          src={image}
-          alt=""
-          aria-hidden
-          loading="lazy"
-          className={`h-full w-full object-cover ${imagePosition === "bottom" ? "object-bottom" : "object-center"}`}
-        />
+      <motion.div style={{ y }} className="absolute inset-0 z-0 scale-110">
+        <img src={image} alt="" aria-hidden loading="lazy" className="h-full w-full object-cover" />
       </motion.div>
       <div className="absolute inset-0 z-[1] bg-gradient-to-r from-ink via-ink/80 to-ink/35" />
 

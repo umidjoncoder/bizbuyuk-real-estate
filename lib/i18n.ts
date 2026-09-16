@@ -107,6 +107,12 @@ export type Dict = {
     visaNote: string;
     askLabel: string;
     askWhatsApp: string;
+    also: {
+      eyebrow: string;
+      title: string;
+      renovation: { title: string; body: string; cta: string };
+      it: { title: string; body: string; cta: string };
+    };
     cta: { title: string; body: string };
   };
   itPage: {
@@ -116,10 +122,10 @@ export type Dict = {
     current: string;
     hero: { eyebrow: string; title: string; sub: string; ctaPrimary: string; ctaSecondary: string };
     proof: { eyebrow: string; title: string; lead: string; items: { title: string; body: string; cta: string }[] };
-    groupsIntro: { eyebrow: string; title: string; lead: string };
+    groupsIntro: { eyebrow: string; title: string; lead: string; viewLabel: string };
     process: { eyebrow: string; title: string; steps: Step[] };
     cta: { title: string; body: string; ctaPrimary: string; ctaSecondary: string };
-    group: { backLabel: string; servicesLabel: string; askLabel: string; askButton: string; otherLabel: string; ctaTitle: string; ctaBody: string };
+    group: { backLabel: string; servicesLabel: string; servicesIntro: string; askLabel: string; askButton: string; otherLabel: string; ctaTitle: string; ctaBody: string };
   };
   renovationPage: {
     metaTitle: string;
@@ -321,6 +327,11 @@ export const dictionary: Record<Locale, Dict> = {
           title: "Turnkey Renovation",
           body: "From an empty space to a furnished home: design, 3D renders, full renovation, furniture and final installation.",
         },
+        {
+          tag: "06",
+          title: "Technology",
+          body: "BIZBUYUK GROUP's technology arm: web and mobile products, business systems and AI, for clients anywhere.",
+        },
       ],
     },
     stats: {
@@ -491,6 +502,20 @@ export const dictionary: Record<Locale, Dict> = {
         "Residence visa rules and the Golden Visa investment threshold change from time to time. We confirm the current requirements on the date of your deal.",
       askLabel: "Question about this section?",
       askWhatsApp: "Ask on WhatsApp",
+      also: {
+        eyebrow: "Also part of what we do",
+        title: "Two more directions",
+        renovation: {
+          title: "Turnkey Renovation",
+          body: "Already bought, or buying elsewhere? We take a space from empty to furnished — design, renders, the full build, furniture and handover.",
+          cta: "See renovation",
+        },
+        it: {
+          title: "Technology",
+          body: "BIZBUYUK GROUP's technology arm — web and mobile products, business systems and AI, for clients anywhere in the world.",
+          cta: "See technology services",
+        },
+      },
       cta: {
         title: "Not sure which service you need?",
         body: "Describe your situation in two sentences. We will tell you where to start and what you need at each step.",
@@ -530,6 +555,7 @@ export const dictionary: Record<Locale, Dict> = {
         eyebrow: "What we build",
         title: "Twelve disciplines, one team",
         lead: "Pick where your project starts. Most projects touch more than one of these — that conversation happens once you write in.",
+        viewLabel: "View services",
       },
       process: {
         eyebrow: "How it works",
@@ -550,6 +576,7 @@ export const dictionary: Record<Locale, Dict> = {
       group: {
         backLabel: "All disciplines",
         servicesLabel: "What's included",
+        servicesIntro: "Each of these is a starting point, not a fixed package — tell us which one is closest to what you need and we'll scope the rest together.",
         askLabel: "Ask about",
         askButton: "Discuss this on WhatsApp",
         otherLabel: "Other disciplines",
@@ -1129,6 +1156,11 @@ export const dictionary: Record<Locale, Dict> = {
           title: "Ремонт под ключ",
           body: "От пустой коробки до готового дома: дизайн, 3D-рендеры, полный ремонт, мебель и финальная комплектация.",
         },
+        {
+          tag: "06",
+          title: "Технологии",
+          body: "Технологическое направление BIZBUYUK GROUP: веб и мобильные продукты, бизнес-системы и AI — для клиентов по всему миру.",
+        },
       ],
     },
     stats: {
@@ -1299,6 +1331,20 @@ export const dictionary: Record<Locale, Dict> = {
         "Условия резидентских виз и порог инвестиций для Golden Visa периодически меняются. Действующие требования проверяем на дату вашей сделки.",
       askLabel: "Есть вопрос по разделу?",
       askWhatsApp: "Спросить в WhatsApp",
+      also: {
+        eyebrow: "Тоже часть того, что мы делаем",
+        title: "Ещё два направления",
+        renovation: {
+          title: "Ремонт под ключ",
+          body: "Уже купили — здесь или в другом месте? Доводим пространство от пустой коробки до готового дома: дизайн, рендеры, ремонт, мебель и передача ключей.",
+          cta: "Смотреть ремонт",
+        },
+        it: {
+          title: "Технологии",
+          body: "Технологическое направление BIZBUYUK GROUP — веб и мобильные продукты, бизнес-системы и AI для клиентов по всему миру.",
+          cta: "Смотреть технологические услуги",
+        },
+      },
       cta: {
         title: "Не знаете, какая услуга нужна именно вам?",
         body: "Опишите ситуацию в двух предложениях. Мы скажем, с чего начать и что понадобится на каждом шаге.",
@@ -1338,6 +1384,7 @@ export const dictionary: Record<Locale, Dict> = {
         eyebrow: "Что мы строим",
         title: "Двенадцать направлений, одна команда",
         lead: "Выберите, с чего начинается ваш проект. Большинство проектов затрагивают сразу несколько направлений — это обсуждается, как только вы напишете нам.",
+        viewLabel: "Смотреть услуги",
       },
       process: {
         eyebrow: "Как это работает",
@@ -1358,6 +1405,7 @@ export const dictionary: Record<Locale, Dict> = {
       group: {
         backLabel: "Все направления",
         servicesLabel: "Что входит",
+        servicesIntro: "Каждый пункт — это отправная точка, а не фиксированный пакет: скажите, какой ближе всего к вашей задаче, и мы вместе определим остальное.",
         askLabel: "Спросить про",
         askButton: "Обсудить в WhatsApp",
         otherLabel: "Другие направления",
@@ -1937,6 +1985,11 @@ export const dictionary: Record<Locale, Dict> = {
           title: "Kalit topshirish taʼmiri",
           body: "Boʻsh xonadondan tayyor uygacha: dizayn, 3D render, toʻliq taʼmir, mebel va yakuniy oʻrnatish.",
         },
+        {
+          tag: "06",
+          title: "Texnologiyalar",
+          body: "BIZBUYUK GROUP'ning texnologik yoʻnalishi: veb va mobil mahsulotlar, biznes tizimlari va AI — dunyoning istalgan nuqtasidagi mijozlar uchun.",
+        },
       ],
     },
     stats: {
@@ -2107,6 +2160,20 @@ export const dictionary: Record<Locale, Dict> = {
         "Rezident vizalari shartlari va Golden Visa uchun investitsiya chegarasi vaqti-vaqti bilan oʻzgaradi. Amaldagi talablarni bitim sanasida tekshiramiz.",
       askLabel: "Ushbu boʻlim boʻyicha savolingiz bormi?",
       askWhatsApp: "WhatsApp orqali soʻrash",
+      also: {
+        eyebrow: "Biz qiladigan ishning yana bir qismi",
+        title: "Yana ikki yoʻnalish",
+        renovation: {
+          title: "Kalit topshirish taʼmiri",
+          body: "Allaqachon sotib oldingizmi — shu yerda yoki boshqa joyda? Xonadonni boʻsh holatdan tayyorgacha olib boramiz: dizayn, renderlar, toʻliq taʼmir, mebel va kalit topshirish.",
+          cta: "Taʼmirni koʻrish",
+        },
+        it: {
+          title: "Texnologiyalar",
+          body: "BIZBUYUK GROUP'ning texnologik yoʻnalishi — veb va mobil mahsulotlar, biznes tizimlari va AI, dunyoning istalgan nuqtasidagi mijozlar uchun.",
+          cta: "Texnologik xizmatlarni koʻrish",
+        },
+      },
       cta: {
         title: "Qaysi xizmat aynan sizga kerakligini bilmayapsizmi?",
         body: "Vaziyatingizni ikki gapda yozing. Nimadan boshlash va har bir qadamda nima kerakligini aytamiz.",
@@ -2146,6 +2213,7 @@ export const dictionary: Record<Locale, Dict> = {
         eyebrow: "Biz nima quramiz",
         title: "Oʻn ikki yoʻnalish, bitta jamoa",
         lead: "Loyihangiz qaysi yoʻnalishdan boshlanishini tanlang. Koʻpchilik loyihalar bir nechta yoʻnalishga tegishli boʻladi — bu haqda yozganingizdan keyin gaplashamiz.",
+        viewLabel: "Xizmatlarni koʻrish",
       },
       process: {
         eyebrow: "Qanday ishlaydi",
@@ -2166,6 +2234,7 @@ export const dictionary: Record<Locale, Dict> = {
       group: {
         backLabel: "Barcha yoʻnalishlar",
         servicesLabel: "Nimalar kiradi",
+        servicesIntro: "Har biri qatʼiy paket emas, boshlangʻich nuqta — qaysi biri sizning ehtiyojingizga yaqinroq ekanini ayting, qolganini birga aniqlaymiz.",
         askLabel: "Soʻrash",
         askButton: "WhatsApp'da muhokama qilish",
         otherLabel: "Boshqa yoʻnalishlar",

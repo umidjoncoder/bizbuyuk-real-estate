@@ -5,7 +5,5 @@ import { ClosingCta } from "./ClosingCta";
 
 export function RealEstateCta() {
   const { t } = useLang();
-  return (
-    <ClosingCta title={t.realEstatePage.cta.title} body={t.realEstatePage.cta.body} imagePosition="bottom" />
-  );
+  return <ClosingCta title={t.realEstatePage.cta.title} body={t.realEstatePage.cta.body} />;
 }

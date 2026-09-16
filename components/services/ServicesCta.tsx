@@ -18,12 +18,13 @@ export function ServicesCta() {
 
   return (
     <section ref={ref} className="relative overflow-hidden border-t border-line">
-      {/* cta.webp is a wide skyline banner, cropped at the source to keep the
-          silhouette prominent; anchoring to the bottom is extra insurance so a
-          very short section still shows the skyline rather than the sky above it. */}
+      {/* servicesCta.webp — a wide skyline banner built for this shorter, wider
+          box, where the shared cta.webp (used elsewhere) read as broken:
+          most of that frame is empty sky, with the silhouette confined to
+          the bottom ~15%. */}
       <motion.div style={{ y }} className="absolute inset-0 z-0 scale-105">
         <img
-          src={BRAND.cta}
+          src={BRAND.servicesCta}
           width={1536}
           height={654}
           alt=""
