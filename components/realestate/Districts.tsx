@@ -10,10 +10,13 @@ import { DISTRICTS, DISTRICT_STAGES, type DistrictStage } from "@/lib/districts"
 type Filter = DistrictStage | "all";
 
 /**
- * The cards are typographic on purpose. District photography does not exist
- * yet, and a stock skyline captioned "Palm Jumeirah" would be worse than no
- * photo at all. Each card has an optional `image`, so adding real photography
- * later is a data change, not a layout change.
+ * Each card carries a stylised gold line-art mark, not a photograph — see the
+ * comment at the top of lib/districts.ts. A photorealistic "photo" captioned
+ * with a real district's name would claim to document what that specific
+ * place looks like today, which a generated image can't guarantee; an
+ * abstract illustration evoking the district's character makes no such
+ * claim. `image` stays optional so real photography can replace a mark for
+ * any district later — that's a data change, not a layout change.
  */
 export function Districts() {
   const { t, locale } = useLang();

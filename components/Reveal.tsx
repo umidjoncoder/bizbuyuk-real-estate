@@ -1,10 +1,12 @@
 "use client";
 
-import { motion, type Variants } from "motion/react";
+import { motion, useReducedMotion, type Variants } from "motion/react";
 
+/* The blur that used to ride along with this was expensive to composite and
+   made every section look like it was still loading. Shorter travel, no blur. */
 const variants: Variants = {
-  hidden: { opacity: 0, y: 28, filter: "blur(6px)" },
-  show: { opacity: 1, y: 0, filter: "blur(0px)" },
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0 },
 };
 
 export function Reveal({
@@ -19,14 +21,18 @@ export function Reveal({
   as?: "div" | "span" | "li";
 }) {
   const MotionTag = motion[as];
+  const reduced = useReducedMotion();
+
+  if (reduced) return <MotionTag className={className}>{children}</MotionTag>;
+
   return (
     <MotionTag
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, margin: "-80px" }}
+      viewport={{ once: true, margin: "0px 0px -60px 0px" }}
       variants={variants}
-      transition={{ duration: 0.9, delay, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.5, delay: Math.min(delay, 0.3), ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </MotionTag>

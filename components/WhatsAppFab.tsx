@@ -1,15 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { CONTACT } from "@/lib/i18n";
-import { useLang } from "../LanguageProvider";
+import { useLang } from "./LanguageProvider";
 
 /**
- * Floating WhatsApp button. Held back until the visitor has scrolled past the
- * hero so it never covers the hero CTAs on a phone.
+ * Floating WhatsApp button, shown on every public page.
+ *
+ * Held back until the visitor has scrolled past the hero so it never covers the
+ * hero CTAs on a phone, and kept off the CRM, which is staff-facing.
  */
 export function WhatsAppFab() {
   const { t } = useLang();
+  const pathname = usePathname();
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
@@ -19,12 +23,14 @@ export function WhatsAppFab() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  if (pathname?.startsWith("/crm")) return null;
+
   return (
     <a
-      href={`${CONTACT.whatsapp}?text=${encodeURIComponent(t.renovationPage.current)}`}
+      href={`${CONTACT.whatsapp}?text=${encodeURIComponent(t.whatsappFab.prefill)}`}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={t.renovationPage.finalCta.ctaAlt}
+      aria-label={t.whatsappFab.aria}
       className={`fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_12px_32px_-8px_rgba(37,211,102,0.6)] transition-all duration-500 ease-lux hover:scale-105 ${
         shown ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
       }`}

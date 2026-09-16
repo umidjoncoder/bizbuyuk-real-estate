@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/components/LanguageProvider";
+import { WhatsAppFab } from "@/components/WhatsAppFab";
 
 const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
@@ -55,7 +56,7 @@ export const metadata: Metadata = {
   formatDetection: { telephone: true, email: true, address: true },
   alternates: {
     canonical: SITE,
-    languages: { en: SITE, ru: SITE, "x-default": SITE },
+    languages: { en: SITE, ru: SITE, uz: SITE, "x-default": SITE },
   },
   openGraph: {
     type: "website",
@@ -126,12 +127,48 @@ const jsonLd = {
         addressLocality: "Dubai",
         addressCountry: "AE",
       },
-      geo: { "@type": "GeoCoordinates", latitude: 25.2048, longitude: 55.2708 },
-      knowsLanguage: ["en", "ru"],
+      numberOfEmployees: { "@type": "QuantitativeValue", minValue: 50 },
+      /* Three Dubai offices. No geo coordinate is claimed for any of them —
+         a single pin on the wrong one is worse than none. */
+      hasPOS: [
+        {
+          "@type": "Place",
+          name: "BIZBUYUK — Business Bay",
+          address: { "@type": "PostalAddress", addressLocality: "Business Bay, Dubai", addressCountry: "AE" },
+        },
+        {
+          "@type": "Place",
+          name: "BIZBUYUK — Jumeirah Village Circle",
+          address: { "@type": "PostalAddress", addressLocality: "Jumeirah Village Circle, Dubai", addressCountry: "AE" },
+        },
+        {
+          "@type": "Place",
+          name: "BIZBUYUK — Palm Jumeirah",
+          address: { "@type": "PostalAddress", addressLocality: "Palm Jumeirah, Dubai", addressCountry: "AE" },
+        },
+      ],
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          telephone: "+971554791313",
+          contactType: "sales",
+          availableLanguage: ["en", "ar", "tr", "ru", "zh", "uz", "kk", "ky", "it", "fr"],
+        },
+        {
+          "@type": "ContactPoint",
+          telephone: "+971503230058",
+          contactType: "technical support",
+          availableLanguage: ["en", "ru", "uz"],
+        },
+      ],
+      /* The desk works in ten languages; the interface is translated into three.
+         These are different claims and are kept apart on purpose. */
+      knowsLanguage: ["en", "ar", "tr", "ru", "zh", "uz", "kk", "ky", "it", "fr"],
       sameAs: [
         "https://instagram.com/bizbuyukrealestate",
-        "https://facebook.com/bizbuyukrealestate",
+        "https://www.facebook.com/profile.php?id=61590479769092",
         "https://youtube.com/@bizbuyukrealestate",
+        "https://t.me/bizbuyukrealestate",
       ],
     },
     {
@@ -139,7 +176,7 @@ const jsonLd = {
       "@id": `${SITE}/#website`,
       url: SITE,
       name: "BIZBUYUK Real Estate",
-      inLanguage: ["en", "ru"],
+      inLanguage: ["en", "ru", "uz"],
       publisher: { "@id": `${SITE}/#org` },
     },
   ],
@@ -153,7 +190,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          {children}
+          <WhatsAppFab />
+        </LanguageProvider>
       </body>
     </html>
   );

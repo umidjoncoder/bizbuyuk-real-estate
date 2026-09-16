@@ -5,6 +5,7 @@ import { RenovationHero } from "@/components/renovation/RenovationHero";
 import { RenovationScope } from "@/components/renovation/RenovationScope";
 import { RenovationProcess } from "@/components/renovation/RenovationProcess";
 import { RenovationDesign } from "@/components/renovation/RenovationDesign";
+import { RenovationVision } from "@/components/renovation/RenovationVision";
 import { RenovationCompare } from "@/components/renovation/RenovationCompare";
 import { RenovationFullService } from "@/components/renovation/RenovationFullService";
 import { RenovationFurniture } from "@/components/renovation/RenovationFurniture";
@@ -14,7 +15,6 @@ import { QuoteForm } from "@/components/renovation/QuoteForm";
 import { RenovationWhy } from "@/components/renovation/RenovationWhy";
 import { RenovationFaq } from "@/components/renovation/RenovationFaq";
 import { RenovationCta } from "@/components/renovation/RenovationCta";
-import { WhatsAppFab } from "@/components/renovation/WhatsAppFab";
 import { HashScroll } from "@/components/HashScroll";
 import { dictionary } from "@/lib/i18n";
 
@@ -81,6 +81,7 @@ export default function RenovationRoute() {
         <RenovationScope />
         <RenovationProcess />
         <RenovationDesign />
+        <RenovationVision />
         <RenovationCompare />
         <RenovationFullService />
         <RenovationFurniture />
@@ -91,7 +92,6 @@ export default function RenovationRoute() {
         <RenovationFaq />
         <RenovationCta />
       </main>
-      <WhatsAppFab />
       <Footer />
     </>
   );

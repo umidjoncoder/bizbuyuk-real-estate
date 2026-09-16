@@ -34,6 +34,7 @@ export const DISTRICT_STAGES: DistrictStage[] = ["established", "prestige", "eme
 export const DISTRICTS: District[] = [
   {
     slug: "downtown-dubai",
+    image: "/real-estate/districts/downtown-dubai.webp",
     name: "Downtown Dubai",
     stage: "prestige",
     types: ["apartment", "penthouse", "branded", "luxury"],
@@ -50,6 +51,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "business-bay",
+    image: "/real-estate/districts/business-bay.webp",
     name: "Business Bay",
     stage: "established",
     types: ["apartment", "studio", "penthouse", "investment"],
@@ -66,6 +68,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "dubai-marina",
+    image: "/real-estate/districts/dubai-marina.webp",
     name: "Dubai Marina",
     stage: "established",
     types: ["apartment", "penthouse", "luxury", "investment"],
@@ -82,6 +85,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "palm-jumeirah",
+    image: "/real-estate/districts/palm-jumeirah.webp",
     name: "Palm Jumeirah",
     stage: "prestige",
     types: ["villa", "apartment", "branded", "luxury", "penthouse"],
@@ -98,6 +102,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "dubai-hills-estate",
+    image: "/real-estate/districts/dubai-hills-estate.webp",
     name: "Dubai Hills Estate",
     stage: "established",
     types: ["villa", "townhouse", "apartment", "luxury"],
@@ -114,6 +119,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "jvc",
+    image: "/real-estate/districts/jvc.webp",
     name: "Jumeirah Village Circle",
     stage: "established",
     types: ["apartment", "studio", "townhouse", "villa", "investment"],
@@ -130,6 +136,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "dubai-creek-harbour",
+    image: "/real-estate/districts/dubai-creek-harbour.webp",
     name: "Dubai Creek Harbour",
     stage: "emerging",
     types: ["apartment", "offplan", "penthouse", "investment"],
@@ -146,6 +153,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "dubai-harbour",
+    image: "/real-estate/districts/dubai-harbour.webp",
     name: "Dubai Harbour",
     stage: "emerging",
     types: ["apartment", "penthouse", "luxury", "offplan"],
@@ -162,6 +170,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "dubai-islands",
+    image: "/real-estate/districts/dubai-islands.webp",
     name: "Dubai Islands",
     stage: "emerging",
     types: ["apartment", "villa", "offplan", "investment"],
@@ -178,6 +187,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "meydan",
+    image: "/real-estate/districts/meydan.webp",
     name: "Meydan",
     stage: "emerging",
     types: ["apartment", "villa", "townhouse", "offplan"],
@@ -194,6 +204,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "sobha-hartland",
+    image: "/real-estate/districts/sobha-hartland.webp",
     name: "Sobha Hartland",
     stage: "established",
     types: ["apartment", "villa", "townhouse", "luxury"],
@@ -210,6 +221,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "dubai-south",
+    image: "/real-estate/districts/dubai-south.webp",
     name: "Dubai South",
     stage: "emerging",
     types: ["apartment", "townhouse", "villa", "offplan", "investment"],
@@ -226,6 +238,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "al-furjan",
+    image: "/real-estate/districts/al-furjan.webp",
     name: "Al Furjan",
     stage: "established",
     types: ["apartment", "townhouse", "villa", "investment"],
@@ -242,6 +255,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "arabian-ranches",
+    image: "/real-estate/districts/arabian-ranches.webp",
     name: "Arabian Ranches",
     stage: "established",
     types: ["villa", "townhouse", "luxury"],
@@ -258,6 +272,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "jumeirah",
+    image: "/real-estate/districts/jumeirah.webp",
     name: "Jumeirah",
     stage: "prestige",
     types: ["villa", "townhouse", "luxury", "branded"],
@@ -274,6 +289,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "ras-al-khor",
+    image: "/real-estate/districts/ras-al-khor.webp",
     name: "Ras Al Khor",
     stage: "emerging",
     types: ["apartment", "offplan", "investment"],
@@ -290,6 +306,7 @@ export const DISTRICTS: District[] = [
   },
   {
     slug: "dubai-silicon-oasis",
+    image: "/real-estate/districts/dubai-silicon-oasis.webp",
     name: "Dubai Silicon Oasis",
     stage: "established",
     types: ["apartment", "studio", "townhouse", "investment"],

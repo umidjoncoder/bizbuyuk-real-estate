@@ -37,6 +37,8 @@ export const BRAND = {
   reHero: "/brand/re-hero.webp",
   reOffplan: "/brand/re-offplan.webp",
   reReady: "/brand/re-ready.webp",
+  itHero: "/it/hero.webp",
+  itCta: "/it/cta.webp",
 } as const;
 
 export function img(id: string, w = 1200, h?: number) {

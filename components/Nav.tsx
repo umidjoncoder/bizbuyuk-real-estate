@@ -24,12 +24,19 @@ export function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Kept to the site's five real destinations, plus Contact — which stays
+  // even though the gold CTA button repeats it at desktop widths, because
+  // below the `lg` breakpoint that button is hidden and this is the only way
+  // to reach the lead form from the header. "Why Us" and "Developers" are
+  // homepage sections a visitor already scrolls past, not destinations of
+  // their own, and adding them here is what pushed this row to two lines at
+  // 1024px — the full set, including those two, still lives in the footer.
   const links = [
+    { href: "/real-estate", label: t.nav.realEstate },
     { href: "/services", label: t.nav.services },
     { href: "/renovation", label: t.nav.renovation },
+    { href: "/it", label: t.nav.it },
     { href: "/team", label: t.nav.team },
-    { href: anchor("#why"), label: t.nav.why },
-    { href: anchor("#partners"), label: t.nav.partners },
     { href: anchor("#contact"), label: t.nav.contact },
   ];
 

@@ -12,8 +12,10 @@ export function Footer() {
   const anchor = (hash: string) => (onHome ? hash : `/${hash}`);
 
   const nav = [
+    { href: "/real-estate", label: t.nav.realEstate },
     { href: "/services", label: t.nav.services },
     { href: "/renovation", label: t.nav.renovation },
+    { href: "/it", label: t.nav.it },
     { href: "/team", label: t.nav.team },
     { href: anchor("#why"), label: t.nav.why },
     { href: anchor("#partners"), label: t.nav.partners },
@@ -29,6 +31,7 @@ export function Footer() {
               <LogoImage height={72} className="rounded-lg" />
             </a>
             <p className="mt-5 max-w-[40ch] text-sm leading-relaxed text-muted">{t.footer.blurb}</p>
+            <p className="mt-4 max-w-[42ch] text-xs leading-relaxed text-muted/70">{t.footer.licenceNote}</p>
           </div>
 
           <FooterCol title={t.footer.nav}>
@@ -57,6 +60,7 @@ export function Footer() {
             <Social href={CONTACT.instagram} label="Instagram" />
             <Social href={CONTACT.facebook} label="Facebook" />
             <Social href={CONTACT.youtube} label="YouTube" />
+            <Social href={CONTACT.telegram} label="Telegram" />
             <Social href={CONTACT.whatsapp} label="WhatsApp" />
           </FooterCol>
         </div>
@@ -64,7 +68,11 @@ export function Footer() {
         <div className="mt-14 hairline" />
         <div className="mt-6 flex flex-col items-center justify-between gap-3 text-xs text-muted/60 sm:flex-row">
           <p>© 2020 BIZBUYUK Real Estate LLC. {t.footer.rights}</p>
-          <p className="tracking-wide">United Arab Emirates</p>
+          <div className="flex items-center gap-4">
+            <a href="/legal/privacy" className="tracking-wide transition-colors hover:text-gold">{t.legal.privacyLabel}</a>
+            <a href="/legal/terms" className="tracking-wide transition-colors hover:text-gold">{t.legal.termsLabel}</a>
+            <span className="tracking-wide">United Arab Emirates</span>
+          </div>
         </div>
       </div>
     </footer>

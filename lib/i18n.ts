@@ -27,7 +27,7 @@ type ListGroup = { title: string; items: string[] };
 type FaqItem = { q: string; a: string };
 
 export type Dict = {
-  nav: { services: string; renovation: string; team: string; partners: string; why: string; contact: string; cta: string };
+  nav: { realEstate: string; services: string; renovation: string; it: string; team: string; partners: string; why: string; contact: string; cta: string };
   hero: {
     eyebrow: string;
     titleA: string;
@@ -39,6 +39,12 @@ export type Dict = {
     scroll: string;
   };
   marqueeIntro: string;
+  whatsappFab: { aria: string; prefill: string };
+  trust: {
+    eyebrow: string;
+    lead: { value: string; label: string; note: string };
+    items: Stat[];
+  };
   services: { eyebrow: string; title: string; items: Service[] };
   stats: { eyebrow: string; title: string; items: Stat[] };
   why: {
@@ -47,6 +53,7 @@ export type Dict = {
     cards: Step[];
   };
   partners: { eyebrow: string; title: string };
+  testimonials: { eyebrow: string; title: string; lead: string; allLabel: string; ratingSuffix: string };
   lead: {
     eyebrow: string;
     title: string;
@@ -68,12 +75,20 @@ export type Dict = {
   };
   footer: {
     blurb: string;
+    licenceNote: string;
     address: string;
     addressValue: string;
     contact: string;
     follow: string;
     rights: string;
     nav: string;
+  };
+  legal: {
+    privacyLabel: string;
+    termsLabel: string;
+    page: { eyebrow: string; updated: string; languageNote: string };
+    privacy: { title: string };
+    terms: { title: string };
   };
   servicesPage: {
     metaTitle: string;
@@ -94,6 +109,18 @@ export type Dict = {
     askWhatsApp: string;
     cta: { title: string; body: string };
   };
+  itPage: {
+    metaTitle: string;
+    metaDescription: string;
+    home: string;
+    current: string;
+    hero: { eyebrow: string; title: string; sub: string; ctaPrimary: string; ctaSecondary: string };
+    proof: { eyebrow: string; title: string; lead: string; items: { title: string; body: string; cta: string }[] };
+    groupsIntro: { eyebrow: string; title: string; lead: string };
+    process: { eyebrow: string; title: string; steps: Step[] };
+    cta: { title: string; body: string; ctaPrimary: string; ctaSecondary: string };
+    group: { backLabel: string; servicesLabel: string; askLabel: string; askButton: string; otherLabel: string; ctaTitle: string; ctaBody: string };
+  };
   renovationPage: {
     metaTitle: string;
     metaDescription: string;
@@ -102,7 +129,14 @@ export type Dict = {
     hero: { eyebrow: string; l1: string; l2: string; l3: string; sub: string; cta: string; ctaAlt: string };
     scope: { title: string; lead: string; groups: ListGroup[]; closing: string };
     process: { eyebrow: string; title: string; steps: RenoStep[] };
-    design: { title: string; lead: string; body: string; styles: string[] };
+    design: { title: string; lead: string; body: string; stylesLabel: string; styleAsk: string; styles: { slug: string; label: string }[] };
+    vision: {
+      eyebrow: string;
+      title: string;
+      lead: string;
+      disclaimer: string;
+      items: { slug: string; label: string }[];
+    };
     beforeAfter: { title: string; lead: string; before: string; after: string; hint: string; empty: string };
     fullService: { title: string; lead: string; cards: NamedCard[] };
     furniture: { title: string; lead: string; groups: ListGroup[]; cta: string };
@@ -201,12 +235,13 @@ export type Dict = {
     ctaTitle: string;
     ctaBody: string;
     ctaButton: string;
+    trustedBroker: string;
   };
 };
 
 export const dictionary: Record<Locale, Dict> = {
   en: {
-    nav: { services: "Services", renovation: "Renovation", team: "Team", partners: "Developers", why: "Why Us", contact: "Contact", cta: "Get a consultation" },
+    nav: { realEstate: "Real Estate", services: "Services", renovation: "Renovation", it: "Technology", team: "Team", partners: "Developers", why: "Why Us", contact: "Contact", cta: "Get a consultation" },
     teamPage: {
       metaTitle: "Our team in Dubai",
       metaDescription:
@@ -228,6 +263,7 @@ export const dictionary: Record<Locale, Dict> = {
       ctaTitle: "Not sure who to ask for?",
       ctaBody: "Write to us and we will put you with the person who speaks your language and covers the part of the market you need.",
       ctaButton: "Get a consultation",
+      trustedBroker: "Trusted broker",
     },
     hero: {
       eyebrow: "UAE · Real Estate · Est. 2020",
@@ -240,6 +276,22 @@ export const dictionary: Record<Locale, Dict> = {
       scroll: "Scroll",
     },
     marqueeIntro: "Trusted by the developers building the UAE",
+    whatsappFab: { aria: "Message us on WhatsApp", prefill: "Hello BIZBUYUK! I have a question." },
+    trust: {
+      eyebrow: "By the numbers",
+      lead: {
+        value: "200,000+",
+        label: "clients served",
+        note: "Consultations and completed transactions since 2020.",
+      },
+      items: [
+        { value: "50,000+", label: "Transactions closed" },
+        { value: "AED 10B+", label: "Portfolio volume" },
+        { value: "7", label: "Emirates covered" },
+        { value: "50+", label: "Specialists on the team" },
+        { value: "10", label: "Languages spoken" },
+      ],
+    },
     services: {
       eyebrow: "What we do",
       title: "Everything we handle in the UAE",
@@ -295,6 +347,13 @@ export const dictionary: Record<Locale, Dict> = {
       ],
     },
     partners: { eyebrow: "Our developers", title: "We work with all developments across the UAE" },
+    testimonials: {
+      eyebrow: "In their own words",
+      title: "What clients tell us",
+      lead: "Unedited, in the language they were written in.",
+      allLabel: "All",
+      ratingSuffix: "/5",
+    },
     lead: {
       eyebrow: "Free consultation",
       title: "Leave a request — we'll get in touch",
@@ -316,12 +375,24 @@ export const dictionary: Record<Locale, Dict> = {
     },
     footer: {
       blurb: "An ambitious, creative UAE real estate agency — buying, selling and leasing residential and commercial property across the Emirates.",
+      licenceNote: "Licensed real estate brokerage. Every broker on our team holds an individual RERA licence — ask your broker for theirs.",
       address: "Address",
       addressValue: "Al Barsha South 4, Jumeirah Village Circle, Prime Business Center, United Arab Emirates.",
       contact: "Contact",
       follow: "Follow",
       rights: "All rights reserved.",
       nav: "Navigate",
+    },
+    legal: {
+      privacyLabel: "Privacy Policy",
+      termsLabel: "Terms of Use",
+      page: {
+        eyebrow: "Legal",
+        updated: "Last updated: September 2026",
+        languageNote: "This page is provided in English, which is the governing language of this document. Write to us in Russian or Uzbek and we will gladly answer any question about it in your language.",
+      },
+      privacy: { title: "Privacy Policy" },
+      terms: { title: "Terms of Use" },
     },
     servicesPage: {
       metaTitle: "Services",
@@ -425,6 +496,67 @@ export const dictionary: Record<Locale, Dict> = {
         body: "Describe your situation in two sentences. We will tell you where to start and what you need at each step.",
       },
     },
+    itPage: {
+      metaTitle: "Technology Services",
+      metaDescription:
+        "BIZBUYUK GROUP's technology arm — web and mobile products, business systems, AI, cloud, security and data, for clients anywhere in the world.",
+      home: "Home",
+      current: "Technology",
+      hero: {
+        eyebrow: "BIZBUYUK GROUP · Technology",
+        title: "The same standard we build our own company on.",
+        sub: "Web and mobile products, business systems, AI, cloud, security and data — delivered by the team that built and runs BIZBUYUK's own CRM. One partner, every discipline, for clients anywhere.",
+        ctaPrimary: "Talk to the IT team",
+        ctaSecondary: "Message on Telegram",
+      },
+      proof: {
+        eyebrow: "Not a slide deck",
+        title: "We run what we build",
+        lead: "Before this was a service we offered, it was a system we needed. Both of the platforms below are live, in daily use, right now.",
+        items: [
+          {
+            title: "BIZBUYUK CRM",
+            body: "Leads, pipeline, finance, tasks and reporting for BIZBUYUK Real Estate's own brokerage — built in-house, used by the team every day.",
+            cta: "Ask for a walkthrough",
+          },
+          {
+            title: "LaWEra CRM",
+            body: "A case- and client-management platform built for LaWEra's legal practice — intake, documents and billing in one system.",
+            cta: "Ask for a walkthrough",
+          },
+        ],
+      },
+      groupsIntro: {
+        eyebrow: "What we build",
+        title: "Twelve disciplines, one team",
+        lead: "Pick where your project starts. Most projects touch more than one of these — that conversation happens once you write in.",
+      },
+      process: {
+        eyebrow: "How it works",
+        title: "From a WhatsApp message to a shipped product",
+        steps: [
+          { title: "Consult", body: "Tell us what you're trying to solve. No form to fill in first — just describe it." },
+          { title: "Scope", body: "We come back with what it takes: team, timeline, and how the price is structured." },
+          { title: "Build", body: "Work happens in short cycles, with something to look at early and often." },
+          { title: "Support", body: "Shipping isn't the end. We stay on for fixes, growth and the next phase." },
+        ],
+      },
+      cta: {
+        title: "Have a project in mind?",
+        body: "Describe it in a message — English, Russian or Uzbek all work. The IT team replies directly, no ticket queue.",
+        ctaPrimary: "WhatsApp the IT team",
+        ctaSecondary: "Message on Telegram",
+      },
+      group: {
+        backLabel: "All disciplines",
+        servicesLabel: "What's included",
+        askLabel: "Ask about",
+        askButton: "Discuss this on WhatsApp",
+        otherLabel: "Other disciplines",
+        ctaTitle: "Ready to scope this out?",
+        ctaBody: "Write to the IT team with a couple of lines about the project — team size, rough timeline, what you're trying to solve.",
+      },
+    },
     renovationPage: {
       metaTitle: "Turnkey Renovation in Dubai",
       metaDescription:
@@ -523,15 +655,28 @@ export const dictionary: Record<Locale, Dict> = {
         title: "Designed for your lifestyle",
         lead: "Every property is different. Every client is different.",
         body: "Our designers build a concept around how you actually live, the property type and, for investors, what the unit needs to earn. The style is your decision, not a template we reuse.",
+        stylesLabel: "Styles we build",
+        styleAsk: "I'd like to discuss this style",
         styles: [
-          "Modern",
-          "Minimalist",
-          "Luxury",
-          "Contemporary",
-          "Japandi",
-          "Classic",
-          "Hotel-style",
-          "Custom design",
+          { slug: "modern", label: "Modern" },
+          { slug: "minimalist", label: "Minimalist" },
+          { slug: "luxury", label: "Luxury" },
+          { slug: "contemporary", label: "Contemporary" },
+          { slug: "japandi", label: "Japandi" },
+          { slug: "classic", label: "Classic" },
+          { slug: "hotel-style", label: "Hotel-style" },
+          { slug: "custom", label: "Custom design" },
+        ],
+      },
+      vision: {
+        eyebrow: "Design vision",
+        title: "What a BIZBUYUK renovation can look like",
+        lead: "Concept renders showing the range of our work — from a dated space to a finished one, in the styles we build.",
+        disclaimer: "Concept visualisations, not a specific completed project. See real, photographed projects in \u201cOur work\u201d below.",
+        items: [
+          { slug: "villa", label: "Villa" },
+          { slug: "burj-view-apartment", label: "Apartment, Burj Khalifa view" },
+          { slug: "office", label: "Office fit-out" },
         ],
       },
       beforeAfter: {
@@ -904,7 +1049,7 @@ export const dictionary: Record<Locale, Dict> = {
     },
   },
   ru: {
-    nav: { services: "Услуги", renovation: "Ремонт", team: "Команда", partners: "Застройщики", why: "Почему мы", contact: "Контакты", cta: "Консультация" },
+    nav: { realEstate: "Недвижимость", services: "Услуги", renovation: "Ремонт", it: "Технологии", team: "Команда", partners: "Застройщики", why: "Почему мы", contact: "Контакты", cta: "Консультация" },
     teamPage: {
       metaTitle: "\u041d\u0430\u0448\u0430 \u043a\u043e\u043c\u0430\u043d\u0434\u0430 \u0432 \u0414\u0443\u0431\u0430\u0435",
       metaDescription:
@@ -926,6 +1071,7 @@ export const dictionary: Record<Locale, Dict> = {
       ctaTitle: "\u041d\u0435 \u0443\u0432\u0435\u0440\u0435\u043d\u044b, \u043a \u043a\u043e\u043c\u0443 \u043e\u0431\u0440\u0430\u0442\u0438\u0442\u044c\u0441\u044f?",
       ctaBody: "\u041d\u0430\u043f\u0438\u0448\u0438\u0442\u0435 \u043d\u0430\u043c, \u0438 \u043c\u044b \u043f\u043e\u0434\u0431\u0435\u0440\u0451\u043c \u0447\u0435\u043b\u043e\u0432\u0435\u043a\u0430, \u043a\u043e\u0442\u043e\u0440\u044b\u0439 \u0433\u043e\u0432\u043e\u0440\u0438\u0442 \u043d\u0430 \u0432\u0430\u0448\u0435\u043c \u044f\u0437\u044b\u043a\u0435 \u0438 \u0432\u0435\u0434\u0451\u0442 \u043d\u0443\u0436\u043d\u044b\u0439 \u0432\u0430\u043c \u0441\u0435\u0433\u043c\u0435\u043d\u0442 \u0440\u044b\u043d\u043a\u0430.",
       ctaButton: "\u041f\u043e\u043b\u0443\u0447\u0438\u0442\u044c \u043a\u043e\u043d\u0441\u0443\u043b\u044c\u0442\u0430\u0446\u0438\u044e",
+      trustedBroker: "\u041f\u0440\u043e\u0432\u0435\u0440\u0435\u043d\u043d\u044b\u0439 \u0431\u0440\u043e\u043a\u0435\u0440",
     },
     hero: {
       eyebrow: "ОАЭ · Недвижимость · с 2020",
@@ -938,6 +1084,22 @@ export const dictionary: Record<Locale, Dict> = {
       scroll: "Листайте",
     },
     marqueeIntro: "Нам доверяют застройщики, которые строят ОАЭ",
+    whatsappFab: { aria: "Написать в WhatsApp", prefill: "Здравствуйте, BIZBUYUK! У меня есть вопрос." },
+    trust: {
+      eyebrow: "В цифрах",
+      lead: {
+        value: "200 000+",
+        label: "клиентов",
+        note: "Консультации и завершённые сделки с 2020 года.",
+      },
+      items: [
+        { value: "50 000+", label: "Закрытых сделок" },
+        { value: "AED 10B+", label: "Объём портфеля" },
+        { value: "7", label: "Эмиратов" },
+        { value: "50+", label: "Специалистов в команде" },
+        { value: "10", label: "Языков в работе" },
+      ],
+    },
     services: {
       eyebrow: "Чем мы занимаемся",
       title: "Всё, что мы берём на себя в ОАЭ",
@@ -993,6 +1155,13 @@ export const dictionary: Record<Locale, Dict> = {
       ],
     },
     partners: { eyebrow: "Наши застройщики", title: "Работаем со всеми проектами ОАЭ" },
+    testimonials: {
+      eyebrow: "Их собственные слова",
+      title: "Что говорят клиенты",
+      lead: "Без редактуры, на языке оригинала.",
+      allLabel: "Все",
+      ratingSuffix: "/5",
+    },
     lead: {
       eyebrow: "Бесплатная консультация",
       title: "Оставьте заявку — мы свяжемся с вами",
@@ -1014,12 +1183,24 @@ export const dictionary: Record<Locale, Dict> = {
     },
     footer: {
       blurb: "Амбициозное и креативное агентство недвижимости в ОАЭ — покупка, продажа и аренда жилой и коммерческой недвижимости по всем Эмиратам.",
+      licenceNote: "Лицензированное агентство недвижимости. Каждый брокер в нашей команде имеет собственную лицензию RERA — уточняйте у вашего брокера.",
       address: "Адрес",
       addressValue: "Al Barsha South 4, Jumeirah Village Circle, Prime Business Center, ОАЭ.",
       contact: "Контакты",
       follow: "Соцсети",
       rights: "Все права защищены.",
       nav: "Навигация",
+    },
+    legal: {
+      privacyLabel: "Политика конфиденциальности",
+      termsLabel: "Условия использования",
+      page: {
+        eyebrow: "Правовая информация",
+        updated: "Обновлено: сентябрь 2026",
+        languageNote: "Эта страница представлена на английском языке — он является языком, на котором этот документ имеет юридическую силу. Напишите нам на русском или узбекском, и мы с радостью ответим на любой вопрос о ней на вашем языке.",
+      },
+      privacy: { title: "Политика конфиденциальности" },
+      terms: { title: "Условия использования" },
     },
     servicesPage: {
       metaTitle: "Услуги",
@@ -1123,6 +1304,67 @@ export const dictionary: Record<Locale, Dict> = {
         body: "Опишите ситуацию в двух предложениях. Мы скажем, с чего начать и что понадобится на каждом шаге.",
       },
     },
+    itPage: {
+      metaTitle: "Технологические услуги",
+      metaDescription:
+        "Технологическое направление BIZBUYUK GROUP — веб и мобильные продукты, бизнес-системы, AI, облако, безопасность и данные для клиентов по всему миру.",
+      home: "Главная",
+      current: "Технологии",
+      hero: {
+        eyebrow: "BIZBUYUK GROUP · Технологии",
+        title: "Тот же стандарт, на котором мы строим собственную компанию.",
+        sub: "Веб и мобильные продукты, бизнес-системы, AI, облако, безопасность и данные — от команды, которая построила и поддерживает собственную CRM BIZBUYUK. Один партнёр, любая дисциплина, клиенты в любой точке мира.",
+        ctaPrimary: "Связаться с IT-командой",
+        ctaSecondary: "Написать в Telegram",
+      },
+      proof: {
+        eyebrow: "Не презентация",
+        title: "Мы пользуемся тем, что строим",
+        lead: "Прежде чем это стало услугой, это было системой, которая нам самим была нужна. Обе платформы ниже — живые, в ежедневном использовании прямо сейчас.",
+        items: [
+          {
+            title: "BIZBUYUK CRM",
+            body: "Лиды, воронка, финансы, задачи и отчётность для собственного брокериджа BIZBUYUK Real Estate — построена внутри компании, используется командой каждый день.",
+            cta: "Запросить демонстрацию",
+          },
+          {
+            title: "LaWEra CRM",
+            body: "Платформа управления делами и клиентами для юридической практики LaWEra — приём заявок, документы и биллинг в одной системе.",
+            cta: "Запросить демонстрацию",
+          },
+        ],
+      },
+      groupsIntro: {
+        eyebrow: "Что мы строим",
+        title: "Двенадцать направлений, одна команда",
+        lead: "Выберите, с чего начинается ваш проект. Большинство проектов затрагивают сразу несколько направлений — это обсуждается, как только вы напишете нам.",
+      },
+      process: {
+        eyebrow: "Как это работает",
+        title: "От сообщения в WhatsApp до готового продукта",
+        steps: [
+          { title: "Консультация", body: "Расскажите, что нужно решить. Никаких форм заранее — просто опишите задачу." },
+          { title: "Оценка", body: "Мы возвращаемся с тем, что для этого нужно: команда, сроки и структура оплаты." },
+          { title: "Разработка", body: "Работа идёт короткими циклами, с результатом, который можно увидеть рано и часто." },
+          { title: "Поддержка", body: "Запуск — не финал. Мы остаёмся на связи для доработок, роста и следующего этапа." },
+        ],
+      },
+      cta: {
+        title: "Есть проект на примете?",
+        body: "Опишите его сообщением — на русском, английском или узбекском. IT-команда отвечает напрямую, без очереди тикетов.",
+        ctaPrimary: "Написать IT-команде в WhatsApp",
+        ctaSecondary: "Написать в Telegram",
+      },
+      group: {
+        backLabel: "Все направления",
+        servicesLabel: "Что входит",
+        askLabel: "Спросить про",
+        askButton: "Обсудить в WhatsApp",
+        otherLabel: "Другие направления",
+        ctaTitle: "Готовы обсудить проект?",
+        ctaBody: "Напишите IT-команде пару строк о проекте — размер команды, примерные сроки, что нужно решить.",
+      },
+    },
     renovationPage: {
       metaTitle: "Ремонт под ключ в Дубае",
       metaDescription:
@@ -1221,15 +1463,28 @@ export const dictionary: Record<Locale, Dict> = {
         title: "Дизайн под ваш образ жизни",
         lead: "Каждый объект разный. Каждый клиент разный.",
         body: "Дизайнеры строят концепцию вокруг того, как вы действительно живёте, типа объекта и, для инвесторов, того, что юнит должен приносить. Стиль выбираете вы, а не шаблон, который мы переиспользуем.",
+        stylesLabel: "Стили, которые мы реализуем",
+        styleAsk: "Хочу обсудить этот стиль",
         styles: [
-          "Modern",
-          "Минимализм",
-          "Luxury",
-          "Contemporary",
-          "Japandi",
-          "Классика",
-          "Hotel-style",
-          "Индивидуальный проект",
+          { slug: "modern", label: "Modern" },
+          { slug: "minimalist", label: "Минимализм" },
+          { slug: "luxury", label: "Luxury" },
+          { slug: "contemporary", label: "Contemporary" },
+          { slug: "japandi", label: "Japandi" },
+          { slug: "classic", label: "Классика" },
+          { slug: "hotel-style", label: "Hotel-style" },
+          { slug: "custom", label: "Индивидуальный проект" },
+        ],
+      },
+      vision: {
+        eyebrow: "Видение дизайна",
+        title: "Как может выглядеть ремонт от BIZBUYUK",
+        lead: "Концепт-рендеры, показывающие диапазон нашей работы — от изношенного пространства до готового, в стилях, которые мы реализуем.",
+        disclaimer: "Концептуальная визуализация, а не конкретный завершённый проект. Реальные, отснятые проекты — в разделе «Наши работы» ниже.",
+        items: [
+          { slug: "villa", label: "Вилла" },
+          { slug: "burj-view-apartment", label: "Квартира с видом на Бурдж-Халифа" },
+          { slug: "office", label: "Офис под ключ" },
         ],
       },
       beforeAfter: {
@@ -1602,7 +1857,7 @@ export const dictionary: Record<Locale, Dict> = {
     },
   },
   uz: {
-    nav: { services: "Xizmatlar", renovation: "Taʼmir", team: "Jamoa", partners: "Quruvchilar", why: "Nega biz", contact: "Aloqa", cta: "Konsultatsiya" },
+    nav: { realEstate: "Koʻchmas mulk", services: "Xizmatlar", renovation: "Taʼmir", it: "Texnologiyalar", team: "Jamoa", partners: "Quruvchilar", why: "Nega biz", contact: "Aloqa", cta: "Konsultatsiya" },
     teamPage: {
       metaTitle: "Dubaydagi jamoamiz",
       metaDescription:
@@ -1624,6 +1879,7 @@ export const dictionary: Record<Locale, Dict> = {
       ctaTitle: "Kimga murojaat qilishni bilmayapsizmi?",
       ctaBody: "Bizga yozing, o\u02bbz tilingizda gaplashadigan va sizga kerakli yo\u02bbnalishni yurituvchi hamkasbni tanlab beramiz.",
       ctaButton: "Konsultatsiya olish",
+      trustedBroker: "Ishonchli broker",
     },
     hero: {
       eyebrow: "BAA · Koʻchmas mulk · 2020 yildan",
@@ -1636,6 +1892,22 @@ export const dictionary: Record<Locale, Dict> = {
       scroll: "Pastga",
     },
     marqueeIntro: "BAAni quradigan kompaniyalar bizga ishonadi",
+    whatsappFab: { aria: "WhatsApp orqali yozish", prefill: "Assalomu alaykum, BIZBUYUK! Savolim bor." },
+    trust: {
+      eyebrow: "Raqamlarda",
+      lead: {
+        value: "200 000+",
+        label: "mijoz",
+        note: "2020 yildan buyon konsultatsiya va yakunlangan bitimlar.",
+      },
+      items: [
+        { value: "50 000+", label: "Yakunlangan bitim" },
+        { value: "AED 10B+", label: "Portfel hajmi" },
+        { value: "7", label: "Emirat" },
+        { value: "50+", label: "Jamoa mutaxassisi" },
+        { value: "10", label: "Ish tili" },
+      ],
+    },
     services: {
       eyebrow: "Nima bilan shugʻullanamiz",
       title: "BAAda oʻz zimmamizga oladigan hamma narsa",
@@ -1691,6 +1963,13 @@ export const dictionary: Record<Locale, Dict> = {
       ],
     },
     partners: { eyebrow: "Bizning quruvchilar", title: "BAAdagi barcha loyihalar bilan ishlaymiz" },
+    testimonials: {
+      eyebrow: "Ularning oʻz soʻzlari",
+      title: "Mijozlar nima deydi",
+      lead: "Tahrirsiz, original tilida.",
+      allLabel: "Barchasi",
+      ratingSuffix: "/5",
+    },
     lead: {
       eyebrow: "Bepul konsultatsiya",
       title: "Ariza qoldiring, biz bogʻlanamiz",
@@ -1712,12 +1991,24 @@ export const dictionary: Record<Locale, Dict> = {
     },
     footer: {
       blurb: "BAAdagi ambitsiyali va kreativ koʻchmas mulk agentligi: barcha Amirliklar boʻylab turar-joy va tijorat mulkini sotib olish, sotish va ijaraga berish.",
+      licenceNote: "Litsenziyalangan koʻchmas mulk agentligi. Jamoamizdagi har bir broker oʻzining shaxsiy RERA litsenziyasiga ega — brokeringizdan soʻrang.",
       address: "Manzil",
       addressValue: "Al Barsha South 4, Jumeirah Village Circle, Prime Business Center, BAA.",
       contact: "Aloqa",
       follow: "Ijtimoiy tarmoqlar",
       rights: "Barcha huquqlar himoyalangan.",
       nav: "Navigatsiya",
+    },
+    legal: {
+      privacyLabel: "Maxfiylik siyosati",
+      termsLabel: "Foydalanish shartlari",
+      page: {
+        eyebrow: "Huquqiy maʼlumot",
+        updated: "Yangilangan: 2026-yil sentyabr",
+        languageNote: "Bu sahifa ingliz tilida taqdim etilgan — bu hujjatning yuridik kuchga ega tili shu. Rus yoki oʻzbek tilida yozing, biz sizga oʻz tilingizda har qanday savol boʻyicha javob beramiz.",
+      },
+      privacy: { title: "Maxfiylik siyosati" },
+      terms: { title: "Foydalanish shartlari" },
     },
     servicesPage: {
       metaTitle: "Xizmatlar",
@@ -1821,6 +2112,67 @@ export const dictionary: Record<Locale, Dict> = {
         body: "Vaziyatingizni ikki gapda yozing. Nimadan boshlash va har bir qadamda nima kerakligini aytamiz.",
       },
     },
+    itPage: {
+      metaTitle: "Texnologik xizmatlar",
+      metaDescription:
+        "BIZBUYUK GROUP'ning texnologik yoʻnalishi — veb va mobil mahsulotlar, biznes tizimlari, AI, cloud, xavfsizlik va maʼlumotlar, dunyoning istalgan nuqtasidagi mijozlar uchun.",
+      home: "Bosh sahifa",
+      current: "Texnologiyalar",
+      hero: {
+        eyebrow: "BIZBUYUK GROUP · Texnologiyalar",
+        title: "Oʻz kompaniyamizni quradigan aynan shu standart.",
+        sub: "Veb va mobil mahsulotlar, biznes tizimlari, AI, cloud, xavfsizlik va maʼlumotlar — BIZBUYUK'ning oʻz CRM'ini qurgan va ishlatayotgan jamoa tomonidan. Bitta hamkor, har qanday yoʻnalish, dunyoning istalgan nuqtasidagi mijozlar uchun.",
+        ctaPrimary: "IT jamoasi bilan bogʻlanish",
+        ctaSecondary: "Telegram orqali yozish",
+      },
+      proof: {
+        eyebrow: "Taqdimot emas",
+        title: "Biz oʻzimiz qurgan narsadan foydalanamiz",
+        lead: "Bu xizmatga aylanishidan oldin, bizga oʻzimizga kerak boʻlgan tizim edi. Quyidagi ikkala platforma ham hozir jonli va har kuni ishlatiladi.",
+        items: [
+          {
+            title: "BIZBUYUK CRM",
+            body: "BIZBUYUK Real Estate'ning oʻz brokerlik faoliyati uchun lidlar, voronka, moliya, vazifalar va hisobot — ichkarida qurilgan, jamoa tomonidan har kuni ishlatiladi.",
+            cta: "Demo koʻrishni soʻrash",
+          },
+          {
+            title: "LaWEra CRM",
+            body: "LaWEra yuridik amaliyoti uchun ish va mijozlarni boshqarish platformasi — murojaatlar, hujjatlar va hisob-kitob bitta tizimda.",
+            cta: "Demo koʻrishni soʻrash",
+          },
+        ],
+      },
+      groupsIntro: {
+        eyebrow: "Biz nima quramiz",
+        title: "Oʻn ikki yoʻnalish, bitta jamoa",
+        lead: "Loyihangiz qaysi yoʻnalishdan boshlanishini tanlang. Koʻpchilik loyihalar bir nechta yoʻnalishga tegishli boʻladi — bu haqda yozganingizdan keyin gaplashamiz.",
+      },
+      process: {
+        eyebrow: "Qanday ishlaydi",
+        title: "WhatsApp xabaridan tayyor mahsulotgacha",
+        steps: [
+          { title: "Konsultatsiya", body: "Nimani hal qilish kerakligini ayting. Oldindan forma toʻldirish shart emas — shunchaki tasvirlab bering." },
+          { title: "Baholash", body: "Buning uchun nima kerakligini qaytarib aytamiz: jamoa, muddat va toʻlov tuzilishi." },
+          { title: "Qurish", body: "Ish qisqa davrlarda ketadi, erta va tez-tez koʻrsatiladigan natija bilan." },
+          { title: "Qoʻllab-quvvatlash", body: "Ishga tushirish — yakun emas. Tuzatishlar, oʻsish va keyingi bosqich uchun aloqada qolamiz." },
+        ],
+      },
+      cta: {
+        title: "Loyihangiz bormi?",
+        body: "Xabar yozib tasvirlab bering — ingliz, rus yoki oʻzbek tilida. IT jamoasi toʻgʻridan-toʻgʻri javob beradi, navbat yoʻq.",
+        ctaPrimary: "IT jamoasiga WhatsApp yozish",
+        ctaSecondary: "Telegram orqali yozish",
+      },
+      group: {
+        backLabel: "Barcha yoʻnalishlar",
+        servicesLabel: "Nimalar kiradi",
+        askLabel: "Soʻrash",
+        askButton: "WhatsApp'da muhokama qilish",
+        otherLabel: "Boshqa yoʻnalishlar",
+        ctaTitle: "Loyihani muhokama qilishga tayyormisiz?",
+        ctaBody: "IT jamoasiga loyiha haqida bir necha qator yozing — jamoa hajmi, taxminiy muddat, nimani hal qilish kerakligi.",
+      },
+    },
     renovationPage: {
       metaTitle: "Dubayda kalit topshirish taʼmiri",
       metaDescription:
@@ -1919,15 +2271,28 @@ export const dictionary: Record<Locale, Dict> = {
         title: "Turmush tarzingizga moslangan dizayn",
         lead: "Har bir obyekt boshqacha. Har bir mijoz boshqacha.",
         body: "Dizaynerlar konsepsiyani siz qanday yashashingiz, obyekt turi va investorlar uchun yunit qancha daromad keltirishi kerakligiga qarab quradi. Uslubni siz tanlaysiz, biz qayta ishlatadigan shablon emas.",
+        stylesLabel: "Biz quradigan uslublar",
+        styleAsk: "Shu uslubni muhokama qilmoqchiman",
         styles: [
-          "Modern",
-          "Minimalizm",
-          "Luxury",
-          "Contemporary",
-          "Japandi",
-          "Klassika",
-          "Hotel-style",
-          "Individual loyiha",
+          { slug: "modern", label: "Modern" },
+          { slug: "minimalist", label: "Minimalizm" },
+          { slug: "luxury", label: "Luxury" },
+          { slug: "contemporary", label: "Contemporary" },
+          { slug: "japandi", label: "Japandi" },
+          { slug: "classic", label: "Klassika" },
+          { slug: "hotel-style", label: "Hotel-style" },
+          { slug: "custom", label: "Individual loyiha" },
+        ],
+      },
+      vision: {
+        eyebrow: "Dizayn vizyoni",
+        title: "BIZBUYUK taʼmiri qanday koʻrinishi mumkin",
+        lead: "Ishimiz doirasini koʻrsatuvchi konsept-render: eskirgan xonadondan tayyor interyergacha, biz quradigan uslublarda.",
+        disclaimer: "Bu konseptual vizualizatsiya, aniq yakunlangan loyiha emas. Haqiqiy, suratga olingan loyihalar quyida, \u201cBizning ishlarimiz\u201d boʻlimida.",
+        items: [
+          { slug: "villa", label: "Villa" },
+          { slug: "burj-view-apartment", label: "Burj Khalifa manzarali kvartira" },
+          { slug: "office", label: "Ofis taʼmiri" },
         ],
       },
       beforeAfter: {
@@ -2303,17 +2668,37 @@ export const dictionary: Record<Locale, Dict> = {
 
 /* Shared, non-translated constants */
 export const CONTACT = {
+  /* Main line — also the number behind the floating WhatsApp button. */
   phone: "+971 55 479 13 13",
   phoneHref: "tel:+971554791313",
-  phone2: "+971 55 182 7010",
+  phone2: "+971 55 182 70 10",
   phone2Href: "tel:+971551827010",
+  /* The IT desk keeps its own line so those enquiries can be told apart. */
+  phoneIt: "+971 50 323 00 58",
+  phoneItHref: "tel:+971503230058",
   email: "info@bizbuyuk.com",
   instagram: "https://instagram.com/bizbuyukrealestate",
   instagramHandle: "@bizbuyukrealestate",
-  facebook: "https://facebook.com/bizbuyukrealestate",
+  facebook: "https://www.facebook.com/profile.php?id=61590479769092",
   youtube: "https://youtube.com/@bizbuyukrealestate",
+  telegram: "https://t.me/bizbuyukrealestate",
+  telegramHandle: "@bizbuyukrealestate",
   whatsapp: "https://wa.me/971554791313",
+  whatsappIt: "https://wa.me/971503230058",
+  telegramIt: "https://t.me/bizbuyuk_admin",
+  telegramItHandle: "@bizbuyuk_admin",
 };
+
+/* The three Dubai offices. Used by the footer, the contact block and the
+   organisation schema — one list so they can never drift apart. */
+export const OFFICES = ["Business Bay", "Jumeirah Village Circle", "Palm Jumeirah"] as const;
+
+/* Languages the desk actually works in, as opposed to the three the interface
+   is translated into. Kept separate so the two claims never get conflated. */
+export const SPOKEN_LANGUAGES = [
+  "English", "Arabic", "Turkish", "Russian", "Chinese",
+  "Uzbek", "Kazakh", "Kyrgyz", "Italian", "French",
+] as const;
 
 export const DEVELOPERS = [
   "EMAAR",

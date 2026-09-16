@@ -13,7 +13,7 @@ type Status = "idle" | "sending" | "success" | "error";
 export function QuoteForm() {
   const { t, locale } = useLang();
   const q = t.renovationPage.quote;
-  const styles = t.renovationPage.design.styles;
+  const styles = t.renovationPage.design.styles.map((s) => s.label);
 
   const [status, setStatus] = useState<Status>("idle");
   const [name, setName] = useState("");
