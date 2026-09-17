@@ -9,7 +9,6 @@ import { Field, NumberInput, ResultRow, SegmentedToggle } from "./shared";
 import { CalculatorLeadCapture } from "./CalculatorLeadCapture";
 
 type Mode = "offplan" | "mortgage";
-type Residency = "resident" | "nonResident";
 
 export function PaymentPlanCalculator() {
   const { t } = useLang();
@@ -27,19 +26,10 @@ export function PaymentPlanCalculator() {
   const [postMonths, setPostMonths] = useState("24");
 
   // Mortgage mode
-  const [residency, setResidency] = useState<Residency>("resident");
   const [mPrice, setMPrice] = useState("1500000");
-  const [rate, setRate] = useState(String(RATES.mortgage.resident.ratePct));
-  const [downPct, setDownPct] = useState(String(100 - RATES.mortgage.resident.maxLtvPct));
+  const [rate, setRate] = useState(String(RATES.mortgage.defaultRatePct));
+  const [downPct, setDownPct] = useState(String(RATES.mortgage.defaultDownPaymentPct));
   const [term, setTerm] = useState("20");
-
-  function onResidencyChange(v: string) {
-    const res = v as Residency;
-    setResidency(res);
-    const preset = RATES.mortgage[res];
-    setRate(String(preset.ratePct));
-    setDownPct(String(100 - preset.maxLtvPct));
-  }
 
   const stageSum = parseNumber(down) + parseNumber(during) + parseNumber(handover) + parseNumber(post);
   const stages = useMemo(
@@ -68,7 +58,6 @@ export function PaymentPlanCalculator() {
           { label: p.postMonthsLabel, value: postMonths },
         ]
       : [
-          { label: p.residencyLabel, value: residency === "resident" ? p.residentOption : p.nonResidentOption },
           { label: p.priceLabel, value: formatMoney(parseNumber(mPrice)) },
           { label: p.downPaymentLabel, value: `${parseNumber(downPct)}%` },
           { label: p.rateLabel, value: `${parseNumber(rate)}%` },
@@ -142,16 +131,6 @@ export function PaymentPlanCalculator() {
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
             <Reveal delay={0.12}>
               <div className="grid h-full grid-cols-2 gap-4 rounded-[1.6rem] bg-white p-7 shadow-[0_30px_70px_-30px_rgba(21,18,13,0.4)] ring-1 ring-line-dark sm:p-9">
-                <Field label={p.residencyLabel} className="col-span-2">
-                  <SegmentedToggle
-                    value={residency}
-                    onChange={onResidencyChange}
-                    options={[
-                      { value: "resident", label: p.residentOption },
-                      { value: "nonResident", label: p.nonResidentOption },
-                    ]}
-                  />
-                </Field>
                 <Field label={p.priceLabel} className="col-span-2">
                   <NumberInput value={mPrice} onChange={setMPrice} />
                 </Field>
