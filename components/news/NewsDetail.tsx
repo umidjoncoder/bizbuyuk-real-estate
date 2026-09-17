@@ -10,18 +10,25 @@ type Post = {
   titleEn: string;
   titleRu: string;
   titleUz: string;
+  titleAr: string | null;
   bodyEn: string;
   bodyRu: string;
   bodyUz: string;
+  bodyAr: string | null;
   coverImage: string | null;
   publishedAt: string;
 };
 
-// News is stored per-locale as separate DB columns (no titleAr/bodyAr yet —
-// that needs a migration). Arabic readers fall back to the English column
-// rather than the page breaking or showing nothing.
-const TITLE_KEY: Record<Locale, keyof Post> = { en: "titleEn", ru: "titleRu", uz: "titleUz", ar: "titleEn" };
-const BODY_KEY: Record<Locale, keyof Post> = { en: "bodyEn", ru: "bodyRu", uz: "bodyUz", ar: "bodyEn" };
+// News is stored per-locale as separate DB columns. Arabic is optional per
+// post (staff aren't required to translate every post) — fall back to the
+// English column when a post has no Arabic text yet, rather than showing
+// nothing.
+const TITLE_KEY: Record<Locale, keyof Post> = { en: "titleEn", ru: "titleRu", uz: "titleUz", ar: "titleAr" };
+const BODY_KEY: Record<Locale, keyof Post> = { en: "bodyEn", ru: "bodyRu", uz: "bodyUz", ar: "bodyAr" };
+
+function pick(post: Post, key: Record<Locale, keyof Post>, loc: Locale): string {
+  return (post[key[loc]] as string | null) || (post[key.en] as string);
+}
 
 export function NewsDetail({ slug }: { slug: string }) {
   const { t, locale } = useLang();
@@ -62,8 +69,8 @@ export function NewsDetail({ slug }: { slug: string }) {
     );
   }
 
-  const title = post[TITLE_KEY[loc]] as string;
-  const body = post[BODY_KEY[loc]] as string;
+  const title = pick(post, TITLE_KEY, loc);
+  const body = pick(post, BODY_KEY, loc);
 
   return (
     <>

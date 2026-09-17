@@ -11,9 +11,11 @@ type Post = {
   titleEn: string;
   titleRu: string;
   titleUz: string;
+  titleAr: string | null;
   bodyEn: string;
   bodyRu: string;
   bodyUz: string;
+  bodyAr: string | null;
   coverImage: string | null;
   status: "DRAFT" | "PUBLISHED";
   publishedAt: string | null;
@@ -21,7 +23,7 @@ type Post = {
   author?: { fullName: string } | null;
 };
 
-const emptyDraft = { titleEn: "", titleRu: "", titleUz: "", bodyEn: "", bodyRu: "", bodyUz: "", coverImage: "" };
+const emptyDraft = { titleEn: "", titleRu: "", titleUz: "", titleAr: "", bodyEn: "", bodyRu: "", bodyUz: "", bodyAr: "", coverImage: "" };
 
 export default function NewsPage() {
   const { user, lang } = useCrm();
@@ -33,7 +35,7 @@ export default function NewsPage() {
   const [editing, setEditing] = useState<Post | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [draft, setDraft] = useState(emptyDraft);
-  const [tab, setTab] = useState<"en" | "ru" | "uz">("en");
+  const [tab, setTab] = useState<"en" | "ru" | "uz" | "ar">("en");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -68,9 +70,11 @@ export default function NewsPage() {
       titleEn: p.titleEn,
       titleRu: p.titleRu,
       titleUz: p.titleUz,
+      titleAr: p.titleAr || "",
       bodyEn: p.bodyEn,
       bodyRu: p.bodyRu,
       bodyUz: p.bodyUz,
+      bodyAr: p.bodyAr || "",
       coverImage: p.coverImage || "",
     });
     setTab("en");
@@ -146,7 +150,9 @@ export default function NewsPage() {
             {en ? "News" : "Новости"}
           </h2>
           <p className="text-sm crm-muted mt-1">
-            {en ? "Post updates to the public site — every post needs EN, RU and UZ." : "Публикация новостей на сайт — каждый пост нужен на EN, RU и UZ."}
+            {en
+              ? "Post updates to the public site — EN, RU and UZ are required, AR is optional (falls back to EN when left blank)."
+              : "Публикация новостей на сайт — EN, RU и UZ обязательны, AR необязателен (без него используется EN)."}
           </p>
         </div>
         {canManage && (
@@ -225,13 +231,14 @@ export default function NewsPage() {
             </div>
 
             <div className="flex gap-1.5">
-              {(["en", "ru", "uz"] as const).map((l) => (
+              {(["en", "ru", "uz", "ar"] as const).map((l) => (
                 <button
                   key={l}
                   onClick={() => setTab(l)}
                   className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${tab === l ? "crm-btn-primary" : "crm-btn-ghost"}`}
                 >
                   {l}
+                  {l === "ar" && !draft.titleAr && !draft.bodyAr && <span className="ml-1 opacity-60">·</span>}
                 </button>
               ))}
             </div>

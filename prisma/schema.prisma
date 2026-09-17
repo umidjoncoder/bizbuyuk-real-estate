@@ -224,9 +224,11 @@ model NewsPost {
   titleEn     String
   titleRu     String
   titleUz     String
+  titleAr     String?
   bodyEn      String     @db.Text
   bodyRu      String     @db.Text
   bodyUz      String     @db.Text
+  bodyAr      String?    @db.Text
   coverImage  String?    @db.Text
   status      NewsStatus @default(DRAFT)
   publishedAt DateTime?

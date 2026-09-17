@@ -26,7 +26,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const body = await req.json();
-    const { titleEn, titleRu, titleUz, bodyEn, bodyRu, bodyUz, coverImage, status } = body;
+    const { titleEn, titleRu, titleUz, titleAr, bodyEn, bodyRu, bodyUz, bodyAr, coverImage, status } = body;
 
     const willPublish = status === "PUBLISHED";
     const wasPublished = existing.status === "PUBLISHED";
@@ -37,9 +37,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         ...(titleEn !== undefined ? { titleEn: String(titleEn).trim() } : {}),
         ...(titleRu !== undefined ? { titleRu: String(titleRu).trim() } : {}),
         ...(titleUz !== undefined ? { titleUz: String(titleUz).trim() } : {}),
+        ...(titleAr !== undefined ? { titleAr: String(titleAr).trim() || null } : {}),
         ...(bodyEn !== undefined ? { bodyEn: String(bodyEn).trim() } : {}),
         ...(bodyRu !== undefined ? { bodyRu: String(bodyRu).trim() } : {}),
         ...(bodyUz !== undefined ? { bodyUz: String(bodyUz).trim() } : {}),
+        ...(bodyAr !== undefined ? { bodyAr: String(bodyAr).trim() || null } : {}),
         ...(coverImage !== undefined ? { coverImage: coverImage || null } : {}),
         ...(status !== undefined ? { status: willPublish ? "PUBLISHED" : "DRAFT" } : {}),
         ...(willPublish && !wasPublished ? { publishedAt: new Date() } : {}),

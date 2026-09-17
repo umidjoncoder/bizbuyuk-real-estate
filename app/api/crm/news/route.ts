@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { titleEn, titleRu, titleUz, bodyEn, bodyRu, bodyUz, coverImage, status } = body;
+    const { titleEn, titleRu, titleUz, titleAr, bodyEn, bodyRu, bodyUz, bodyAr, coverImage, status } = body;
     if (!titleEn?.trim() || !titleRu?.trim() || !titleUz?.trim()) {
       return NextResponse.json({ error: "Title is required in all three languages" }, { status: 400 });
     }
@@ -72,9 +72,11 @@ export async function POST(req: Request) {
         titleEn: titleEn.trim(),
         titleRu: titleRu.trim(),
         titleUz: titleUz.trim(),
+        titleAr: titleAr?.trim() || null,
         bodyEn: bodyEn.trim(),
         bodyRu: bodyRu.trim(),
         bodyUz: bodyUz.trim(),
+        bodyAr: bodyAr?.trim() || null,
         coverImage: coverImage || null,
         status: willPublish ? "PUBLISHED" : "DRAFT",
         publishedAt: willPublish ? new Date() : null,
