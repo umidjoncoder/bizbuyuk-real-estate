@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { MotionConfig } from "motion/react";
-import { defaultLocale, dictionary, type Dict, type Locale, locales } from "@/lib/i18n";
+import { defaultLocale, dictionary, dirFor, type Dict, type Locale, locales } from "@/lib/i18n";
 
 type Ctx = { locale: Locale; setLocale: (l: Locale) => void; t: Dict };
 
@@ -21,11 +21,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (locales.includes(nav as Locale)) setLocaleState(nav as Locale);
   }, []);
 
-  // Keep <html lang> in step with the active locale. Doing it here rather than
-  // only inside setLocale also covers the locale restored from storage or from
-  // the browser's own language on first load.
+  // Keep <html lang>/<html dir> in step with the active locale. Doing it here
+  // rather than only inside setLocale also covers the locale restored from
+  // storage or from the browser's own language on first load. A blocking
+  // inline script in app/layout.tsx sets both ahead of hydration too, so
+  // an Arabic visitor never sees a flash of left-to-right layout.
   useEffect(() => {
     document.documentElement.lang = locale;
+    document.documentElement.dir = dirFor(locale);
   }, [locale]);
 
   const setLocale = useCallback((l: Locale) => {

@@ -24,7 +24,7 @@ export function CtaBand() {
           className="h-full w-full object-cover"
         />
       </motion.div>
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-ink via-ink/75 to-ink/30" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r rtl:bg-gradient-to-l from-ink via-ink/75 to-ink/30" />
 
       <div className="relative z-10 mx-auto max-w-[1280px] px-5 py-28 sm:px-8 sm:py-36">
         <Reveal>
@@ -38,7 +38,7 @@ export function CtaBand() {
         <Reveal delay={0.16}>
           <a href="#contact" className="btn-gold mt-9">
             {t.hero.cta}
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" className="rtl:-scale-x-100">
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
           </a>

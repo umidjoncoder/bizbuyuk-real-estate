@@ -34,7 +34,7 @@ export type RenovationProject = {
   before?: string;
   after?: string;
   gallery?: string[];
-  summary: { en: string; ru: string; uz: string };
+  summary: { en: string; ru: string; uz: string; ar: string };
 };
 
 export const RENOVATION_PROJECTS: RenovationProject[] = [];

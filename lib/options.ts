@@ -1,7 +1,10 @@
 // Built-in default options. Admins can ADD more via Settings (stored in the DB);
 // the UI merges defaults + custom so dropdowns work out of the box and grow
 // without code changes.
-export const DEFAULT_SOURCES = ["Manual", "Facebook", "Instagram", "Google", "Website", "Telegram"];
+export const DEFAULT_SOURCES = [
+  "Manual", "Facebook", "Instagram", "Google", "Website", "Telegram",
+  "Rental Yield Calculator", "Payment Plan Calculator", "Relocation Cost Calculator",
+];
 // Pipeline stages. WON/LOST are special (sale / requires reason) and always kept.
 export const DEFAULT_STATUSES = ["NEW", "CONTACTED", "NEGOTIATION", "VIEWING", "WON", "LOST"];
 export const DEFAULT_DEVELOPERS = ["Emaar", "DAMAC", "Nakheel", "Sobha", "Danube", "Binghatti"];

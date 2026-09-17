@@ -23,7 +23,7 @@ export function ITProcess() {
             return (
               <Reveal as="li" key={step.title} delay={i * 0.08}>
                 <div
-                  className={`h-full border-line-dark px-0 py-7 sm:px-6 sm:first:pl-0 lg:border-l lg:px-6 lg:first:border-l-0 lg:first:pl-0 ${
+                  className={`h-full border-line-dark px-0 py-7 sm:px-6 sm:first:ps-0 lg:border-s lg:px-6 lg:first:border-s-0 lg:first:ps-0 ${
                     last ? "" : "border-b sm:border-b-0"
                   }`}
                 >

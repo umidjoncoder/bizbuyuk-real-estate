@@ -18,8 +18,11 @@ type Post = {
   publishedAt: string;
 };
 
-const TITLE_KEY: Record<Locale, keyof Post> = { en: "titleEn", ru: "titleRu", uz: "titleUz" };
-const BODY_KEY: Record<Locale, keyof Post> = { en: "bodyEn", ru: "bodyRu", uz: "bodyUz" };
+// News is stored per-locale as separate DB columns (no titleAr/bodyAr yet —
+// that needs a migration). Arabic readers fall back to the English column
+// rather than the page breaking or showing nothing.
+const TITLE_KEY: Record<Locale, keyof Post> = { en: "titleEn", ru: "titleRu", uz: "titleUz", ar: "titleEn" };
+const BODY_KEY: Record<Locale, keyof Post> = { en: "bodyEn", ru: "bodyRu", uz: "bodyUz", ar: "bodyEn" };
 
 export function NewsList() {
   const { t, locale } = useLang();

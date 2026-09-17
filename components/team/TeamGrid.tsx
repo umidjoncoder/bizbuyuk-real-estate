@@ -44,8 +44,8 @@ export function TeamGrid() {
                 type="button"
                 aria-pressed={on}
                 onClick={() => setActive(on ? null : id)}
-                className={`inline-flex items-center gap-2.5 rounded-full border py-2 pr-4 text-[0.82rem] leading-none transition-all duration-400 ease-lux ${
-                  flag ? "pl-2.5" : "pl-4"
+                className={`inline-flex items-center gap-2.5 rounded-full border py-2 pe-4 text-[0.82rem] leading-none transition-all duration-400 ease-lux ${
+                  flag ? "ps-2.5" : "ps-4"
                 } ${
                   on
                     ? "border-gold bg-[rgba(200,161,90,0.14)] text-cream"
@@ -60,7 +60,7 @@ export function TeamGrid() {
           })}
         </div>
 
-        <div className="ml-auto flex shrink-0 items-center gap-4 max-md:ml-0">
+        <div className="ms-auto flex shrink-0 items-center gap-4 max-md:ms-0">
           <span role="status" className="text-[0.68rem] uppercase tracking-[0.18em] text-muted">
             {active ? `${label(active)}: ${hits} ${t.teamPage.peopleWord}` : t.teamPage.hint}
           </span>
@@ -110,14 +110,18 @@ export function TeamGrid() {
                   decoding="async"
                   className="h-full w-full object-cover transition-transform duration-1000 ease-lux group-hover:scale-[1.05]"
                 />
-                <span className="absolute right-3 top-3 flex h-8 w-8 translate-y-[-6px] items-center justify-center rounded-full bg-ink/55 text-champagne opacity-0 backdrop-blur-md transition-all duration-500 ease-lux group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100">
+                <span className="absolute end-3 top-3 flex h-8 w-8 translate-y-[-6px] items-center justify-center rounded-full bg-ink/55 text-champagne opacity-0 backdrop-blur-md transition-all duration-500 ease-lux group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100">
+                  {/* Diagonal "open" glyph, same family as lucide's ArrowUpRight
+                      used elsewhere for card links — deliberately left
+                      unmirrored under RTL (see report: outward/external
+                      affordance, not a reading-order arrow). */}
                   <ArrowGlyph />
                 </span>
                 {/* Every broker on the roster is individually licensed — this
                     is the site's stand-in for a single company-wide licence
                     number, planted on the person a visitor is actually
                     looking at rather than buried in the footer. */}
-                <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-ink/60 py-1 pl-2 pr-2.5 backdrop-blur-md sm:py-1.5 sm:pl-2.5 sm:pr-3">
+                <span className="absolute bottom-3 start-3 inline-flex items-center gap-1.5 rounded-full bg-ink/60 py-1 ps-2 pe-2.5 backdrop-blur-md sm:py-1.5 sm:ps-2.5 sm:pe-3">
                   <ShieldGlyph className="h-3 w-3 shrink-0 text-gold sm:h-3.5 sm:w-3.5" />
                   <span className="text-[0.56rem] font-semibold uppercase tracking-[0.1em] text-cream/90 sm:text-[0.62rem] sm:tracking-[0.14em]">
                     {t.teamPage.trustedBroker}

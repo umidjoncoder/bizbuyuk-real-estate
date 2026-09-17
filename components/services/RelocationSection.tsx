@@ -29,7 +29,7 @@ export function RelocationSection() {
             return (
               <Reveal as="li" key={it.title} delay={i * 0.08}>
                 <div
-                  className={`group h-full border-line-dark px-0 py-7 transition-colors duration-500 sm:px-6 sm:first:pl-0 lg:border-l lg:px-6 lg:first:border-l-0 lg:first:pl-0 ${
+                  className={`group h-full border-line-dark px-0 py-7 transition-colors duration-500 sm:px-6 sm:first:ps-0 lg:border-s lg:px-6 lg:first:border-s-0 lg:first:ps-0 ${
                     last ? "" : "border-b sm:border-b-0"
                   }`}
                 >
@@ -48,7 +48,7 @@ export function RelocationSection() {
         </ol>
 
         <Reveal>
-          <p className="mt-10 max-w-[74ch] border-l border-bronze/40 pl-4 text-[0.86rem] leading-relaxed text-muted-dark">
+          <p className="mt-10 max-w-[74ch] border-s border-bronze/40 ps-4 text-[0.86rem] leading-relaxed text-muted-dark">
             {t.servicesPage.visaNote}
           </p>
         </Reveal>

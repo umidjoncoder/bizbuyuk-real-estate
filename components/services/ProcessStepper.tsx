@@ -32,12 +32,12 @@ export function ProcessStepper() {
         </Reveal>
       </div>
 
-      <div ref={railRef} className="relative pl-9">
-        <span aria-hidden className="absolute left-[5px] top-2 bottom-2 w-px bg-line-dark" />
+      <div ref={railRef} className="relative ps-9">
+        <span aria-hidden className="absolute start-[5px] top-2 bottom-2 w-px bg-line-dark" />
         <motion.span
           aria-hidden
           style={{ height: reduce ? "100%" : drawn }}
-          className="absolute left-[5px] top-2 w-px bg-gradient-to-b from-gold-soft to-bronze"
+          className="absolute start-[5px] top-2 w-px bg-gradient-to-b from-gold-soft to-bronze"
         />
 
         <ol className="space-y-8">
@@ -49,7 +49,7 @@ export function ProcessStepper() {
                 whileInView={{ scale: 1, opacity: 1 }}
                 viewport={{ once: true, margin: "-40% 0px -40% 0px" }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute -left-9 top-[7px] block h-[11px] w-[11px] rounded-full bg-bronze ring-4 ring-sand"
+                className="absolute -start-9 top-[7px] block h-[11px] w-[11px] rounded-full bg-bronze ring-4 ring-sand"
               />
               <Reveal delay={i * 0.06}>
                 <p className="text-[0.68rem] font-bold tracking-[0.22em] text-bronze">

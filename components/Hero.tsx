@@ -30,9 +30,11 @@ export function Hero() {
       </motion.div>
 
       {/* Legibility overlays. The horizontal scrim carries the headline on the
-          left; the vertical one only needs to settle the top and bottom edges,
-          so it stays light enough for the photo to read on the right. */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-ink via-ink/85 to-ink/15" />
+          reading-start side (left in LTR, mirrored to the right under RTL via
+          rtl:bg-gradient-to-l); the vertical one only needs to settle the top
+          and bottom edges, so it stays light enough for the photo to read on
+          the far side. */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r rtl:bg-gradient-to-l from-ink via-ink/85 to-ink/15" />
       <div className="absolute inset-0 z-[1] bg-gradient-to-t from-ink/85 via-transparent to-ink/45" />
 
       <motion.div style={{ opacity: fade }} className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1280px] flex-col justify-center px-5 pt-28 pb-28 sm:px-8">
@@ -52,7 +54,7 @@ export function Hero() {
         <div className="mt-10 flex flex-col items-start gap-3.5 sm:flex-row sm:items-center">
           <MagneticButton href="#contact" className="btn-gold">
             {t.hero.cta}
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" className="rtl:-scale-x-100">
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
           </MagneticButton>

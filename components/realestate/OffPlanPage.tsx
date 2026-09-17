@@ -73,7 +73,7 @@ export function OffPlanPage() {
             ))}
           </div>
           <Reveal>
-            <p className="mt-10 max-w-[64ch] border-l border-gold/40 pl-4 text-[0.88rem] leading-relaxed text-muted">
+            <p className="mt-10 max-w-[64ch] border-s border-gold/40 ps-4 text-[0.88rem] leading-relaxed text-muted">
               {o.payment.note}
             </p>
           </Reveal>

@@ -124,7 +124,7 @@ export function LeadForm() {
                 </motion.div>
               ) : (
                 <motion.form key="form" onSubmit={onSubmit} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-5">
-                  <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden value={company} onChange={(e) => setCompany(e.target.value)} className="absolute -left-[9999px] h-0 w-0 opacity-0" />
+                  <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden value={company} onChange={(e) => setCompany(e.target.value)} className="absolute -start-[9999px] h-0 w-0 opacity-0" />
 
                   <div>
                     <label className="mb-2 block text-sm font-bold text-coal">{t.lead.name}</label>

@@ -22,7 +22,7 @@ export function RenovationHero() {
                 </a>
               </li>
               <li aria-hidden className="text-muted/40">
-                <ChevronRight size={13} strokeWidth={1.6} />
+                <ChevronRight size={13} strokeWidth={1.6} className="rtl:-scale-x-100" />
               </li>
               <li aria-current="page" className="text-cream/80">
                 {r.current}

@@ -23,6 +23,7 @@
   --color-muted-dark: rgba(21, 18, 13, 0.62);
 
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
   --ease-lux: cubic-bezier(0.16, 1, 0.3, 1);
 
   --radius-xl2: 1.75rem;
@@ -48,6 +49,16 @@ body {
   font-family: var(--font-sans);
   overflow-x: hidden;
   letter-spacing: -0.011em;
+}
+
+/* Cairo takes over for Arabic — Manrope has no Arabic glyphs at all, and
+   Cairo's Latin is close enough in weight/width that numerals, phone
+   numbers and brand names (AED, EMAAR) still sit comfortably alongside it.
+   The tight Manrope tracking above reads as cramped in Arabic, so it's
+   reset to normal here rather than carried over. */
+[dir="rtl"] body {
+  font-family: var(--font-arabic);
+  letter-spacing: normal;
 }
 
 ::selection { background: rgba(200, 161, 90, 0.3); color: #fff; }
@@ -137,6 +148,10 @@ body {
     transition: left 0.85s var(--ease-lux);
   }
   .btn-gold:hover::after { left: 140%; }
+  /* Mirror the shimmer sweep under RTL so it still travels in the button's
+     own reading direction instead of visibly running "backwards". */
+  [dir="rtl"] .btn-gold::after { left: auto; right: -120%; }
+  [dir="rtl"] .btn-gold:hover::after { left: auto; right: 140%; }
 
   .btn-outline {
     display: inline-flex;

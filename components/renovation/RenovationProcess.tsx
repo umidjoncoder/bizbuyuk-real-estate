@@ -25,12 +25,12 @@ export function RenovationProcess() {
           <h2 className="display max-w-[16ch] text-[clamp(2rem,5vw,3.6rem)]">{p.title}</h2>
         </Reveal>
 
-        <ol ref={railRef} className="relative mt-16 pl-10 sm:pl-14">
-          <span aria-hidden className="absolute left-[7px] top-3 bottom-3 w-px bg-line sm:left-[11px]" />
+        <ol ref={railRef} className="relative mt-16 ps-10 sm:ps-14">
+          <span aria-hidden className="absolute start-[7px] top-3 bottom-3 w-px bg-line sm:start-[11px]" />
           <motion.span
             aria-hidden
             style={{ height: reduce ? "100%" : drawn }}
-            className="absolute left-[7px] top-3 w-px bg-gradient-to-b from-champagne to-bronze sm:left-[11px]"
+            className="absolute start-[7px] top-3 w-px bg-gradient-to-b from-champagne to-bronze sm:start-[11px]"
           />
 
           {p.steps.map((step, i) => (
@@ -41,7 +41,7 @@ export function RenovationProcess() {
                 whileInView={{ scale: 1, opacity: 1 }}
                 viewport={{ once: true, margin: "-35% 0px -35% 0px" }}
                 transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute -left-10 top-2 block h-[15px] w-[15px] rounded-full bg-gold ring-4 ring-ink sm:-left-14 sm:h-[23px] sm:w-[23px]"
+                className="absolute -start-10 top-2 block h-[15px] w-[15px] rounded-full bg-gold ring-4 ring-ink sm:-start-14 sm:h-[23px] sm:w-[23px]"
               />
               <Reveal delay={i * 0.05}>
                 <div className="grid gap-x-10 gap-y-2 md:grid-cols-[7rem_1fr]">

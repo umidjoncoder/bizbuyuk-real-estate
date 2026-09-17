@@ -45,6 +45,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: "https://bizbuyuk.com/calculators",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: "https://bizbuyuk.com/calculators/rental-yield",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: "https://bizbuyuk.com/calculators/payment-plan",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: "https://bizbuyuk.com/calculators/relocation-cost",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: "https://bizbuyuk.com/it",
       lastModified: new Date(),
       changeFrequency: "monthly",

@@ -33,7 +33,7 @@ export function ServicesCta() {
           className="h-full w-full object-cover object-bottom"
         />
       </motion.div>
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-ink via-ink/80 to-ink/35" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r rtl:bg-gradient-to-l from-ink via-ink/80 to-ink/35" />
 
       <div className="relative z-10 mx-auto max-w-[1280px] px-5 py-28 sm:px-8 sm:py-32">
         <Reveal>
@@ -46,7 +46,7 @@ export function ServicesCta() {
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <a href="/#contact" className="btn-gold">
               {s.ctaPrimary}
-              <ArrowRight size={16} strokeWidth={2.4} />
+              <ArrowRight size={16} strokeWidth={2.4} className="rtl:-scale-x-100" />
             </a>
             <a
               href={waLink(s.cta.title)}

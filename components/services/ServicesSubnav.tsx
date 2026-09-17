@@ -58,7 +58,7 @@ export function ServicesSubnav() {
             >
               {b.nav}
               <span
-                className={`absolute inset-x-4 bottom-0 h-px origin-left bg-gold transition-transform duration-500 ease-lux ${
+                className={`absolute inset-x-4 bottom-0 h-px origin-left rtl:origin-right bg-gold transition-transform duration-500 ease-lux ${
                   on ? "scale-x-100" : "scale-x-0"
                 }`}
               />

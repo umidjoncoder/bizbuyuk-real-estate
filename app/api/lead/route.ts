@@ -20,6 +20,10 @@ type LeadBody = {
   details?: { label?: string; value?: string }[];
   /** honeypot — bots fill this, humans don't */
   company?: string;
+  /** Explicit source override, e.g. a calculator naming itself. Falls back to
+      the usual UTM/referrer guess when not sent, so every existing caller
+      keeps behaving exactly as before. */
+  toolSource?: string;
 };
 
 /** Trim the submitted brief down to something safe to store and send on. */
@@ -89,7 +93,7 @@ export async function POST(req: Request) {
     timeZone: "Asia/Dubai",
   }).format(new Date());
 
-  const source = deriveSource(body.utm, body.referrer);
+  const source = (body.toolSource || "").trim().slice(0, 60) || deriveSource(body.utm, body.referrer);
   const details = cleanDetails(body.details);
   const detailsText = details.map((d) => `${d.label}: ${d.value}`).join("\n");
 

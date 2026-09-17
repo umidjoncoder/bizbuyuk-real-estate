@@ -37,7 +37,7 @@ export function PageHero({
                   <li key={c.label} className="flex items-center gap-2">
                     {i > 0 && (
                       <span aria-hidden className="text-muted/40">
-                        <ChevronRight size={13} strokeWidth={1.6} />
+                        <ChevronRight size={13} strokeWidth={1.6} className="rtl:-scale-x-100" />
                       </span>
                     )}
                     {c.href ? (
@@ -104,7 +104,7 @@ export function PageHero({
           <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-x-6 px-5 sm:grid-cols-3 sm:px-8">
             {stats.map((s, i) => (
               <Reveal key={s.label} delay={i * 0.08}>
-                <div className="min-w-0 border-line py-9 sm:border-l sm:pl-7 sm:first:border-l-0 sm:first:pl-0">
+                <div className="min-w-0 border-line py-9 sm:border-s sm:ps-7 sm:first:border-s-0 sm:first:ps-0">
                   <Counter value={s.value} />
                   <p className="mt-2 max-w-[22ch] text-xs leading-snug tracking-wide text-muted">{s.label}</p>
                 </div>

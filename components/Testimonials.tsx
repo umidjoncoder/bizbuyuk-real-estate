@@ -110,7 +110,7 @@ export function Testimonials() {
                     type="button"
                     onClick={() => setActive(l.id)}
                     aria-pressed={on}
-                    className={`inline-flex items-center gap-2 rounded-full border py-1.5 pl-2 pr-3 text-[0.76rem] font-semibold transition-colors duration-300 ${
+                    className={`inline-flex items-center gap-2 rounded-full border py-1.5 ps-2 pe-3 text-[0.76rem] font-semibold transition-colors duration-300 ${
                       on ? "border-gold bg-[rgba(200,161,90,0.14)] text-cream" : "border-line text-muted hover:text-cream"
                     }`}
                   >
@@ -127,11 +127,18 @@ export function Testimonials() {
           <div className="relative mt-12">
             <div
               ref={trackRef}
+              dir="ltr"
               onPointerDown={onPointerDown}
               onPointerMove={onPointerMove}
               onPointerUp={onPointerUp}
               onPointerCancel={onPointerUp}
               onClickCapture={onClickCapture}
+              // Scroll math (scrollLeft / scrollBy({ left })) is only
+              // consistent across Chrome/Firefox/Safari when the scroll
+              // container's own dir is ltr — pinning it here keeps the drag
+              // and button logic simple regardless of the page's direction.
+              // pr-5/sm:pr-8 stay physical to match: they pad the trailing
+              // (always physical-right) edge of this pinned-ltr track.
               className="flex touch-pan-y cursor-grab gap-4 overflow-x-auto pb-3 pr-5 [scroll-snap-type:x_mandatory] [scrollbar-width:none] active:cursor-grabbing sm:pr-8 [&::-webkit-scrollbar]:hidden"
             >
               {shown.map((item) => (
@@ -163,6 +170,10 @@ export function Testimonials() {
               <div className="w-px shrink-0" aria-hidden />
             </div>
 
+            {/* Masks the trailing edge of the pinned-ltr track above, so this
+                stays physical right/bg-gradient-to-l regardless of page dir —
+                it always has to line up with that track's own physical-right
+                "more cards this way" edge. */}
             <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-16 bg-gradient-to-l from-ink-2 to-transparent sm:block" />
 
             <div className="mt-6 flex items-center justify-between gap-3">
@@ -181,7 +192,7 @@ export function Testimonials() {
                   aria-label="Previous"
                   className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-cream transition-colors duration-300 hover:border-gold/50 hover:text-gold"
                 >
-                  <ChevronLeft size={18} strokeWidth={2.2} />
+                  <ChevronLeft size={18} strokeWidth={2.2} className="rtl:-scale-x-100" />
                 </button>
                 <button
                   type="button"
@@ -189,7 +200,7 @@ export function Testimonials() {
                   aria-label="Next"
                   className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-cream transition-colors duration-300 hover:border-gold/50 hover:text-gold"
                 >
-                  <ChevronRight size={18} strokeWidth={2.2} />
+                  <ChevronRight size={18} strokeWidth={2.2} className="rtl:-scale-x-100" />
                 </button>
               </div>
             </div>

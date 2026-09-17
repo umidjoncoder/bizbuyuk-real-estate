@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope } from "next/font/google";
+import { Manrope, Cairo } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
+import { locales } from "@/lib/i18n";
 
 const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
@@ -10,6 +11,19 @@ const manrope = Manrope({
   variable: "--font-manrope",
   display: "swap",
 });
+
+// Manrope carries no Arabic glyphs — Cairo takes over for Arabic copy only,
+// scoped by `[dir="rtl"]` in globals.css.
+const cairo = Cairo({
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-cairo",
+  display: "swap",
+});
+
+// Read by the anti-flash script below, so the allow-list can never drift
+// from the real one.
+const LOCALES_JSON = JSON.stringify(locales);
 
 const SITE = "https://bizbuyuk.com";
 const TITLE = "BIZBUYUK Real Estate — Your trusted partner in the UAE property market";
@@ -56,7 +70,7 @@ export const metadata: Metadata = {
   formatDetection: { telephone: true, email: true, address: true },
   alternates: {
     canonical: SITE,
-    languages: { en: SITE, ru: SITE, uz: SITE, "x-default": SITE },
+    languages: { en: SITE, ru: SITE, uz: SITE, ar: SITE, "x-default": SITE },
   },
   openGraph: {
     type: "website",
@@ -65,7 +79,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     siteName: "BIZBUYUK Real Estate",
     locale: "en_US",
-    alternateLocale: ["ru_RU"],
+    alternateLocale: ["ru_RU", "uz_UZ", "ar_AE"],
   },
   twitter: {
     card: "summary_large_image",
@@ -176,16 +190,29 @@ const jsonLd = {
       "@id": `${SITE}/#website`,
       url: SITE,
       name: "BIZBUYUK Real Estate",
-      inLanguage: ["en", "ru", "uz"],
+      inLanguage: ["en", "ru", "uz", "ar"],
       publisher: { "@id": `${SITE}/#org` },
     },
   ],
 };
 
+// Runs before hydration so a returning Arabic visitor (or a first-time one
+// whose browser is set to Arabic) never sees a left-to-right flash before
+// LanguageProvider's own effect catches up. Mirrors LanguageProvider's own
+// detection order: stored choice first, then the browser's language.
+const ANTI_FLASH_SCRIPT = `(function(){try{
+  var L=${LOCALES_JSON};
+  var v=localStorage.getItem("bb-locale");
+  var l=(v&&L.indexOf(v)!==-1)?v:null;
+  if(!l){var n=(navigator.language||"en").slice(0,2); if(L.indexOf(n)!==-1) l=n;}
+  if(l==="ar"){document.documentElement.dir="rtl";document.documentElement.lang="ar";}
+}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={manrope.variable}>
+    <html lang="en" className={`${manrope.variable} ${cairo.variable}`} suppressHydrationWarning>
       <body className="grain">
+        <script dangerouslySetInnerHTML={{ __html: ANTI_FLASH_SCRIPT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

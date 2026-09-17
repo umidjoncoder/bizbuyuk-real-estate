@@ -43,7 +43,7 @@ export function BuyingPaths() {
                     <ArrowRight
                       size={16}
                       strokeWidth={2.4}
-                      className="transition-transform duration-500 ease-lux group-hover:translate-x-1"
+                      className="rtl:-scale-x-100 transition-transform duration-500 ease-lux group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
                     />
                   </span>
                 </div>

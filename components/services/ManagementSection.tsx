@@ -8,12 +8,12 @@ import { AskLine, IconChip } from "./shared";
 
 const icons = [Users, Settings, PaintRoller, TrendingUp];
 /** Two of the four tiles carry a photo so the grid is not four text boxes. */
-const photos: (string | null)[] = [BRAND.rental, null, null, BRAND.resale];
+const photos: (string | null)[] = [BRAND.mgmtTenant, null, null, BRAND.mgmtResale];
 const photoAlt = [
-  "Sheikh Zayed Road and the Dubai skyline at dusk",
+  "A key and welcome note on the console table of a move-in-ready Dubai apartment",
   "",
   "",
-  "Waterfront villas on a UAE island at sunset",
+  "A sold notice and keys on the counter of a finished Dubai apartment",
 ];
 
 export function ManagementSection() {

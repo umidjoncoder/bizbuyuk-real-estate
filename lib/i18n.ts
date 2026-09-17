@@ -6,7 +6,7 @@
 
 import type { LangId } from "./team";
 
-export const locales = ["en", "ru", "uz"] as const;
+export const locales = ["en", "ru", "uz", "ar"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "en";
 
@@ -14,7 +14,15 @@ export const localeNames: Record<Locale, string> = {
   en: "EN",
   ru: "RU",
   uz: "UZ",
+  ar: "AR",
 };
+
+/** The one locale that reads right-to-left. Centralised so a future RTL
+    language doesn't need a second `=== "ar"` check hiding somewhere. */
+export const rtlLocales: readonly Locale[] = ["ar"];
+export function dirFor(locale: Locale): "rtl" | "ltr" {
+  return rtlLocales.includes(locale) ? "rtl" : "ltr";
+}
 
 type Service = { title: string; body: string; tag: string };
 type Stat = { value: string; label: string };
@@ -98,6 +106,7 @@ export type Dict = {
     licenceNote: string;
     address: string;
     addressValue: string;
+    offices: string;
     contact: string;
     follow: string;
     rights: string;
@@ -137,6 +146,7 @@ export type Dict = {
     process: { title: string; body: string; steps: Step[] };
     trust: { title: string; items: string[] };
     visaNote: string;
+    legalNote: string;
     askLabel: string;
     askWhatsApp: string;
     also: {
@@ -146,6 +156,48 @@ export type Dict = {
       it: { title: string; body: string; cta: string };
     };
     cta: { title: string; body: string };
+  };
+  calculatorsPage: {
+    metaTitle: string;
+    metaDescription: string;
+    home: string;
+    current: string;
+    eyebrow: string;
+    title: string;
+    sub: string;
+    disclaimer: string;
+    cards: { slug: string; title: string; body: string; cta: string }[];
+    rentalYield: {
+      metaTitle: string; metaDescription: string; nav: string;
+      eyebrow: string; title: string; sub: string;
+      priceLabel: string; rentLabel: string; serviceChargeLabel: string; vacancyLabel: string;
+      grossLabel: string; netLabel: string; resultNote: string;
+    };
+    paymentPlan: {
+      metaTitle: string; metaDescription: string; nav: string;
+      eyebrow: string; title: string; sub: string;
+      modeOffplan: string; modeMortgage: string;
+      priceLabel: string;
+      stageDown: string; stageDuring: string; stageHandover: string; stagePost: string; postMonthsLabel: string;
+      stageSumError: string; offplanNote: string; totalLabel: string; perMonthLabel: string;
+      residencyLabel: string; residentOption: string; nonResidentOption: string;
+      rateLabel: string; downPaymentLabel: string; termLabel: string; monthlyLabel: string; totalInterestLabel: string; mortgageNote: string;
+    };
+    relocationCost: {
+      metaTitle: string; metaDescription: string; nav: string;
+      eyebrow: string; title: string; sub: string;
+      applicantsLabel: string;
+      visaTypeLabel: string; standardOption: string; goldenOption: string;
+      buyingLabel: string; buyingYes: string; buyingNo: string;
+      propertyTypeLabel: string; offplanOption: string; secondaryOption: string; priceLabel: string;
+      insuranceLabel: string; basicOption: string; midOption: string; comprehensiveOption: string;
+      lineVisa: string; lineEmiratesId: string; lineInsurance: string; lineDldTransfer: string; lineDldRegistration: string; lineCommission: string;
+      totalLabel: string; bankNote: string;
+    };
+    leadCapture: {
+      title: string; body: string; name: string; phone: string; email: string;
+      submit: string; sending: string; success: string; error: string; consent: string; whatsapp: string;
+    };
   };
   itPage: {
     metaTitle: string;
@@ -439,6 +491,7 @@ export const dictionary: Record<Locale, Dict> = {
       licenceNote: "Licensed real estate brokerage. Every broker on our team holds an individual RERA licence — ask your broker for theirs.",
       address: "Address",
       addressValue: "Al Barsha South 4, Jumeirah Village Circle, Prime Business Center, United Arab Emirates.",
+      offices: "Offices",
       contact: "Contact",
       follow: "Follow",
       rights: "All rights reserved.",
@@ -480,9 +533,9 @@ export const dictionary: Record<Locale, Dict> = {
       ctaSecondary: "Ask on WhatsApp",
       stats: [
         { value: "7", label: "Emirates covered" },
-        { value: "4", label: "Service directions" },
-        { value: "19", label: "Services inside" },
-        { value: "3", label: "Languages: EN / RU / UZ" },
+        { value: "5", label: "Service directions" },
+        { value: "23", label: "Services inside" },
+        { value: "4", label: "Languages: EN / RU / UZ / AR" },
       ],
       blocks: [
         {
@@ -539,6 +592,19 @@ export const dictionary: Record<Locale, Dict> = {
             { title: "Resale", body: "Resale and assignment: help exiting the investment when it makes sense." },
           ],
         },
+        {
+          id: "legal",
+          nav: "Legal & Consulting",
+          title: "Legal and consulting support",
+          intro:
+            "A legal and consulting arm that reaches beyond the UAE: company formation, visa processing and a network of lawyers across BRICS countries, run by the same team as your property deal.",
+          items: [
+            { title: "International legal network", body: "Partner lawyers across BRICS countries, coordinated through one point of contact, for matters that reach beyond the UAE." },
+            { title: "Company formation", body: "Mainland, free zone or offshore: we structure the entity and handle licensing so you end up trading, not just registered." },
+            { title: "Visa processing", body: "A clear number for the visa itself: 7 working days once your documents are complete. Related matters are scoped in a consultation, not promised in advance." },
+            { title: "Commission and property management", body: "Selling, renting out, or handing us the property to manage: pricing is quoted for your property and your case, not published as a flat rate." },
+          ],
+        },
       ],
       process: {
         title: "How it works",
@@ -562,6 +628,8 @@ export const dictionary: Record<Locale, Dict> = {
       },
       visaNote:
         "Residence visa rules and the Golden Visa investment threshold change from time to time. We confirm the current requirements on the date of your deal.",
+      legalNote:
+        "Broker and partner terms are also agreed case by case. Tell us who you are working with and we confirm the best terms for the arrangement.",
       askLabel: "Question about this section?",
       askWhatsApp: "Ask on WhatsApp",
       also: {
@@ -581,6 +649,109 @@ export const dictionary: Record<Locale, Dict> = {
       cta: {
         title: "Not sure which service you need?",
         body: "Describe your situation in two sentences. We will tell you where to start and what you need at each step.",
+      },
+    },
+    calculatorsPage: {
+      metaTitle: "Calculators",
+      metaDescription: "Estimate rental yield, a payment plan or mortgage, and the full cost of relocating to the UAE — then get the exact numbers from a BIZBUYUK consultant.",
+      home: "Home",
+      current: "Calculators",
+      eyebrow: "Plan the numbers",
+      title: "Calculators",
+      sub: "Quick estimates for the three questions every buyer and mover asks first. For a number you can commit to, a consultant confirms it against your exact case.",
+      disclaimer: "Estimates only, for planning purposes. Rates, fees and government charges change — we confirm the current figures for your case in a consultation.",
+      cards: [
+        { slug: "rental-yield", title: "Rental yield", body: "What a property could return after service charge and vacancy.", cta: "Calculate yield" },
+        { slug: "payment-plan", title: "Payment plan & mortgage", body: "An off-plan payment schedule, or a mortgage monthly payment.", cta: "Calculate payments" },
+        { slug: "relocation-cost", title: "Relocation cost", body: "Visa, Emirates ID, insurance and, if you are buying, the transaction costs.", cta: "Estimate the cost" },
+      ],
+      rentalYield: {
+        metaTitle: "Rental Yield Calculator",
+        metaDescription: "Estimate gross and net rental yield on a UAE property, factoring in service charge and vacancy.",
+        nav: "Rental Yield",
+        eyebrow: "Rental yield calculator",
+        title: "What could this property return?",
+        sub: "Enter the purchase price and expected rent. We factor in service charge and a vacancy allowance to show a realistic net figure, not just the headline number.",
+        priceLabel: "Purchase price, AED",
+        rentLabel: "Expected annual rent, AED",
+        serviceChargeLabel: "Annual service charge, AED",
+        vacancyLabel: "Vacancy allowance, %",
+        grossLabel: "Gross yield",
+        netLabel: "Net yield",
+        resultNote: "Net yield assumes the vacancy allowance and service charge are the only deductions. It does not include financing costs, which the payment plan and mortgage calculator covers.",
+      },
+      paymentPlan: {
+        metaTitle: "Payment Plan & Mortgage Calculator",
+        metaDescription: "Model an off-plan payment schedule or a standard UAE mortgage, with resident and non-resident presets.",
+        nav: "Payment Plan",
+        eyebrow: "Payment plan & mortgage calculator",
+        title: "How would you pay for it?",
+        sub: "Two ways to pay: a developer's off-plan schedule, or a bank mortgage. Switch between them to compare.",
+        modeOffplan: "Off-plan schedule",
+        modeMortgage: "Mortgage",
+        priceLabel: "Property price, AED",
+        stageDown: "Down payment, %",
+        stageDuring: "During construction, %",
+        stageHandover: "On handover, %",
+        stagePost: "Post-handover, %",
+        postMonthsLabel: "Post-handover period, months",
+        stageSumError: "The four stages should add up to 100%.",
+        offplanNote: "This is an example schedule, not a specific developer's terms. Plans differ by developer and by project, and change between launch phases — we compare the actual plans open at the time you are buying.",
+        totalLabel: "Total",
+        perMonthLabel: "per month",
+        residencyLabel: "Buyer status",
+        residentOption: "UAE resident",
+        nonResidentOption: "Non-resident",
+        rateLabel: "Interest rate, % per year",
+        downPaymentLabel: "Down payment, %",
+        termLabel: "Term, years",
+        monthlyLabel: "Monthly payment",
+        totalInterestLabel: "Total interest over the term",
+        mortgageNote: "The rate and maximum financing shown are typical starting points, not an offer. A bank confirms your actual rate and eligibility after reviewing your file.",
+      },
+      relocationCost: {
+        metaTitle: "Relocation Cost Calculator",
+        metaDescription: "Estimate the cost of moving to the UAE: visa, Emirates ID, insurance and, if you are buying property, the transaction costs.",
+        nav: "Relocation Cost",
+        eyebrow: "Relocation cost calculator",
+        title: "What does moving here actually cost?",
+        sub: "Visa, Emirates ID and insurance for everyone relocating, plus the transaction costs if a property purchase is part of the move.",
+        applicantsLabel: "Number of applicants",
+        visaTypeLabel: "Visa route",
+        standardOption: "Standard residence visa",
+        goldenOption: "Golden Visa",
+        buyingLabel: "Also buying a property?",
+        buyingYes: "Yes",
+        buyingNo: "No",
+        propertyTypeLabel: "Property type",
+        offplanOption: "Off-plan",
+        secondaryOption: "Secondary market",
+        priceLabel: "Property price, AED",
+        insuranceLabel: "Health insurance level",
+        basicOption: "Basic",
+        midOption: "Mid",
+        comprehensiveOption: "Comprehensive",
+        lineVisa: "Residence visa",
+        lineEmiratesId: "Emirates ID",
+        lineInsurance: "Health insurance",
+        lineDldTransfer: "DLD transfer fee (4%)",
+        lineDldRegistration: "DLD registration fee",
+        lineCommission: "Agency commission",
+        totalLabel: "Estimated total",
+        bankNote: "Opening a UAE bank account is typically free; some banks ask for a minimum average balance instead of a fee. We point you to the right bank for your case.",
+      },
+      leadCapture: {
+        title: "Get the exact numbers",
+        body: "Send us this estimate and a consultant confirms the real figures for your case, usually within one business day.",
+        name: "Your name",
+        phone: "Phone number",
+        email: "Email",
+        submit: "Send my numbers",
+        sending: "Sending…",
+        success: "Received. A consultant will be in touch shortly.",
+        error: "Something went wrong. Please try again or message us on WhatsApp.",
+        consent: "By submitting you agree to be contacted about your enquiry.",
+        whatsapp: "Ask on WhatsApp instead",
       },
     },
     itPage: {
@@ -1298,6 +1469,7 @@ export const dictionary: Record<Locale, Dict> = {
       licenceNote: "Лицензированное агентство недвижимости. Каждый брокер в нашей команде имеет собственную лицензию RERA — уточняйте у вашего брокера.",
       address: "Адрес",
       addressValue: "Al Barsha South 4, Jumeirah Village Circle, Prime Business Center, ОАЭ.",
+      offices: "Офисы",
       contact: "Контакты",
       follow: "Соцсети",
       rights: "Все права защищены.",
@@ -1339,9 +1511,9 @@ export const dictionary: Record<Locale, Dict> = {
       ctaSecondary: "Спросить в WhatsApp",
       stats: [
         { value: "7", label: "Эмирата в работе" },
-        { value: "4", label: "Направления сопровождения" },
-        { value: "19", label: "Услуг внутри" },
-        { value: "3", label: "Языка: RU / UZ / EN" },
+        { value: "5", label: "Направления сопровождения" },
+        { value: "23", label: "Услуг внутри" },
+        { value: "4", label: "Языка: RU / UZ / EN / AR" },
       ],
       blocks: [
         {
@@ -1398,6 +1570,19 @@ export const dictionary: Record<Locale, Dict> = {
             { title: "Перепродажа", body: "Resale и assignment: помогаем выйти из инвестиции, когда это становится выгодным." },
           ],
         },
+        {
+          id: "legal",
+          nav: "Юридические услуги",
+          title: "Юридическое сопровождение и консалтинг",
+          intro:
+            "Юридическое и консалтинговое направление, которое работает не только в ОАЭ: регистрация компаний, оформление виз и сеть юристов в странах BRICS — та же команда, что ведёт вашу сделку с недвижимостью.",
+          items: [
+            { title: "Международная юридическая сеть", body: "Партнёрские юристы в странах BRICS, единая точка контакта — для вопросов, которые выходят за рамки ОАЭ." },
+            { title: "Регистрация компании", body: "Mainland, free zone или offshore: оформляем структуру и лицензию так, чтобы вы начали работать, а не просто получили регистрацию." },
+            { title: "Оформление визы", body: "Чёткий срок на саму визу: 7 рабочих дней после подачи полного пакета документов. Смежные вопросы разбираем на консультации, а не обещаем заранее." },
+            { title: "Комиссия и управление недвижимостью", body: "Продажа, сдача в аренду или передача объекта в управление: стоимость называем под конкретный объект и ситуацию, а не по фиксированному прайсу." },
+          ],
+        },
       ],
       process: {
         title: "Как это происходит",
@@ -1421,6 +1606,8 @@ export const dictionary: Record<Locale, Dict> = {
       },
       visaNote:
         "Условия резидентских виз и порог инвестиций для Golden Visa периодически меняются. Действующие требования проверяем на дату вашей сделки.",
+      legalNote:
+        "Условия для брокеров и партнёров также обсуждаются индивидуально. Скажите, с кем вы работаете — подтвердим лучшие условия для этого сотрудничества.",
       askLabel: "Есть вопрос по разделу?",
       askWhatsApp: "Спросить в WhatsApp",
       also: {
@@ -1440,6 +1627,109 @@ export const dictionary: Record<Locale, Dict> = {
       cta: {
         title: "Не знаете, какая услуга нужна именно вам?",
         body: "Опишите ситуацию в двух предложениях. Мы скажем, с чего начать и что понадобится на каждом шаге.",
+      },
+    },
+    calculatorsPage: {
+      metaTitle: "Калькуляторы",
+      metaDescription: "Рассчитайте доходность аренды, график платежей или ипотеку, а также полную стоимость переезда в ОАЭ — точные цифры уточнит консультант BIZBUYUK.",
+      home: "Главная",
+      current: "Калькуляторы",
+      eyebrow: "Просчитайте цифры",
+      title: "Калькуляторы",
+      sub: "Быстрая оценка по трём вопросам, которые задаёт каждый покупатель и переезжающий. Точную цифру, на которую можно опираться, подтвердит консультант по вашей ситуации.",
+      disclaimer: "Это только оценка для планирования. Ставки, сборы и госпошлины меняются — актуальные цифры по вашему случаю уточняем на консультации.",
+      cards: [
+        { slug: "rental-yield", title: "Доходность аренды", body: "Какую доходность может принести объект с учётом service charge и простоя.", cta: "Рассчитать доходность" },
+        { slug: "payment-plan", title: "Рассрочка и ипотека", body: "График платежей от застройщика или ежемесячный платёж по ипотеке.", cta: "Рассчитать платежи" },
+        { slug: "relocation-cost", title: "Стоимость переезда", body: "Виза, Emirates ID, страховка и, если покупаете недвижимость, расходы на сделку.", cta: "Оценить стоимость" },
+      ],
+      rentalYield: {
+        metaTitle: "Калькулятор доходности аренды",
+        metaDescription: "Рассчитайте валовую и чистую доходность аренды недвижимости в ОАЭ с учётом service charge и простоя.",
+        nav: "Доходность аренды",
+        eyebrow: "Калькулятор доходности",
+        title: "Какую доходность может дать этот объект?",
+        sub: "Укажите цену покупки и ожидаемую аренду. Мы учтём service charge и допущение на простой между арендаторами, чтобы показать реалистичную чистую доходность, а не только заголовочную цифру.",
+        priceLabel: "Цена покупки, AED",
+        rentLabel: "Ожидаемая годовая аренда, AED",
+        serviceChargeLabel: "Годовой service charge, AED",
+        vacancyLabel: "Допущение на простой, %",
+        grossLabel: "Валовая доходность",
+        netLabel: "Чистая доходность",
+        resultNote: "Чистая доходность учитывает только простой и service charge. Расходы на финансирование сюда не входят — их считает калькулятор рассрочки и ипотеки.",
+      },
+      paymentPlan: {
+        metaTitle: "Калькулятор рассрочки и ипотеки",
+        metaDescription: "Смоделируйте график рассрочки от застройщика или стандартную ипотеку в ОАЭ, с готовыми условиями для резидентов и нерезидентов.",
+        nav: "Рассрочка",
+        eyebrow: "Калькулятор рассрочки и ипотеки",
+        title: "Как вы будете платить?",
+        sub: "Два способа оплаты: рассрочка от застройщика или банковская ипотека. Переключайтесь между ними, чтобы сравнить.",
+        modeOffplan: "Рассрочка от застройщика",
+        modeMortgage: "Ипотека",
+        priceLabel: "Цена объекта, AED",
+        stageDown: "Первый взнос, %",
+        stageDuring: "В процессе строительства, %",
+        stageHandover: "При сдаче, %",
+        stagePost: "После сдачи, %",
+        postMonthsLabel: "Срок после сдачи, мес.",
+        stageSumError: "Четыре этапа должны в сумме давать 100%.",
+        offplanNote: "Это пример графика, а не условия конкретного застройщика. Планы отличаются у разных застройщиков и проектов и меняются между этапами продаж — сравниваем актуальные планы на момент вашей покупки.",
+        totalLabel: "Итого",
+        perMonthLabel: "в месяц",
+        residencyLabel: "Статус покупателя",
+        residentOption: "Резидент ОАЭ",
+        nonResidentOption: "Нерезидент",
+        rateLabel: "Ставка, % годовых",
+        downPaymentLabel: "Первый взнос, %",
+        termLabel: "Срок, лет",
+        monthlyLabel: "Ежемесячный платёж",
+        totalInterestLabel: "Переплата за весь срок",
+        mortgageNote: "Указанные ставка и максимальное финансирование — типичные стартовые условия, а не предложение банка. Реальную ставку и одобрение банк подтверждает после проверки документов.",
+      },
+      relocationCost: {
+        metaTitle: "Калькулятор стоимости переезда",
+        metaDescription: "Оцените стоимость переезда в ОАЭ: виза, Emirates ID, страховка и, при покупке недвижимости, расходы на сделку.",
+        nav: "Стоимость переезда",
+        eyebrow: "Калькулятор стоимости переезда",
+        title: "Сколько стоит переезд на самом деле?",
+        sub: "Виза, Emirates ID и страховка для всех, кто переезжает, плюс расходы на сделку, если покупка недвижимости — часть переезда.",
+        applicantsLabel: "Количество заявителей",
+        visaTypeLabel: "Тип визы",
+        standardOption: "Стандартная резидентская виза",
+        goldenOption: "Golden Visa",
+        buyingLabel: "Планируете также купить недвижимость?",
+        buyingYes: "Да",
+        buyingNo: "Нет",
+        propertyTypeLabel: "Тип объекта",
+        offplanOption: "Off-plan",
+        secondaryOption: "Вторичный рынок",
+        priceLabel: "Цена объекта, AED",
+        insuranceLabel: "Уровень медицинской страховки",
+        basicOption: "Базовый",
+        midOption: "Средний",
+        comprehensiveOption: "Расширенный",
+        lineVisa: "Резидентская виза",
+        lineEmiratesId: "Emirates ID",
+        lineInsurance: "Медицинская страховка",
+        lineDldTransfer: "Пошлина DLD за переоформление (4%)",
+        lineDldRegistration: "Регистрационный сбор DLD",
+        lineCommission: "Комиссия агентства",
+        totalLabel: "Итого по оценке",
+        bankNote: "Открытие счёта в банке ОАЭ обычно бесплатно; некоторые банки требуют минимальный средний остаток вместо платы за обслуживание. Подскажем подходящий банк под вашу ситуацию.",
+      },
+      leadCapture: {
+        title: "Узнать точные цифры",
+        body: "Отправьте нам этот расчёт — консультант подтвердит реальные цифры по вашей ситуации, обычно в течение одного рабочего дня.",
+        name: "Ваше имя",
+        phone: "Номер телефона",
+        email: "Email",
+        submit: "Отправить расчёт",
+        sending: "Отправка…",
+        success: "Заявка получена. Консультант скоро свяжется с вами.",
+        error: "Что-то пошло не так. Попробуйте ещё раз или напишите нам в WhatsApp.",
+        consent: "Отправляя заявку, вы соглашаетесь на связь по вашему вопросу.",
+        whatsapp: "Спросить в WhatsApp",
       },
     },
     itPage: {
@@ -2157,6 +2447,7 @@ export const dictionary: Record<Locale, Dict> = {
       licenceNote: "Litsenziyalangan koʻchmas mulk agentligi. Jamoamizdagi har bir broker oʻzining shaxsiy RERA litsenziyasiga ega — brokeringizdan soʻrang.",
       address: "Manzil",
       addressValue: "Al Barsha South 4, Jumeirah Village Circle, Prime Business Center, BAA.",
+      offices: "Ofislar",
       contact: "Aloqa",
       follow: "Ijtimoiy tarmoqlar",
       rights: "Barcha huquqlar himoyalangan.",
@@ -2198,9 +2489,9 @@ export const dictionary: Record<Locale, Dict> = {
       ctaSecondary: "WhatsApp orqali soʻrash",
       stats: [
         { value: "7", label: "Amirlik qamrovi" },
-        { value: "4", label: "Xizmat yoʻnalishi" },
-        { value: "19", label: "Ichki xizmat" },
-        { value: "3", label: "Til: UZ / RU / EN" },
+        { value: "5", label: "Xizmat yoʻnalishi" },
+        { value: "23", label: "Ichki xizmat" },
+        { value: "4", label: "Til: UZ / RU / EN / AR" },
       ],
       blocks: [
         {
@@ -2257,6 +2548,19 @@ export const dictionary: Record<Locale, Dict> = {
             { title: "Qayta sotish", body: "Resale va assignment: foydali boʻlgan paytda investitsiyadan chiqishga yordam beramiz." },
           ],
         },
+        {
+          id: "legal",
+          nav: "Yuridik xizmat",
+          title: "Yuridik va konsalting yordami",
+          intro:
+            "BAAdan tashqarida ham ishlaydigan yuridik va konsalting yoʻnalishi: kompaniya ochish, viza rasmiylashtirish va BRICS mamlakatlaridagi yuristlar tarmogʻi — bitimingizni yuritayotgan jamoaning oʻzi.",
+          items: [
+            { title: "Xalqaro yuridik tarmoq", body: "BRICS mamlakatlaridagi hamkor yuristlar, yagona aloqa nuqtasi orqali — BAAdan tashqariga chiqadigan masalalar uchun." },
+            { title: "Kompaniya ochish", body: "Mainland, free zone yoki offshore: strukturani va litsenziyani shunday tuzamizki, faqat roʻyxatdan oʻtish bilan emas, real ishlash bilan yakunlanadi." },
+            { title: "Viza rasmiylashtirish", body: "Vizaning oʻzi uchun aniq muddat: hujjatlar toʻliq boʻlgach 7 ish kuni. Bogʻliq masalalar konsultatsiyada koʻrib chiqiladi, oldindan vaʼda berilmaydi." },
+            { title: "Komissiya va mulk boshqaruvi", body: "Sotish, ijaraga berish yoki boshqaruvga topshirish: narx obyekt va vaziyatga qarab aytiladi, belgilangan tarif sifatida eʼlon qilinmaydi." },
+          ],
+        },
       ],
       process: {
         title: "Bu qanday kechadi",
@@ -2280,6 +2584,8 @@ export const dictionary: Record<Locale, Dict> = {
       },
       visaNote:
         "Rezident vizalari shartlari va Golden Visa uchun investitsiya chegarasi vaqti-vaqti bilan oʻzgaradi. Amaldagi talablarni bitim sanasida tekshiramiz.",
+      legalNote:
+        "Broker va hamkorlar uchun shartlar ham har bir holatda alohida kelishiladi. Kim bilan ishlayotganingizni ayting — hamkorlik uchun eng yaxshi shartlarni tasdiqlaymiz.",
       askLabel: "Ushbu boʻlim boʻyicha savolingiz bormi?",
       askWhatsApp: "WhatsApp orqali soʻrash",
       also: {
@@ -2299,6 +2605,109 @@ export const dictionary: Record<Locale, Dict> = {
       cta: {
         title: "Qaysi xizmat aynan sizga kerakligini bilmayapsizmi?",
         body: "Vaziyatingizni ikki gapda yozing. Nimadan boshlash va har bir qadamda nima kerakligini aytamiz.",
+      },
+    },
+    calculatorsPage: {
+      metaTitle: "Kalkulyatorlar",
+      metaDescription: "Ijara daromadini, to'lov rejasi yoki ipotekani va BAAga ko'chishning to'liq xarajatini hisoblang — aniq raqamlarni BIZBUYUK konsultanti tasdiqlaydi.",
+      home: "Bosh sahifa",
+      current: "Kalkulyatorlar",
+      eyebrow: "Raqamlarni hisoblang",
+      title: "Kalkulyatorlar",
+      sub: "Har bir xaridor va ko'chib keluvchi so'raydigan uchta savol bo'yicha tezkor baho. Tayanish mumkin bo'lgan aniq raqamni konsultant sizning holatingiz bo'yicha tasdiqlaydi.",
+      disclaimer: "Bu faqat rejalashtirish uchun baho. Stavkalar, yig'imlar va davlat to'lovlari o'zgarib turadi — sizning holatingiz bo'yicha amaldagi raqamlarni konsultatsiyada aniqlashtiramiz.",
+      cards: [
+        { slug: "rental-yield", title: "Ijara daromadi", body: "Xizmat haqi va bo'sh turishni hisobga olganda obyekt qancha daromad berishi mumkinligi.", cta: "Daromadni hisoblash" },
+        { slug: "payment-plan", title: "To'lov rejasi va ipoteka", body: "Quruvchidan to'lov jadvali yoki ipoteka bo'yicha oylik to'lov.", cta: "To'lovni hisoblash" },
+        { slug: "relocation-cost", title: "Ko'chish xarajati", body: "Viza, Emirates ID, sug'urta va agar mulk sotib olsangiz — bitim xarajatlari.", cta: "Xarajatni baholash" },
+      ],
+      rentalYield: {
+        metaTitle: "Ijara daromadi kalkulyatori",
+        metaDescription: "BAAdagi mulkning yalpi va sof ijara daromadini xizmat haqi va bo'sh turishni hisobga olib hisoblang.",
+        nav: "Ijara daromadi",
+        eyebrow: "Ijara daromadi kalkulyatori",
+        title: "Bu obyekt qancha daromad berishi mumkin?",
+        sub: "Sotib olish narxi va kutilayotgan ijarani kiriting. Haqiqiy sof raqamni ko'rsatish uchun xizmat haqi va ijarachilar orasidagi bo'sh turish faraz qilingan foizni hisobga olamiz.",
+        priceLabel: "Sotib olish narxi, AED",
+        rentLabel: "Kutilayotgan yillik ijara, AED",
+        serviceChargeLabel: "Yillik xizmat haqi, AED",
+        vacancyLabel: "Bo'sh turish farazi, %",
+        grossLabel: "Yalpi daromad",
+        netLabel: "Sof daromad",
+        resultNote: "Sof daromad faqat bo'sh turish va xizmat haqini hisobga oladi. Moliyalashtirish xarajatlari bunga kirmaydi — ularni to'lov rejasi va ipoteka kalkulyatori hisoblaydi.",
+      },
+      paymentPlan: {
+        metaTitle: "To'lov rejasi va ipoteka kalkulyatori",
+        metaDescription: "Quruvchining off-plan to'lov jadvalini yoki BAAdagi standart ipotekani, rezident va norezidentlar uchun tayyor shartlar bilan modellashtiring.",
+        nav: "To'lov rejasi",
+        eyebrow: "To'lov rejasi va ipoteka kalkulyatori",
+        title: "Qanday to'laysiz?",
+        sub: "To'lovning ikki yo'li: quruvchidan rassrochka yoki bank ipotekasi. Solishtirish uchun ular orasida almashtiring.",
+        modeOffplan: "Quruvchi to'lov rejasi",
+        modeMortgage: "Ipoteka",
+        priceLabel: "Obyekt narxi, AED",
+        stageDown: "Boshlang'ich to'lov, %",
+        stageDuring: "Qurilish jarayonida, %",
+        stageHandover: "Topshirishda, %",
+        stagePost: "Topshirilgandan keyin, %",
+        postMonthsLabel: "Topshirilgandan keyingi muddat, oy",
+        stageSumError: "To'rtta bosqich jami 100% bo'lishi kerak.",
+        offplanNote: "Bu namunaviy jadval, aniq quruvchining shartlari emas. Rejalar quruvchi va loyihaga qarab farq qiladi va sotuv bosqichlari orasida o'zgaradi — xarid vaqtingizdagi amaldagi rejalarni solishtiramiz.",
+        totalLabel: "Jami",
+        perMonthLabel: "oyiga",
+        residencyLabel: "Xaridor maqomi",
+        residentOption: "BAA rezidenti",
+        nonResidentOption: "Norezident",
+        rateLabel: "Stavka, yillik %",
+        downPaymentLabel: "Boshlang'ich to'lov, %",
+        termLabel: "Muddat, yil",
+        monthlyLabel: "Oylik to'lov",
+        totalInterestLabel: "Butun muddat uchun ustama",
+        mortgageNote: "Ko'rsatilgan stavka va maksimal moliyalashtirish odatiy boshlang'ich shartlar, taklif emas. Haqiqiy stavka va tasdiqni bank hujjatlaringizni tekshirgandan keyin beradi.",
+      },
+      relocationCost: {
+        metaTitle: "Ko'chish xarajati kalkulyatori",
+        metaDescription: "BAAga ko'chish xarajatini baholang: viza, Emirates ID, sug'urta va agar mulk sotib olsangiz — bitim xarajatlari.",
+        nav: "Ko'chish xarajati",
+        eyebrow: "Ko'chish xarajati kalkulyatori",
+        title: "Ko'chish aslida qancha turadi?",
+        sub: "Ko'chib kelayotgan har bir kishi uchun viza, Emirates ID va sug'urta, agar mulk xaridi ham ko'chish rejangizga kirsa — bitim xarajatlari qo'shiladi.",
+        applicantsLabel: "Arizachilar soni",
+        visaTypeLabel: "Viza turi",
+        standardOption: "Standart rezident vizasi",
+        goldenOption: "Golden Visa",
+        buyingLabel: "Mulk ham sotib olasizmi?",
+        buyingYes: "Ha",
+        buyingNo: "Yo'q",
+        propertyTypeLabel: "Obyekt turi",
+        offplanOption: "Off-plan",
+        secondaryOption: "Ikkilamchi bozor",
+        priceLabel: "Obyekt narxi, AED",
+        insuranceLabel: "Tibbiy sug'urta darajasi",
+        basicOption: "Bazaviy",
+        midOption: "O'rta",
+        comprehensiveOption: "Keng qamrovli",
+        lineVisa: "Rezident vizasi",
+        lineEmiratesId: "Emirates ID",
+        lineInsurance: "Tibbiy sug'urta",
+        lineDldTransfer: "DLD ko'chirish yig'imi (4%)",
+        lineDldRegistration: "DLD ro'yxatdan o'tkazish yig'imi",
+        lineCommission: "Agentlik komissiyasi",
+        totalLabel: "Taxminiy jami",
+        bankNote: "BAAda bank hisobi ochish odatda bepul; ba'zi banklar to'lov o'rniga minimal o'rtacha qoldiq talab qiladi. Holatingizga mos bankni tavsiya qilamiz.",
+      },
+      leadCapture: {
+        title: "Aniq raqamlarni bilib oling",
+        body: "Ushbu hisobni bizga yuboring — konsultant holatingiz bo'yicha real raqamlarni odatda bir ish kuni ichida tasdiqlaydi.",
+        name: "Ismingiz",
+        phone: "Telefon raqami",
+        email: "Email",
+        submit: "Hisobni yuborish",
+        sending: "Yuborilmoqda…",
+        success: "Qabul qilindi. Konsultant tez orada bog'lanadi.",
+        error: "Xatolik yuz berdi. Qayta urinib ko'ring yoki WhatsApp orqali yozing.",
+        consent: "Yuborish orqali so'rovingiz bo'yicha bog'lanishga rozilik bildirasiz.",
+        whatsapp: "WhatsApp orqali so'rash",
       },
     },
     itPage: {
@@ -2851,6 +3260,976 @@ export const dictionary: Record<Locale, Dict> = {
         cta: {
           title: "Tayyor narsa qidiryapsizmi?",
           body: "Tuman va byudjetni ayting. Bozorda nima borligi va uning aslida qancha turishi bilan qaytamiz.",
+        },
+      },
+    },
+  },
+  ar: {
+    nav: { realEstate: "العقارات", services: "الخدمات", renovation: "التجديد", it: "التقنية", team: "الفريق", partners: "المطورون", why: "لماذا نحن", contact: "تواصل معنا", cta: "احجز استشارة", news: "الأخبار" },
+    teamPage: {
+      metaTitle: "فريقنا في دبي",
+      metaDescription:
+        "فريق BIZBUYUK Real Estate في دبي. سبعة وسطاء عقاريين ومديرين يتحدثون الروسية والإنجليزية والأوزبكية والكازاخستانية والطاجيكية والأذربيجانية والعربية والصينية. اعثر على الزميل الذي يتحدث لغتك.",
+      eyebrow: "الفريق",
+      titleA: "صوتك مسموع",
+      titleEm: "بلغتك الأم",
+      lead: "مكتب BIZBUYUK في دبي. اختر اللغة التي تشعر فيها بالراحة لتتعرف على من سيتولى متابعتك.",
+      bandLabel: "نتحدث بـ",
+      hint: "اختر لغة",
+      reset: "إعادة تعيين",
+      peopleWord: "في الفريق",
+      waIntro: "مرحباً! أنا على موقع BIZBUYUK وأود التواصل مع {name}.",
+      langs: {
+        ru: "الروسية", en: "الإنجليزية", uz: "الأوزبكية", kz: "الكازاخستانية", tj: "الطاجيكية",
+        az: "الأذربيجانية", ar: "العربية", zh: "الصينية", af: "اللغات الأفريقية",
+      },
+      langsShort: { af: "أفريقيا" },
+      ctaTitle: "لست متأكداً بمن عليك أن تتصل؟",
+      ctaBody: "راسلنا وسنوصلك بالشخص الذي يتحدث لغتك ويغطي القطاع الذي تحتاجه من السوق.",
+      ctaButton: "احجز استشارة",
+      trustedBroker: "وسيط عقاري موثوق",
+    },
+    hero: {
+      eyebrow: "الإمارات · العقارات · تأسست عام 2020",
+      titleA: "شريكك الموثوق في",
+      titleEm: "سوق العقارات",
+      titleB: "الإماراتي.",
+      sub: "مشاريع off-plan حديثة الإطلاق من كبرى شركات التطوير في الإمارات، استثمارات محمية، ومسار سلس نحو الاستقرار في الإمارات — نرافقكم فيه خطوة بخطوة حتى النهاية.",
+      cta: "احجز استشارة",
+      ctaAlt: "استكشف خدماتنا",
+      scroll: "مرر",
+    },
+    marqueeIntro: "تثق بنا الشركات التي تبني الإمارات",
+    whatsappFab: { aria: "راسلنا عبر WhatsApp", prefill: "مرحباً BIZBUYUK! لدي سؤال." },
+    trust: {
+      eyebrow: "بالأرقام",
+      lead: {
+        value: "200,000+",
+        label: "عميل",
+        note: "استشارات وصفقات منجزة منذ عام 2020.",
+      },
+      items: [
+        { value: "50,000+", label: "صفقة منجزة" },
+        { value: "AED 10B+", label: "حجم المحفظة العقارية" },
+        { value: "7", label: "إمارات" },
+        { value: "50+", label: "أخصائي في الفريق" },
+        { value: "10", label: "لغة نعمل بها" },
+      ],
+    },
+    services: {
+      eyebrow: "ماذا نقدّم",
+      title: "كل ما نتولاه في الإمارات",
+      items: [
+        {
+          tag: "01",
+          title: "العقارات",
+          body: "مشاريع off-plan حديثة الإطلاق ووحدات جاهزة من أكبر شركات التطوير في الإمارات. بحث، وتفاوض، وإتمام الصفقة، بعمولة 0% على المشتري.",
+        },
+        {
+          tag: "02",
+          title: "حماية الاستثمار",
+          body: "فحص شامل للمطوّر والمشروع، ومراجعة حساب Escrow وبنود العقد، والتسجيل لدى Dubai Land Department.",
+        },
+        {
+          tag: "03",
+          title: "السياحة ونقل الإقامة",
+          body: "زيارة الإمارات أو الإقامة فيها أو الانتقال إليها: تأشيرات الإقامة، وEmirates ID، والحسابات المصرفية، والمدارس، والاستقرار.",
+        },
+        {
+          tag: "04",
+          title: "إدارة الأملاك",
+          body: "بعد الشراء: إيجاد المستأجرين، وتحصيل الإيجار، والصيانة، وإعادة البيع في الوقت المناسب.",
+        },
+        {
+          tag: "05",
+          title: "التجديد الشامل",
+          body: "من مساحة فارغة إلى منزل مؤثّث بالكامل: التصميم، والرندرات ثلاثية الأبعاد، والتجديد الكامل، والأثاث، والتركيب النهائي.",
+        },
+        {
+          tag: "06",
+          title: "التقنية",
+          body: "الذراع التقنية لمجموعة BIZBUYUK GROUP: منتجات ويب وموبايل، وأنظمة أعمال، وذكاء اصطناعي، لعملاء في أي مكان.",
+        },
+      ],
+    },
+    stats: {
+      eyebrow: "لماذا الإمارات",
+      title: "سوق بُني خصيصاً للمستثمرين",
+      items: [
+        { value: "11%", label: "متوسط نمو الأسعار سنوياً" },
+        { value: "12%", label: "متوسط العائد الإيجاري" },
+        { value: "0%", label: "ضريبة على العقار والدخل" },
+      ],
+    },
+    why: {
+      about: {
+        eyebrow: "من نحن",
+        title: "أهلاً بكم في BIZBUYUK Real Estate",
+        body: "تأسست BIZBUYUK عام 2020 وتتمثل مهمتنا في تقديم خدمات وساطة عقارية بمستوى عالمي، وبأعلى معايير الاحترافية والأخلاقيات والجودة. وانطلاقاً من ثقة متبادلة عميقة والتزام راسخ، نسعى لأن نصبح الوكالة العقارية الأكثر قيمة في المنطقة.",
+      },
+      eyebrow: "لماذا نحن",
+      cards: [
+        { title: "خبراء السوق", body: "فريق من المحللين المجتهدين الذين يراقبون اتجاهات السوق ويعرفون الأحياء عن قرب — ليكتشفوا أفضل الفرص لعملائنا." },
+        { title: "وصول مباشر", body: "وصول مباشر إلى عقارات في مواقع متميزة من البائعين أنفسهم، إلى جانب تشكيلة واسعة من حلول off-plan تناسب كل ميزانية." },
+        { title: "صفقة بلا متاعب", body: "عائد استثماري ممتاز عبر عملية استحواذ شفافة وسلسة وخالية من المتاعب." },
+        { title: "خدمات شاملة", body: "وكالة طموحة ومبدعة تتولى بيع وشراء وتأجير العقارات السكنية والتجارية في أبرز مناطق الإمارات." },
+      ],
+    },
+    partners: { eyebrow: "شركاؤنا من المطورين", title: "نتعامل مع جميع المشاريع العقارية في الإمارات" },
+    testimonials: {
+      eyebrow: "بكلماتهم",
+      title: "ماذا يقول عملاؤنا",
+      lead: "بلا تحرير، باللغة التي كُتبت بها.",
+      allLabel: "الكل",
+      ratingSuffix: "/5",
+      writeReview: "أضف تقييمك",
+      form: {
+        title: "أضف تقييمك",
+        name: "اسمك",
+        city: "مدينتك",
+        country: "بلدك",
+        language: "اللغة التي تكتب بها",
+        service: "ما الخدمة التي يتعلق بها تقييمك؟",
+        rating: "التقييم",
+        quote: "رأيك",
+        quotePlaceholder: "ما الأمر الذي سار بشكل جيد — أو لم يسر كذلك؟",
+        submit: "إرسال التقييم",
+        submitting: "جارٍ الإرسال…",
+        success: "شكراً لك. يراجع فريقنا تقييمك قبل نشره.",
+        error: "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+        note: "تُراجَع التقييمات قبل ظهورها على الموقع.",
+        close: "إغلاق",
+      },
+    },
+    lead: {
+      eyebrow: "استشارة مجانية",
+      title: "اترك طلبك — وسنتواصل معك",
+      sub: "زوّدنا بطريقة التواصل معك، وسيتصل بك أحد كبار المستشارين خلال يوم عمل واحد.",
+      name: "اسمك",
+      phone: "رقم الهاتف",
+      email: "البريد الإلكتروني",
+      emailHint: "يكفي كتابة الاسم فقط - سنضيف «@gmail.com» تلقائياً.",
+      contactPref: "طريقة التواصل المفضلة",
+      contactCall: "اتصال هاتفي",
+      contactWhatsApp: "WhatsApp",
+      contactTelegram: "Telegram",
+      contactEmail: "البريد الإلكتروني",
+      submit: "إرسال الطلب",
+      sending: "جارٍ الإرسال…",
+      success: "شكراً لك — سنتواصل معك قريباً.",
+      error: "حدث خطأ ما. يرجى المحاولة مرة أخرى أو الاتصال بنا مباشرة.",
+      consent: "بإرسالك هذا الطلب، فإنك توافق على أن نتواصل معك بخصوص استفسارك.",
+    },
+    footer: {
+      blurb: "وكالة عقارية إماراتية طموحة ومبدعة — بيع وشراء وتأجير العقارات السكنية والتجارية في مختلف أنحاء الإمارات.",
+      licenceNote: "وساطة عقارية مرخّصة. يحمل كل وسيط في فريقنا رخصة RERA الفردية الخاصة به — اطلبها من وسيطك.",
+      address: "العنوان",
+      addressValue: "Al Barsha South 4, Jumeirah Village Circle, Prime Business Center, الإمارات العربية المتحدة.",
+      offices: "المكاتب",
+      contact: "التواصل",
+      follow: "تابعنا",
+      rights: "جميع الحقوق محفوظة.",
+      nav: "التنقل",
+    },
+    legal: {
+      privacyLabel: "سياسة الخصوصية",
+      termsLabel: "شروط الاستخدام",
+      page: {
+        eyebrow: "الشؤون القانونية",
+        updated: "آخر تحديث: سبتمبر 2026",
+        languageNote: "هذه الصفحة معروضة باللغة الإنجليزية، وهي اللغة المعتمدة رسمياً لهذه الوثيقة. راسلونا بالروسية أو الأوزبكية وسيسعدنا الرد على أي استفسار عنها بلغتكم.",
+      },
+      privacy: { title: "سياسة الخصوصية" },
+      terms: { title: "شروط الاستخدام" },
+    },
+    newsPage: {
+      metaTitle: "الأخبار",
+      metaDescription: "آخر مستجدات BIZBUYUK Real Estate و BIZBUYUK GROUP.",
+      home: "الرئيسية",
+      current: "الأخبار",
+      eyebrow: "المستجدات",
+      title: "أخبار BIZBUYUK",
+      lead: "ما نعمل عليه، وما نطلقه، وما نتعلمه.",
+      empty: "لا توجد أخبار بعد — تفقّد الصفحة قريباً.",
+      readMore: "اقرأ المزيد",
+      back: "جميع الأخبار",
+    },
+    servicesPage: {
+      metaTitle: "الخدمات",
+      metaDescription:
+        "من اختيار العقار إلى الاستقرار في الإمارات: عقارات، وحماية للاستثمار، ونقل إقامة، وإدارة أملاك — نرافقكم خطوة بخطوة حتى النهاية.",
+      home: "الرئيسية",
+      current: "الخدمات",
+      eyebrow: "ماذا نقدّم",
+      title: "خدماتنا",
+      sub: "من اختيار العقار إلى الاستقرار في الإمارات، نرافقكم في كل خطوة.",
+      ctaPrimary: "احجز استشارة",
+      ctaSecondary: "اسأل عبر WhatsApp",
+      stats: [
+        { value: "7", label: "إمارات نغطيها" },
+        { value: "5", label: "مسارات خدمية" },
+        { value: "23", label: "خدمة فرعية" },
+        { value: "4", label: "اللغات: EN / RU / UZ / AR" },
+      ],
+      blocks: [
+        {
+          id: "real-estate",
+          nav: "العقارات",
+          title: "البحث والشراء",
+          intro:
+            "نختار لكم العقارات من كبرى شركات التطوير في الإمارات. عمولة المشتري 0%: أتعابنا يدفعها المطوّر، لا أنتم.",
+          items: [
+            { title: "Off-plan مباشرة من المطوّر", body: "عقود مباشرة مع المطوّر: أسعار الإطلاق، وخطط سداد، وشروط ما بعد التسليم دون أي هامش ربح إضافي من وسيط." },
+            { title: "العقار الجاهز", body: "السوق الثانوي: عاينوا الوحدة، وأجّروها، وابدأوا تحقيق الدخل فور إتمام الصفقة." },
+            { title: "التحليل الاستثماري", body: "حساب ROI وrental yield مع الأخذ بعين الاعتبار service charge ورسوم الإدارة ونسبة الشغور." },
+            { title: "قائمة مختصرة من 2-3 وحدات", body: "ليس الكتالوج كاملاً، بل قائمة مختصرة تتناسب مع ميزانيتكم وهدفكم ومدة احتفاظكم بالعقار." },
+            { title: "الحجز وSPA", body: "حجز الوحدة، ومراجعة تفصيلية لبنود العقد، ومرافقتكم حتى التوقيع." },
+          ],
+        },
+        {
+          id: "protection",
+          nav: "حماية الاستثمار",
+          title: "حماية الاستثمار",
+          intro:
+            "حماية قانونية لرأس مالكم في كل مرحلة من مراحل الصفقة. نتحقق من الأمور التي عادةً ما يتأخر التحقق منها كثيراً.",
+          items: [
+            { title: "Due diligence للمطوّر", body: "سجل المطوّر في تسليم مشاريعه السابقة، ومتانته المالية، وحالة المشروع في سجلّات RERA." },
+            { title: "حساب Escrow وخطة السداد", body: "نتحقق من أن الأموال تودَع في حساب Escrow الخاص بالمشروع، وأن جدول السداد مطابق لما جاء في العقد." },
+            { title: "مراجعة SPA قبل التوقيع", body: "مواعيد التسليم، والغرامات، وشروط الفسخ، وإجراءات تسليم الوحدة." },
+            { title: "Oqood وTitle Deed", body: "تسجيل الملكية لدى Dubai Land Department، ومتابعة المهل الزمنية لإنجاز المعاملات الورقية." },
+            { title: "النزاعات", body: "الدعم اللازم في حال تأخّر المطوّر في التسليم أو أخلّ ببنود العقد." },
+          ],
+        },
+        {
+          id: "relocation",
+          nav: "السياحة ونقل الإقامة",
+          title: "السياحة ونقل الإقامة",
+          intro: "من الزيارة الأولى إلى حياة كاملة في الإمارات.",
+          items: [
+            { title: "جولة تعريفية", body: "برنامج زيارة كامل: معاينة العقارات، ولقاءات مع المطورين، والتنقلات، والإقامة." },
+            { title: "تأشيرة الإقامة", body: "إنجاز إجراءات التأشيرة، بما في ذلك Golden Visa إذا بلغ الاستثمار الحد المطلوب حالياً." },
+            { title: "الحساب المصرفي وEmirates ID", body: "فتح حساب مصرفي في الإمارات والحصول على بطاقة الهوية الإماراتية." },
+            { title: "المدارس والمنطقة السكنية", body: "اختيار المدرسة أو الحضانة المناسبة والمنطقة الملائمة لعائلتكم." },
+            { title: "الاستقرار", body: "التأمين الصحي، والخدمات، والمواصلات، وخطوط الاتصال." },
+          ],
+        },
+        {
+          id: "management",
+          nav: "الإدارة",
+          title: "إدارة الأملاك",
+          intro:
+            "الشراء لا ينتهي عند التوقيع. فبعد إتمام الصفقة، يحتاج العقار إلى التجهيز والتأجير والمتابعة.",
+          items: [
+            { title: "إيجاد المستأجر", body: "إيجار طويل وقصير الأجل، وفحص المستأجرين، والعقد، وتسجيل Ejari." },
+            { title: "إدارة العقار", body: "التنسيق مع إدارة المبنى، وصيانة الوحدة، وتحصيل الإيجار." },
+            { title: "التجديد والتأثيث", body: "تجهيز الوحدة لتكون جاهزة للتأجير: التشطيبات، والأثاث، والأجهزة، وتصوير الوحدة للإعلان عنها." },
+            { title: "إعادة البيع", body: "Resale وassignment: نساعدكم على الخروج من الاستثمار عندما يكون ذلك مجدياً." },
+          ],
+        },
+        {
+          id: "legal",
+          nav: "الخدمات القانونية",
+          title: "الدعم القانوني والاستشاري",
+          intro:
+            "ذراع قانونية واستشارية تمتد إلى ما هو أبعد من الإمارات: تأسيس الشركات، وإنجاز التأشيرات، وشبكة من المحامين في دول BRICS، يديرها الفريق نفسه الذي يتابع صفقتكم العقارية.",
+          items: [
+            { title: "شبكة قانونية دولية", body: "محامون شركاء في دول BRICS، منسّقون عبر جهة اتصال واحدة، للمسائل التي تتجاوز حدود الإمارات." },
+            { title: "تأسيس الشركات", body: "Mainland أو free zone أو offshore: نبني الهيكل القانوني المناسب وننجز الترخيص بحيث تبدؤون العمل الفعلي، لا مجرد التسجيل." },
+            { title: "إنجاز التأشيرات", body: "مدة واضحة للتأشيرة نفسها: 7 أيام عمل بعد اكتمال مستنداتكم. أما المسائل المرتبطة بها فتُحدَّد ضمن الاستشارة، دون وعد مسبق بها." },
+            { title: "العمولة وإدارة الأملاك", body: "البيع أو التأجير أو تسليمنا العقار لإدارته: نحدد السعر بحسب عقاركم وحالتكم، لا بحسب تعرفة ثابتة معلنة." },
+          ],
+        },
+      ],
+      process: {
+        title: "كيف نعمل",
+        body: "خمس خطوات من أول محادثة وحتى تسجيل الملكية باسمكم. عادةً أسبوعان أو أكثر.",
+        steps: [
+          { title: "الموجز الأولي", body: "الميزانية، والهدف، والأفق الزمني، وطريقة السداد التي تناسبكم." },
+          { title: "القائمة المختصرة", body: "وحدتان أو ثلاث، مع حساب العائد لكل منها." },
+          { title: "المعاينة", body: "جولة فيديو للوحدة أو زيارة إلى الإمارات." },
+          { title: "الحجز", body: "حجز الوحدة ومراجعة SPA قبل التوقيع." },
+          { title: "إتمام الصفقة", body: "التوقيع، والسداد، والتسجيل لدى Dubai Land Department." },
+        ],
+      },
+      trust: {
+        title: "ما يعنيه ذلك عملياً",
+        items: [
+          "نعمل كوساطة عقارية مسجَّلة رسمياً في الإمارات",
+          "كل صفقة تُسجَّل لدى Dubai Land Department",
+          "أموال المشتري تودَع في حساب Escrow الخاص بالمشروع",
+          "يراجع المحامي العقد قبل التوقيع، لا بعده",
+        ],
+      },
+      visaNote:
+        "تتغيّر من وقت لآخر ضوابط تأشيرة الإقامة وحدّ الاستثمار المطلوب لـ Golden Visa. نتحقق من المتطلبات المعمول بها في تاريخ إتمام صفقتكم.",
+      legalNote:
+        "تُتَّفق شروط الوسطاء والشركاء أيضاً على أساس كل حالة على حدة. أخبرونا بمن تتعاملون وسنؤكد لكم أفضل الشروط لهذا التعاون.",
+      askLabel: "لديك سؤال حول هذا القسم؟",
+      askWhatsApp: "اسأل عبر WhatsApp",
+      also: {
+        eyebrow: "من ضمن ما نقدّمه أيضاً",
+        title: "مساران إضافيان",
+        renovation: {
+          title: "التجديد الشامل",
+          body: "اشتريتم عقاركم بالفعل، أو تشترون في مكان آخر؟ نأخذ المساحة من الفراغ إلى التأثيث الكامل — تصميم، ورندرات ثلاثية الأبعاد، وتنفيذ كامل، وأثاث، وتسليم نهائي.",
+          cta: "شاهد خدمات التجديد",
+        },
+        it: {
+          title: "التقنية",
+          body: "الذراع التقنية لمجموعة BIZBUYUK GROUP — منتجات ويب وموبايل، وأنظمة أعمال، وذكاء اصطناعي، لعملاء في أي مكان بالعالم.",
+          cta: "شاهد خدماتنا التقنية",
+        },
+      },
+      cta: {
+        title: "لست متأكداً أي خدمة تحتاجها؟",
+        body: "صف لنا وضعك في جملتين، وسنخبرك من أين تبدأ وما الذي تحتاجه في كل خطوة.",
+      },
+    },
+    calculatorsPage: {
+      metaTitle: "الحاسبات",
+      metaDescription: "احسبوا العائد الإيجاري، وخطة السداد أو القسط العقاري، والتكلفة الكاملة للانتقال إلى الإمارات — ثم احصلوا على الأرقام الدقيقة من أحد مستشاري BIZBUYUK.",
+      home: "الرئيسية",
+      current: "الحاسبات",
+      eyebrow: "احسب أرقامك",
+      title: "الحاسبات",
+      sub: "تقديرات سريعة للأسئلة الثلاثة التي يطرحها كل مشترٍ وكل منتقل إلى الإمارات أولاً. وللحصول على رقم يمكنكم التعويل عليه، يؤكده أحد مستشارينا بحسب حالتكم بدقة.",
+      disclaimer: "هذه تقديرات فقط لأغراض التخطيط. فالأسعار والرسوم والضرائب الحكومية تتغيّر — ونحن نؤكد لكم الأرقام المعمول بها في حالتكم خلال الاستشارة.",
+      cards: [
+        { slug: "rental-yield", title: "العائد الإيجاري", body: "العائد المتوقع من العقار بعد خصم service charge ونسبة الشغور.", cta: "احسب العائد" },
+        { slug: "payment-plan", title: "خطة السداد والقسط العقاري", body: "جدول سداد لعقار off-plan، أو القسط الشهري لقرض عقاري.", cta: "احسب الأقساط" },
+        { slug: "relocation-cost", title: "تكلفة الانتقال", body: "التأشيرة، وEmirates ID، والتأمين، وإن كنتم تشترون عقاراً، تكاليف الصفقة.", cta: "قدّر التكلفة" },
+      ],
+      rentalYield: {
+        metaTitle: "حاسبة العائد الإيجاري",
+        metaDescription: "احسبوا العائد الإيجاري الإجمالي والصافي لعقار في الإمارات، مع الأخذ بعين الاعتبار service charge ونسبة الشغور.",
+        nav: "العائد الإيجاري",
+        eyebrow: "حاسبة العائد الإيجاري",
+        title: "كم يمكن أن يُدرّ عليكم هذا العقار؟",
+        sub: "أدخِلوا سعر الشراء والإيجار المتوقع. نحتسب service charge ونسبة تقديرية للشغور لنعرض لكم رقماً صافياً واقعياً، لا مجرد الرقم الأولي المعلن.",
+        priceLabel: "سعر الشراء، AED",
+        rentLabel: "الإيجار السنوي المتوقع، AED",
+        serviceChargeLabel: "قيمة service charge السنوية، AED",
+        vacancyLabel: "نسبة الشغور، %",
+        grossLabel: "العائد الإجمالي",
+        netLabel: "العائد الصافي",
+        resultNote: "يفترض العائد الصافي أن نسبة الشغور وservice charge هما الخصمان الوحيدان. ولا يشمل تكاليف التمويل، التي تغطيها حاسبة خطة السداد والقسط العقاري.",
+      },
+      paymentPlan: {
+        metaTitle: "حاسبة خطة السداد والقسط العقاري",
+        metaDescription: "احسبوا جدول سداد لعقار off-plan أو قسط قرض عقاري عادي في الإمارات، بخيارات جاهزة للمقيمين وغير المقيمين.",
+        nav: "خطة السداد",
+        eyebrow: "حاسبة خطة السداد والقسط العقاري",
+        title: "كيف تودّون سداد ثمنه؟",
+        sub: "طريقتان للسداد: جدول Off-plan من المطوّر، أو قرض عقاري من البنك. بدّلوا بينهما للمقارنة.",
+        modeOffplan: "جدول Off-plan",
+        modeMortgage: "القرض العقاري",
+        priceLabel: "سعر العقار، AED",
+        stageDown: "الدفعة الأولى، %",
+        stageDuring: "أثناء البناء، %",
+        stageHandover: "عند التسليم، %",
+        stagePost: "بعد التسليم، %",
+        postMonthsLabel: "مدة ما بعد التسليم، بالأشهر",
+        stageSumError: "يجب أن يكون مجموع المراحل الأربع 100%.",
+        offplanNote: "هذا جدول توضيحي فقط، وليس شروط مطوّر بعينه. فالخطط تختلف من مطوّر لآخر ومن مشروع لآخر، وتتغيّر بين مراحل الإطلاق — ونحن نقارن لكم الخطط الفعلية المتاحة وقت شرائكم.",
+        totalLabel: "الإجمالي",
+        perMonthLabel: "شهرياً",
+        residencyLabel: "صفة المشتري",
+        residentOption: "مقيم في الإمارات",
+        nonResidentOption: "غير مقيم",
+        rateLabel: "نسبة الفائدة، % سنوياً",
+        downPaymentLabel: "الدفعة الأولى، %",
+        termLabel: "مدة القرض، بالسنوات",
+        monthlyLabel: "القسط الشهري",
+        totalInterestLabel: "إجمالي الفائدة خلال مدة القرض",
+        mortgageNote: "النسبة والحد الأقصى للتمويل المعروضان نقطة انطلاق نموذجية لا عرضاً فعلياً. ويؤكد البنك نسبتكم الفعلية وأهليتكم بعد مراجعة ملفكم.",
+      },
+      relocationCost: {
+        metaTitle: "حاسبة تكلفة الانتقال",
+        metaDescription: "احسبوا تكلفة الانتقال إلى الإمارات: التأشيرة، وEmirates ID، والتأمين، وإن كنتم تشترون عقاراً، تكاليف الصفقة.",
+        nav: "تكلفة الانتقال",
+        eyebrow: "حاسبة تكلفة الانتقال",
+        title: "كم تكلّف حقاً الإقامة هنا؟",
+        sub: "التأشيرة وEmirates ID والتأمين لكل من ينتقل إلى الإمارات، بالإضافة إلى تكاليف الصفقة إذا كان شراء عقار جزءاً من خطة الانتقال.",
+        applicantsLabel: "عدد مقدّمي الطلب",
+        visaTypeLabel: "نوع التأشيرة",
+        standardOption: "تأشيرة الإقامة القياسية",
+        goldenOption: "Golden Visa",
+        buyingLabel: "هل ستشترون عقاراً أيضاً؟",
+        buyingYes: "نعم",
+        buyingNo: "لا",
+        propertyTypeLabel: "نوع العقار",
+        offplanOption: "Off-plan",
+        secondaryOption: "السوق الثانوي",
+        priceLabel: "سعر العقار، AED",
+        insuranceLabel: "مستوى التأمين الصحي",
+        basicOption: "أساسي",
+        midOption: "متوسط",
+        comprehensiveOption: "شامل",
+        lineVisa: "تأشيرة الإقامة",
+        lineEmiratesId: "Emirates ID",
+        lineInsurance: "التأمين الصحي",
+        lineDldTransfer: "رسوم نقل الملكية لدى DLD (4%)",
+        lineDldRegistration: "رسوم تسجيل DLD",
+        lineCommission: "عمولة الوكالة",
+        totalLabel: "الإجمالي التقديري",
+        bankNote: "فتح حساب مصرفي في الإمارات مجاني عادةً؛ وبعض البنوك تشترط حداً أدنى لمتوسط الرصيد بدلاً من رسوم الفتح. نرشدكم إلى البنك الأنسب لحالتكم.",
+      },
+      leadCapture: {
+        title: "احصل على الأرقام الدقيقة",
+        body: "أرسِلوا لنا هذا التقدير، وسيؤكد لكم أحد المستشارين الأرقام الفعلية لحالتكم، عادةً خلال يوم عمل واحد.",
+        name: "اسمك",
+        phone: "رقم الهاتف",
+        email: "البريد الإلكتروني",
+        submit: "أرسل أرقامي",
+        sending: "جارٍ الإرسال…",
+        success: "تم الاستلام. سيتواصل معك أحد المستشارين قريباً.",
+        error: "حدث خطأ ما. يرجى المحاولة مرة أخرى أو مراسلتنا عبر WhatsApp.",
+        consent: "بإرسالك هذا الطلب، فإنك توافق على أن نتواصل معك بخصوص استفسارك.",
+        whatsapp: "أو اسأل عبر WhatsApp",
+      },
+    },
+    itPage: {
+      metaTitle: "الخدمات التقنية",
+      metaDescription:
+        "الذراع التقنية لمجموعة BIZBUYUK GROUP — منتجات ويب وموبايل، وأنظمة أعمال، وذكاء اصطناعي، وحلول سحابية، وأمن سيبراني، وبيانات، لعملاء في أي مكان بالعالم.",
+      home: "الرئيسية",
+      current: "التقنية",
+      hero: {
+        eyebrow: "BIZBUYUK GROUP · التقنية",
+        title: "المعيار نفسه الذي نبني عليه شركتنا.",
+        sub: "منتجات ويب وموبايل، وأنظمة أعمال، وذكاء اصطناعي، وحلول سحابية، وأمن سيبراني، وبيانات — ينفّذها الفريق الذي بنى ويشغّل CRM الخاص بـ BIZBUYUK نفسها. شريك واحد، لكل التخصصات، لعملاء في أي مكان.",
+        ctaPrimary: "تواصل مع فريق التقنية",
+        ctaSecondary: "راسلنا عبر Telegram",
+      },
+      proof: {
+        eyebrow: "لسنا مجرد عرض تقديمي",
+        title: "نستخدم ما نبنيه بأنفسنا",
+        items: [
+          {
+            title: "BIZBUYUK CRM",
+            body: "العملاء المحتملون، ومسار المبيعات، والمالية، والمهام، والتقارير، لوساطة BIZBUYUK Real Estate نفسها — نظام بُني داخلياً ويستخدمه الفريق يومياً.",
+            cta: "اطلب عرضاً توضيحياً",
+          },
+          {
+            title: "LaWEra CRM",
+            body: "منصة لإدارة القضايا والعملاء بُنيت لممارسة LaWEra القانونية — استقبال الطلبات، والمستندات، والفوترة في نظام واحد.",
+            cta: "اطلب عرضاً توضيحياً",
+          },
+        ],
+      },
+      groupsIntro: {
+        eyebrow: "ماذا نبني",
+        title: "اثنا عشر تخصصاً، فريق واحد",
+        lead: "اختاروا من أين يبدأ مشروعكم. معظم المشاريع تتقاطع مع أكثر من تخصص واحد من هذه — وهذا ما نناقشه بمجرد أن تراسلونا.",
+        viewLabel: "عرض الخدمات",
+      },
+      process: {
+        eyebrow: "كيف نعمل",
+        title: "من رسالة على WhatsApp إلى منتج جاهز",
+        steps: [
+          { title: "استشارة", body: "أخبرونا بما تريدون حله. لا حاجة لتعبئة نموذج أولاً — فقط صفوه لنا." },
+          { title: "تحديد النطاق", body: "نعود إليكم بما يتطلبه الأمر: الفريق، والجدول الزمني، وكيفية هيكلة السعر." },
+          { title: "التنفيذ", body: "يسير العمل عبر دورات قصيرة، مع نتائج ملموسة يمكنكم الاطلاع عليها باكراً وبانتظام." },
+          { title: "الدعم", body: "الإطلاق ليس النهاية. نبقى معكم للإصلاحات والتطوير والمرحلة التالية." },
+        ],
+      },
+      cta: {
+        title: "لديك مشروع في ذهنك؟",
+        body: "صِفه لنا برسالة — بالإنجليزية أو الروسية أو الأوزبكية، جميعها تناسبنا. فريق التقنية يرد عليكم مباشرة، دون قوائم انتظار.",
+        ctaPrimary: "راسل فريق التقنية عبر WhatsApp",
+        ctaSecondary: "راسلنا عبر Telegram",
+      },
+      group: {
+        backLabel: "جميع التخصصات",
+        servicesLabel: "ما الذي يشمله",
+        servicesIntro: "كل بند هنا نقطة انطلاق، لا باقة ثابتة — أخبرونا بأقربها إلى ما تحتاجونه، ونحدد الباقي معاً.",
+        askLabel: "اسأل عن",
+        askButton: "ناقش هذا عبر WhatsApp",
+        otherLabel: "تخصصات أخرى",
+        ctaTitle: "مستعدون لتحديد نطاق المشروع؟",
+        ctaBody: "راسلوا فريق التقنية بضعة أسطر عن مشروعكم — حجم الفريق، والجدول الزمني التقريبي، وما تحاولون حله.",
+      },
+    },
+    renovationPage: {
+      metaTitle: "التجديد الشامل في دبي",
+      metaDescription:
+        "تقدّم BIZBUYUK خدمة تجديد شاملة بالكامل في دبي: تصميم داخلي وتصور ثلاثي الأبعاد، وتجديد كامل، وأثاث حسب الطلب، وتأثيث نهائي. فريق واحد، وعقد واحد، وعقار جاهز للسكن مباشرة.",
+      home: "الرئيسية",
+      current: "التجديد الشامل",
+      hero: {
+        eyebrow: "التجديد الشامل",
+        l1: "عقارك.",
+        l2: "رؤيتنا.",
+        l3: "جاهز للسكن.",
+        sub: "من مساحة فارغة إلى منزل مؤثّث بالكامل. نتولى العملية بأكملها، من التصميم والتجديد إلى الأثاث والتركيب النهائي.",
+        cta: "احصل على استشارة مجانية",
+        ctaAlt: "شاهد مشاريعنا",
+      },
+      scope: {
+        title: "كل شيء. من الصفر إلى الجاهزية التامة للسكن.",
+        lead: "لستم بحاجة لتنسيق عمل عشرات المقاولين. فالتجديد بأكمله يسير تحت سقف واحد، وجدول زمني واحد، وعقد واحد.",
+        groups: [
+          {
+            title: "التصميم والتخطيط",
+            items: ["التصميم الداخلي", "التخطيط المعماري", "التصور ثلاثي الأبعاد"],
+          },
+          {
+            title: "أعمال البناء",
+            items: [
+              "التجديد الكامل",
+              "الأعمال الكهربائية",
+              "السباكة",
+              "الأرضيات",
+              "أعمال الدهان",
+              "الأسقف والإضاءة",
+              "المطبخ",
+              "دورات المياه",
+              "أعمال النجارة حسب الطلب",
+              "الخزائن",
+            ],
+          },
+          {
+            title: "التأثيث والتسليم",
+            items: [
+              "الستائر",
+              "الأثاث",
+              "العناصر الديكورية",
+              "الأجهزة المنزلية",
+              "التركيب النهائي",
+              "التنظيف النهائي",
+            ],
+          },
+        ],
+        closing: "تسلّموننا المفاتيح، ونعيد إليكم عقاراً جاهزاً للحياة.",
+      },
+      process: {
+        eyebrow: "كيف نعمل",
+        title: "ست مراحل، فريق واحد",
+        steps: [
+          {
+            n: "01",
+            title: "الاستشارة",
+            lead: "نتعرّف على عقاركم وأسلوب حياتكم وميزانيتكم.",
+            body: "نزور العقار، ونأخذ القياسات، ونناقش كيف تنوون استخدامه، ونتفق على ما يجب أن تغطيه الميزانية.",
+          },
+          {
+            n: "02",
+            title: "التصميم",
+            lead: "مساحتكم تحصل على مفهوم تصميمي متكامل.",
+            body: "مخططات الأرضية، والخامات، والألوان، وتوزيع الأثاث، جميعها مصممة بما يلائم ذوقكم وطريقة استخدام العقار.",
+          },
+          {
+            n: "03",
+            title: "التصور ثلاثي الأبعاد",
+            lead: "شاهدوا منزلكم المستقبلي قبل بدء التجديد.",
+            body: "رندرات واقعية لكل غرفة. لا يُهدَم شيء قبل أن تروا النتيجة وتوافقوا عليها.",
+          },
+          {
+            n: "04",
+            title: "التجديد",
+            lead: "فريقنا يحوّل المساحة بالكامل.",
+            body: "الهدم، والكهرباء، والسباكة، والتشطيبات، والنجارة، وفق الجدول الزمني المتفق عليه مع التصميم، مع تقارير دورية عن سير العمل.",
+          },
+          {
+            n: "05",
+            title: "التأثيث",
+            lead: "نؤثّث كل تفصيلة.",
+            body: "الأثاث، والإضاءة، والستائر، والمطبخ، والخزائن، والأجهزة، والديكور: التوريد والتوصيل والتركيب.",
+          },
+          {
+            n: "06",
+            title: "الانتقال إلى العقار",
+            lead: "عقاركم جاهز.",
+            body: "فحص نهائي، وتنظيف شامل، وتسليم. لا يبقى عليكم سوى إحضار حقيبتكم.",
+          },
+        ],
+      },
+      design: {
+        title: "تصميم مصمَّم لأسلوب حياتكم",
+        lead: "كل عقار مختلف. وكل عميل مختلف.",
+        body: "يبني مصمّمونا المفهوم التصميمي حول طريقة عيشكم الفعلية، ونوع العقار، وبالنسبة للمستثمرين، حول ما يجب أن تدرّه الوحدة من عائد. الطراز قراركم أنتم، لا قالباً جاهزاً نعيد استخدامه.",
+        stylesLabel: "الطرز التي ننفذها",
+        styleAsk: "أرغب في مناقشة هذا الطراز",
+        styles: [
+          { slug: "modern", label: "Modern" },
+          { slug: "minimalist", label: "البساطة" },
+          { slug: "luxury", label: "Luxury" },
+          { slug: "contemporary", label: "Contemporary" },
+          { slug: "japandi", label: "Japandi" },
+          { slug: "classic", label: "الكلاسيكي" },
+          { slug: "hotel-style", label: "Hotel-style" },
+          { slug: "custom", label: "تصميم مخصص" },
+        ],
+      },
+      vision: {
+        eyebrow: "رؤية التصميم",
+        title: "كيف يمكن أن يبدو تجديد BIZBUYUK",
+        lead: "رندرات مفاهيمية تعرض نطاق أعمالنا — من مساحة قديمة إلى أخرى جاهزة تماماً، بالطرز التي ننفذها.",
+        disclaimer: "تصورات مفاهيمية، وليست مشروعاً منجزاً بعينه. شاهدوا مشاريعنا الحقيقية المصوَّرة في قسم «أعمالنا» أدناه.",
+        items: [
+          { slug: "villa", label: "فيلا" },
+          { slug: "burj-view-apartment", label: "شقة بإطلالة على برج خليفة" },
+          { slug: "office", label: "تجهيز مكتب" },
+        ],
+      },
+      beforeAfter: { title: "من الفراغ إلى التميّز", lead: "اسحبوا المقبض لمشاهدة الغرفة نفسها قبل التجديد وبعده.", before: "قبل", after: "بعد", hint: "اسحب للمقارنة", empty: "مقارنات المشاريع قيد الإعداد.", emptyBody: "لا ننشر مقارنة «قبل/بعد» إلا لمشروع BIZBUYUK حقيقي ومنجز فعلياً — دون أي نماذج تخيلية. وستُنشر أول مقارنة فور تسليم أحد مشاريع التجديد الجارية حالياً." },
+      fullService: {
+        title: "فريق واحد. عقد واحد. نتيجة واحدة.",
+        lead: "لا حاجة لإدارة مصممين ومقاولين ونجارين وكهربائيين وموردي أثاث كل على حدة. BIZBUYUK تنسّق المشروع من الفكرة وحتى الإنجاز الكامل.",
+        cards: [
+          { title: "التصميم", body: "التصميم الداخلي والتصور ثلاثي الأبعاد." },
+          { title: "التجديد", body: "أعمال البناء والتجديد الكاملة." },
+          { title: "النجارة", body: "أثاث وخزائن مصنوعة حسب الطلب." },
+          { title: "المطبخ", body: "تصميم المطبخ وتركيبه بالكامل." },
+          { title: "دورات المياه", body: "تجديد وتجهيز دورات المياه بالكامل." },
+          { title: "الإضاءة", body: "مفهوم الإضاءة وتركيبها." },
+          { title: "الأثاث", body: "الاختيار والتوريد والتوصيل." },
+          { title: "الديكور", body: "الستائر والمرايا واللوحات والإكسسوارات." },
+          { title: "الأجهزة المنزلية", body: "باقة كاملة من الأجهزة المنزلية مع التركيب." },
+        ],
+      },
+      furniture: {
+        title: "من الجدران إلى الأثاث",
+        lead: "لا نتوقف عند التجديد. فالعقار يُسلَّم مكتملاً بالكامل.",
+        groups: [
+          {
+            title: "غرفة المعيشة والطعام",
+            items: ["الأرائك", "طاولات الطعام", "الكراسي", "وحدات التلفاز", "طاولات القهوة"],
+          },
+          {
+            title: "غرفة النوم والتخزين",
+            items: ["الأسرّة", "المراتب", "الخزائن", "خزائن المطبخ"],
+          },
+          {
+            title: "المفروشات والديكور",
+            items: ["الستائر", "الإضاءة", "المرايا", "السجاد", "اللوحات الفنية", "الإكسسوارات"],
+          },
+        ],
+        cta: "أثّثوا عقاري",
+      },
+      investor: {
+        title: "تجديد يضيف قيمة",
+        lead: "العقار المصمَّم باحترافية والمؤثَّث بالكامل أسهل في التأجير، وأسهل في البيع، وتظهر صوره بشكل أفضل مقارنة بعقار فارغ.",
+        items: [
+          "تجديد العقار",
+          "التصميم الداخلي",
+          "التأثيث الكامل",
+          "التجهيز للإيجار طويل الأجل",
+          "التجهيز للإيجار قصير الأجل",
+          "تسليم العقار",
+          "تصميم موجَّه للاستثمار",
+        ],
+        cta: "تحدّث مع أخصائي استثمار",
+      },
+      portfolio: {
+        title: "أعمالنا",
+        lead: "مشاريع تجديد منجزة في مختلف أنحاء الإمارات.",
+        filters: ["الكل", "الشقق", "الفلل", "استوديو", "1BR", "2BR", "3BR+"],
+        empty: "صور المشاريع قيد الإعداد. اطلبوا منا معرض الأعمال الحالي وسنرسله لكم مباشرة.",
+      },
+      quote: {
+        title: "كل عقار يستحق خطة مصمَّمة خصيصاً له",
+        lead: "تعتمد تكلفة التجديد على المساحة، والحالة، والمفهوم التصميمي، والخامات، ومدى شمول التأثيث. أخبرونا عن عقاركم وستحصلون على عرض سعر مكتوب.",
+        name: "اسمك",
+        phone: "رقم WhatsApp",
+        email: "البريد الإلكتروني",
+        location: "موقع العقار",
+        propertyType: "نوع العقار",
+        propertyTypes: ["شقة", "فيلا", "تاون هاوس", "استوديو", "مكتب"],
+        size: "المساحة، قدم مربع",
+        condition: "الحالة الراهنة",
+        conditions: ["جديد تماماً، تم تسليمه", "مسكون، يحتاج تجديداً بسيطاً", "قديم، يحتاج إزالة كاملة وإعادة بناء", "قيد الإنشاء"],
+        style: "الطراز المرغوب",
+        budget: "الميزانية التقديرية، AED",
+        budgets: ["حتى 100k", "100k - 250k", "250k - 500k", "500k - 1M", "أكثر من 1M", "لم أحدد بعد"],
+        message: "أي شيء آخر تودّون إخبارنا به",
+        messagePlaceholder: "تاريخ التسليم، وما ترغبون بالإبقاء عليه، وكيف تخططون لاستخدام العقار.",
+        photosNote: "هل لديكم صور للعقار؟ أرسلوها عبر WhatsApp بعد إرسال النموذج وسنرفقها بملفكم.",
+        submit: "اطلب عرض سعر",
+        sending: "جارٍ الإرسال…",
+        success: "شكراً لكم. سنعود إليكم بأسئلة أو بعرض سعر خلال يوم عمل واحد.",
+        error: "حدث خطأ ما. يرجى المحاولة مرة أخرى أو مراسلتنا عبر WhatsApp.",
+        consent: "بإرسالك هذا النموذج، فإنك توافق على أن نتواصل معك بخصوص هذا العقار.",
+      },
+      why: {
+        title: "لماذا BIZBUYUK",
+        cards: [
+          { title: "جهة تواصل واحدة", body: "فريق واحد يدير المشروع بأكمله. ولديكم شخص واحد فقط تتصلون به." },
+          { title: "خدمة متكاملة", body: "التصميم والتجديد والأثاث والتركيب ضمن عقد واحد." },
+          { title: "عملية شفافة", body: "نطاق متفق عليه، وجدول زمني متفق عليه، وتقدّم يمكنكم رؤيته فعلياً." },
+          { title: "تصميم احترافي", body: "تصميم داخلي مصمَّم خصيصاً لعقاركم، لا قالباً معاداً استخدامه." },
+          { title: "ضبط الجودة", body: "تُفحص كل مرحلة قبل اعتمادها وقبل التسليم." },
+          { title: "جاهز للسكن", body: "لا نكتفي بتجديد العقار، بل نجهّزه للحياة فعلياً." },
+        ],
+      },
+      faq: {
+        title: "الأسئلة الشائعة",
+        lead: "إن لم تجدوا سؤالكم هنا، اسألونا عبر WhatsApp.",
+        items: [
+          {
+            q: "كم تستغرق عملية التجديد؟",
+            a: "يعتمد ذلك على المساحة ونطاق العمل. فتجديد استوديو أو شقة بغرفة نوم واحدة يُقاس عادةً بالأسابيع، بينما إزالة فيلا كاملة وإعادة بنائها تُقاس بالأشهر. تحصلون على جدول زمني مؤرَّخ مع عرض التصميم، قبل بدء أي عمل.",
+          },
+          {
+            q: "هل تقدّمون خدمة التصميم الداخلي؟",
+            a: "نعم. فالتصميم هو نقطة انطلاق كل مشروع: مخططات الأرضية، والخامات، والألوان، وتوزيع الأثاث، تليها رندرات ثلاثية الأبعاد لتعتمدوا النتيجة قبل هدم أي شيء.",
+          },
+          {
+            q: "هل يمكنكم تجديد عقار فارغ حالياً؟",
+            a: "هذه هي الحالة الأبسط. فالوحدة الفارغة لا تحتاج لحماية أثاث ولا للتنسيق حول ساكنين، لذا يكون الجدول الزمني أقصر.",
+          },
+          {
+            q: "هل تؤمّنون الأثاث؟",
+            a: "نعم. نختاره، ونوفّره، ونوصّله، ونركّبه. وتعتمدون كل قطعة في مرحلة التصميم.",
+          },
+          {
+            q: "هل يمكنكم تأثيث الشقة بالكامل؟",
+            a: "نعم، حتى المراتب والستائر والمرايا واللوحات. وعند التسليم، يكون العقار جاهزاً لتناموا فيه في المساء نفسه.",
+          },
+          {
+            q: "هل تعملون مع الفلل؟",
+            a: "نعم. الشقق والتاون هاوس والفلل، في دبي وفي مختلف أنحاء الإمارات.",
+          },
+          {
+            q: "هل يمكنني اختيار طراز التصميم والخامات؟",
+            a: "نعم. يُبنى المفهوم حول ذوقكم وميزانيتكم، وتعتمدون قائمة الخامات قبل أي عملية شراء.",
+          },
+          {
+            q: "هل تقدّمون رندرات ثلاثية الأبعاد قبل التجديد؟",
+            a: "دائماً. لا يُهدَم شيء قبل أن تروا الرندرات وتعتمدوها.",
+          },
+          {
+            q: "هل يمكنكم إدارة المشروع وأنا خارج الإمارات؟",
+            a: "نعم، والكثير من الملّاك يكونون خارج الإمارات طوال فترة المشروع. تصلكم تحديثات دورية بالصور والفيديو، وتتم الموافقات عن بُعد.",
+          },
+          {
+            q: "هل تقدّمون عرض سعر مخصصاً؟",
+            a: "نعم. يحصل كل عقار على عرض سعر خاص به بحسب المساحة، والحالة، والمفهوم التصميمي، والخامات، ومستوى التأثيث.",
+          },
+        ],
+      },
+      finalCta: {
+        title: "مستعدون لتحويل عقاركم؟",
+        lead: "دعونا نحوّل مساحتكم إلى منزل.",
+        cta: "ابدأ مشروعك",
+        ctaAlt: "راسلنا عبر WhatsApp",
+      },
+    },
+    propertyTypes: {
+      studio: "استوديو",
+      apartment: "شقة",
+      penthouse: "بنتهاوس",
+      villa: "فيلا",
+      townhouse: "تاون هاوس",
+      branded: "Branded residence",
+      luxury: "Luxury",
+      investment: "استثماري",
+      offplan: "Off-plan",
+    },
+    realEstatePage: {
+      metaTitle: "العقارات في دبي",
+      metaDescription:
+        "اشترِ عقاراً في دبي مع BIZBUYUK: عقارات off-plan وجاهزة، من الاستوديوهات إلى الفلل وBranded residence، في سبع عشرة منطقة. عمولة 0% على المشتري.",
+      home: "الرئيسية",
+      current: "العقارات",
+      hero: {
+        eyebrow: "العقارات",
+        title: "كل نوع عقار، في مختلف أنحاء دبي.",
+        sub: "نحن لا نبيع مبنى واحداً في منطقة واحدة. بل ننطلق من ميزانيتكم وهدفكم وأفقكم الزمني، ثم نعدّ قائمة مختصرة بما يناسبكم فعلياً.",
+        cta: "احجز استشارة",
+        ctaAlt: "شاهد المناطق",
+      },
+      stats: [
+        { value: "17", label: "منطقة نعمل فيها" },
+        { value: "0%", label: "عمولة على المشتري" },
+        { value: "2", label: "طريقتان للشراء: off-plan أو جاهز" },
+      ],
+      types: {
+        title: "ماذا يمكنكم أن تشتروا",
+        lead: "يعتمد النوع المناسب على ما إذا كنتم تشترون للسكن، أو للتأجير، أو للاحتفاظ به. هذه هي الخيارات التي نعمل بها، وما يُختار كل منها من أجله عادةً.",
+        groups: [
+          {
+            title: "بحسب المساحة",
+            items: [
+              { title: "استوديو", body: "أقل سعر دخول وأعلى عائد لكل درهم. يحظى بإقبال من مشغّلي الإيجار قصير الأجل والمستأجرين الأفراد." },
+              { title: "غرفة نوم واحدة", body: "أعمق سوق إيجار في دبي. سهل التأجير، وسهل إعادة البيع." },
+              { title: "غرفتا نوم", body: "المرحلة التي يبدأ عندها الأزواج والعائلات الصغيرة بالبحث. أبطأ في التأجير من غرفة النوم الواحدة، لكن بعقود إيجار أطول." },
+              { title: "3 غرف نوم فأكثر", body: "مخزون عقاري عائلي. مستأجرون أقل عدداً، لكنهم يبقون لسنوات، ما يقلّل من الشغور وتكلفة تبديل المستأجرين." },
+              { title: "بنتهاوس", body: "وحدات في الطوابق العليا بتراسات خاصة. سوق ضيق، تحرّكه الإطلالة والتشطيب أكثر من العائد." },
+            ],
+          },
+          {
+            title: "بحسب الشكل",
+            items: [
+              { title: "شقة", body: "أبراج ومبانٍ متوسطة الارتفاع. تغطي service charge احتياجات المبنى، ما يجعل الملكية شبه خالية من أي عبء إداري." },
+              { title: "فيلا", body: "منزل مستقل بقطعة أرض. تكلفة دخول أعلى وصيانة أكبر، لكن أقوى نمو لرأس المال في المجتمعات العائلية." },
+              { title: "تاون هاوس", body: "تصميم شبيه بالفيلا بميزانية شقة. الحل الوسط المعتاد للعائلات التي تريد مساحة أكبر دون قطعة أرض مستقلة." },
+            ],
+          },
+          {
+            title: "بحسب الفئة",
+            items: [
+              { title: "Luxury", body: "عناوين متميزة، ومساحات أكبر، ومشترون يهتمون بالإطلالة والجيران أكثر من اهتمامهم بالعائد." },
+              { title: "Branded residence", body: "تدار من قبل علامة فندقية أو علامة أزياء عالمية. سعر أعلى لكل قدم مربع، وعلاوة إيجارية تصاحبه عادةً." },
+              { title: "عقار استثماري", body: "يُختار بالأرقام أولاً: العائد، وservice charge، وطلب المستأجرين، وسهولة إعادة بيعه." },
+            ],
+          },
+        ],
+      },
+      paths: {
+        title: "طريقتان للشراء",
+        lead: "يتلخّص القرار في الغالب بهذا: السداد على دفعات أثناء البناء، أو شراء ما هو قائم فعلياً اليوم.",
+        offplan: {
+          title: "Off-plan",
+          body: "يُشترى من المطوّر قبل البناء أو أثناءه. سعر إطلاق مميز، وخطة سداد موزّعة على فترة البناء، وغالباً أقساط بعد التسليم. تنتظرون، وتتحملون مخاطر البناء.",
+          cta: "كيف يعمل نظام Off-plan",
+        },
+        ready: {
+          title: "العقار الجاهز",
+          body: "يُشترى من مالك حالي. يمكنكم معاينة الوحدة بعينها، والتحقق من المبنى، وتأجيرها بعد شهر واحد من نقل الملكية. تدفعون السعر الحالي، غالباً دفعة واحدة كاملة.",
+          cta: "كيف يتم شراء العقار الجاهز",
+        },
+      },
+      districts: {
+        title: "أين نعمل",
+        lead: "سبع عشرة منطقة، لكل منها سبب مختلف يدفعكم للشراء فيها. صنّفوا حسب مدى استقرار المنطقة، ثم اسألونا عن المشاريع المتاحة فيها حالياً.",
+        filters: {
+          all: "جميع المناطق",
+          established: "مناطق راسخة",
+          prestige: "مناطق راقية",
+          emerging: "مناطق ناشئة",
+        },
+        typesLabel: "نوعية العقارات الشائعة",
+        note: "نعمل أيضاً في مناطق غير مدرجة في هذه القائمة. إن كانت لديكم منطقة معينة في ذهنكم، فقط اسألونا.",
+        ask: "اسأل عن هذه المنطقة",
+      },
+      why: {
+        title: "كيف نعمل",
+        cards: [
+          { title: "عمولة 0% عليكم", body: "في مبيعات المطوّرين، يدفع المطوّر أتعابنا، ولا تُضاف إلى سعركم." },
+          { title: "قائمة مختصرة، لا كتالوج", body: "وحدتان أو ثلاث تتوافق مع طلبكم، ولكل منها أرقامها الداعمة." },
+          { title: "السوق بأكمله", body: "لسنا مرتبطين بمطوّر واحد، لذا تُختار القائمة على أساس الجدارة الفعلية." },
+          { title: "الأرقام قبل المشاعر", body: "العائد، وservice charge، وخطة السداد، وخيار الخروج، جميعها مطروحة على الطاولة قبل أن تقرروا." },
+          { title: "تحقّق قبل التوقيع", body: "يُتحقّق أولاً من المطوّر، وحالة المشروع، وEscrow، والعقد." },
+          { title: "بعد الشراء", body: "التأثيث، والمستأجرون، والإدارة، وإعادة البيع، متى ما رغبتم بذلك." },
+        ],
+      },
+      cta: {
+        title: "أخبرونا بالميزانية والهدف.",
+        body: "هذا يكفي للبدء. سنعود إليكم بعقارين أو ثلاثة مناسبة، مع التفسير المنطقي وراء كل خيار.",
+      },
+      offplan: {
+        metaTitle: "عقارات Off-plan في دبي",
+        metaDescription:
+          "كيف يعمل شراء عقار off-plan في دبي: خطط السداد، والدفعة الأولى، وأقساط ما بعد التسليم، والتحقق من المطوّر وEscrow، والعملية كاملة حتى التسليم.",
+        current: "Off-plan",
+        hero: {
+          eyebrow: "Off-plan",
+          title: "اشترِ عند الإطلاق، وادفع مع تقدّم البناء.",
+          sub: "الشراء off-plan هو أرخص طريقة للدخول في مشروع جديد في دبي، وهو أيضاً الأكثر تعقيداً من الناحية الإجرائية. إليكم بالتحديد كيف يعمل.",
+          cta: "ناقش شراء عقار off-plan",
+        },
+        what: {
+          title: "ما الذي يعنيه Off-plan فعلياً",
+          lead: "أنتم تشترون وحدة لم تُنشأ بعد، مباشرة من المطوّر، بموجب عقد يحدد السعر وجدول البناء معاً.",
+          points: [
+            { title: "سعر الإطلاق", body: "الطرح الأول لأي مشروع يكون عادةً الأرخص. أما المراحل اللاحقة فتُسعَّر بحسب الطلب." },
+            { title: "سداد موزّع على فترة البناء", body: "تدفعون على دفعات مرتبطة بمراحل الإنشاء، لا دفعة واحدة." },
+            { title: "نمو رأس المال", body: "إن أدّت المنطقة والمشروع أداءً جيداً، فقد تصبح قيمة الوحدة عند التسليم أعلى مما تعاقدتم عليه. وقد لا تكون كذلك أيضاً." },
+            { title: "مخاطر البناء", body: "مواعيد التسليم قد تتأخر. والعقد، وحساب Escrow، وسجل المطوّر، هي ما يحميكم." },
+          ],
+        },
+        payment: {
+          title: "كيف تُبنى خطط السداد",
+          lead: "يكاد كل عرض يكون تنويعاً على هذه الأجزاء الأربعة. والتوزيع بينها هو ما يفرّق بين شراء مريح وآخر مرهق.",
+          plans: [
+            { title: "الدفعة الأولى", body: "تُدفع عند الحجز، مع توقيع نموذج الحجز. وهذا الرقم هو ما يحدد ما إذا كان المشروع في متناولكم." },
+            { title: "أثناء البناء", body: "دفعات تُطلق بحسب مراحل البناء، أو في تواريخ محددة، وحتى الإنجاز الكامل." },
+            { title: "عند التسليم", body: "الرصيد المتبقي المستحق عند جاهزية الوحدة وتسليم المفاتيح." },
+            { title: "ما بعد التسليم", body: "يسمح بعض المطورين باستمرار جزء من السعر بعد استلام المفاتيح، بحيث يساعد الإيجار في تغطيته." },
+          ],
+          note: "تختلف الخطط من مطوّر لآخر ومن مشروع لآخر، وتتغيّر بين المراحل. نقارن لكم الخطط الفعلية المتاحة وقت شرائكم.",
+        },
+        process: {
+          title: "العملية من البداية إلى النهاية",
+          lead: "ثماني مراحل. تشاركون في الخمس الأولى، ونتولى نحن الباقي.",
+          steps: [
+            { n: "01", title: "الاستشارة", lead: "الميزانية، والهدف، والأفق الزمني.", body: "نحدد ما تريدون أن يحققه العقار لكم، والمبلغ الذي يمكنكم الالتزام به سنوياً." },
+            { n: "02", title: "اختيار نوع العقار", lead: "النوع، والمساحة، والمنطقة.", body: "نضيّق الخيارات إلى نوع العقار والمناطق التي تتوافق مع طلبكم، ونستبعد الباقي." },
+            { n: "03", title: "اختيار المشروع", lead: "المطوّر والمرحلة.", body: "نقارن المشاريع المطروحة من حيث السعر، وخطة السداد، وسجل التسليم، وما تدعمه المنطقة." },
+            { n: "04", title: "الحجز", lead: "يتم حجز الوحدة.", body: "نموذج الحجز ودفعة الحجز. تُسحب الوحدة من السوق باسمكم." },
+            { n: "05", title: "SPA", lead: "يُوقَّع العقد.", body: "نراجع معكم عقد البيع والشراء قبل التوقيع: المواعيد، والغرامات، وما يحدث إن تأخر أي طرف." },
+            { n: "06", title: "التسجيل", lead: "Oqood لدى DLD.", body: "تُسجَّل الصفقة لدى Dubai Land Department ويُثبَّت حقكم رسمياً." },
+            { n: "07", title: "البناء", lead: "الأقساط وسير العمل.", body: "نتابع مراحل الإنجاز ومواعيد الدفعات حتى لا يفوتكم شيء ولا تقعوا تحت طائلة أي غرامة." },
+            { n: "08", title: "التسليم", lead: "المفاتيح وقائمة الملاحظات.", body: "المعاينة، وقائمة الملاحظات، والدفعة الأخيرة، والملكية. من هنا يمكننا تأثيث الوحدة أو تأجيرها." },
+          ],
+        },
+        checks: {
+          title: "ما نتحقق منه قبل التزامكم",
+          items: [
+            "سجل المطوّر في تسليم مشاريعه السابقة",
+            "تسجيل المشروع وحالته لدى RERA",
+            "أن الدفعات تودَع في حساب Escrow الخاص بالمشروع",
+            "أن جدول السداد في العقد مطابق لما عُرض عليكم",
+            "مواعيد التسليم، وبنود الغرامات، وشروط الفسخ",
+            "ما تدعمه المنطقة فعلياً من حيث الإيجار وإعادة البيع",
+          ],
+        },
+        cta: {
+          title: "ما المشاريع المتاحة حالياً؟",
+          body: "مراحل الإطلاق تُفتح وتُغلق بسرعة. أخبرونا بميزانيتكم وسنرسل لكم ما هو متاح فعلياً هذا الأسبوع.",
+        },
+      },
+      ready: {
+        metaTitle: "العقار الجاهز في دبي",
+        metaDescription:
+          "شراء عقار جاهز في دبي: البحث، والمعاينات، والتفاوض، والتحقق من المستندات، والنقل لدى Dubai Land Department، والتسليم.",
+        current: "العقار الجاهز",
+        hero: {
+          eyebrow: "العقار الجاهز",
+          title: "عايِن، وتحقّق، ثم اشترِ.",
+          sub: "وحدة مكتملة يمكنكم التجول فيها ومعاينتها وتأجيرها بعد شهر واحد من نقل الملكية. دون أي مخاطر بناء ودون انتظار.",
+          cta: "ناقش شراء عقار جاهز",
+        },
+        what: {
+          title: "لماذا يفضّل المشترون العقار الجاهز",
+          lead: "الشراء off-plan أرخص على الورق. أما العقار الجاهز فهو الخيار الأكيد.",
+          points: [
+            { title: "ترون الوحدة الفعلية", body: "الإطلالة، والطابق، والتشطيب، والجيران، كلها حقائق ملموسة، لا رندرات." },
+            { title: "دخل من الشهر الأول", body: "يمكن تأجيرها فور إتمام نقل الملكية، فيبدأ الأصل بالعمل فوراً." },
+            { title: "للمبنى سجل واضح", body: "service charge، وجودة الإدارة، وسجل الإيجار، جميعها ظاهرة للعيان قبل الشراء." },
+            { title: "لا مخاطر بناء", body: "لا موعد تسليم قد يتأخر، ولا بناء يحتاج للمتابعة." },
+          ],
+        },
+        process: {
+          title: "العملية من البداية إلى النهاية",
+          lead: "تسع مراحل من الموجز الأول وحتى استلام المفاتيح.",
+          steps: [
+            { n: "01", title: "البحث", lead: "الموجز يتحول إلى قائمة.", body: "نستعرض السوق بحسب ميزانيتكم ومنطقتكم ونوع العقار المطلوب، بما في ذلك وحدات غير معلنة للعموم." },
+            { n: "02", title: "القائمة المختصرة", lead: "اثنان أو ثلاثة، لا ثلاثون.", body: "نختصر القائمة إلى ما يناسبكم فعلياً، ونوضح سبب استبعاد البقية." },
+            { n: "03", title: "التحليل", lead: "الأرقام الخاصة بكل وحدة.", body: "سعر الطلب مقارنة بالصفقات الأخيرة، وservice charge، والإيجار القابل للتحقيق، والعائد الصافي." },
+            { n: "04", title: "المعاينة", lead: "حضورياً أو عبر الفيديو.", body: "نستعرض معكم الوحدة والمبنى، أو نوثّقهما بدقة إن كنتم خارج الدولة." },
+            { n: "05", title: "التفاوض", lead: "السعر والشروط.", body: "نتفاوض نيابة عنكم: السعر، وما يبقى داخل الوحدة، والجدول الزمني لنقل الملكية." },
+            { n: "06", title: "فحص المستندات", lead: "قبل تحريك أي أموال.", body: "سند الملكية (Title Deed)، وسجل service charge، وأي رهن عقاري قائم، ووضع NOC، وأي قيود على الوحدة." },
+            { n: "07", title: "الصفقة", lead: "MOU والعربون.", body: "تُوقَّع مذكرة التفاهم، ويودَع العربون وفق آليات الحماية المعتادة." },
+            { n: "08", title: "التسجيل", lead: "النقل لدى DLD.", body: "NOC من المطوّر، ثم النقل لدى Dubai Land Department وإصدار سند الملكية باسمكم." },
+            { n: "09", title: "التسليم", lead: "المفاتيح والخدمات.", body: "تسليم المفاتيح، وبطاقات الدخول، ونقل DEWA والتبريد باسمكم. من هنا يمكننا تأثيث الوحدة أو إيجاد مستأجر لها." },
+          ],
+        },
+        checks: {
+          title: "ما نتحقق منه في الوحدة",
+          items: [
+            "سند الملكية (Title Deed) والتأكد أن البائع هو المالك المسجَّل فعلياً",
+            "أي رهن عقاري قائم على العقار وكيف ستتم تسويته",
+            "سجل service charge وما إذا كان هناك أي مبالغ مستحقة",
+            "سجل إدارة المبنى وصيانته",
+            "أسعار الصفقات الأخيرة في المبنى نفسه، لا أسعار العروض المطروحة",
+            "سجل الإيجار وما تحققه الوحدة فعلياً من عائد",
+          ],
+        },
+        cta: {
+          title: "تبحثون عن عقار جاهز؟",
+          body: "أخبرونا بالمنطقة والميزانية. وسنعود إليكم بما هو متاح في السوق وبقيمته الفعلية.",
         },
       },
     },

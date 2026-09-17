@@ -92,7 +92,7 @@ export function QuoteForm() {
             <p className="mt-6 max-w-[44ch] text-[1rem] leading-relaxed text-muted-dark">{q.lead}</p>
           </Reveal>
           <Reveal delay={0.14}>
-            <p className="mt-8 max-w-[40ch] border-l border-bronze/40 pl-4 text-[0.88rem] leading-relaxed text-muted-dark">
+            <p className="mt-8 max-w-[40ch] border-s border-bronze/40 ps-4 text-[0.88rem] leading-relaxed text-muted-dark">
               {q.photosNote}
             </p>
           </Reveal>

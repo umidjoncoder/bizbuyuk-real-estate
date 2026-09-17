@@ -27,7 +27,7 @@ export function ITGroupHero({ slug }: { slug: string }) {
                 </a>
               </li>
               <li aria-hidden className="text-muted/40">
-                <ChevronRight size={13} strokeWidth={1.6} />
+                <ChevronRight size={13} strokeWidth={1.6} className="rtl:-scale-x-100" />
               </li>
               <li>
                 <a href="/it" className="transition-colors hover:text-gold">
@@ -35,7 +35,7 @@ export function ITGroupHero({ slug }: { slug: string }) {
                 </a>
               </li>
               <li aria-hidden className="text-muted/40">
-                <ChevronRight size={13} strokeWidth={1.6} />
+                <ChevronRight size={13} strokeWidth={1.6} className="rtl:-scale-x-100" />
               </li>
               <li aria-current="page" className="text-cream/80">
                 {title}

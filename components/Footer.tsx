@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useLang } from "./LanguageProvider";
 import { LogoImage } from "./Logo";
-import { CONTACT } from "@/lib/i18n";
+import { CONTACT, OFFICES } from "@/lib/i18n";
 
 export function Footer() {
   const { t } = useLang();
@@ -15,6 +15,7 @@ export function Footer() {
     { href: "/real-estate", label: t.nav.realEstate },
     { href: "/services", label: t.nav.services },
     { href: "/renovation", label: t.nav.renovation },
+    { href: "/calculators", label: t.calculatorsPage.current },
     { href: "/it", label: t.nav.it },
     { href: "/team", label: t.nav.team },
     { href: "/news", label: t.nav.news },
@@ -55,6 +56,8 @@ export function Footer() {
             </a>
             <p className="mt-3 text-xs uppercase tracking-[0.2em] text-muted/60">{t.footer.address}</p>
             <p className="text-sm text-muted">{t.footer.addressValue}</p>
+            <p className="mt-3 text-xs uppercase tracking-[0.2em] text-muted/60">{t.footer.offices}</p>
+            <p className="text-sm text-muted">{OFFICES.join(" · ")}</p>
           </FooterCol>
 
           <FooterCol title={t.footer.follow}>

@@ -17,8 +17,11 @@ type Post = {
   publishedAt: string;
 };
 
-const TITLE_KEY: Record<Locale, keyof Post> = { en: "titleEn", ru: "titleRu", uz: "titleUz" };
-const BODY_KEY: Record<Locale, keyof Post> = { en: "bodyEn", ru: "bodyRu", uz: "bodyUz" };
+// News is stored per-locale as separate DB columns (no titleAr/bodyAr yet —
+// that needs a migration). Arabic readers fall back to the English column
+// rather than the page breaking or showing nothing.
+const TITLE_KEY: Record<Locale, keyof Post> = { en: "titleEn", ru: "titleRu", uz: "titleUz", ar: "titleEn" };
+const BODY_KEY: Record<Locale, keyof Post> = { en: "bodyEn", ru: "bodyRu", uz: "bodyUz", ar: "bodyEn" };
 
 export function NewsDetail({ slug }: { slug: string }) {
   const { t, locale } = useLang();
@@ -74,7 +77,7 @@ export function NewsDetail({ slug }: { slug: string }) {
                 </a>
               </li>
               <li aria-hidden className="text-muted/40">
-                <ChevronRight size={13} strokeWidth={1.6} />
+                <ChevronRight size={13} strokeWidth={1.6} className="rtl:-scale-x-100" />
               </li>
               <li>
                 <a href="/news" className="transition-colors hover:text-gold">
@@ -103,7 +106,7 @@ export function NewsDetail({ slug }: { slug: string }) {
 
           <div className="mt-16 border-t border-line-dark pt-8">
             <a href="/news" className="text-sm font-bold text-bronze transition-colors hover:text-coal">
-              ← {n.back}
+              <span aria-hidden className="inline-block rtl:-scale-x-100">←</span> {n.back}
             </a>
           </div>
         </div>

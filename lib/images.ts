@@ -22,6 +22,8 @@ export const BRAND = {
   protection: "/brand/protection.webp",
   rental: "/brand/rental.webp",
   resale: "/brand/resale.webp",
+  mgmtTenant: "/brand/mgmt-tenant.webp",
+  mgmtResale: "/brand/mgmt-resale.webp",
   cta: "/brand/cta.webp",
   // A purpose-built banner for this one CTA — the shared cta.webp above packs
   // its skyline into the bottom ~15% of the frame, which reads as broken on

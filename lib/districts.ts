@@ -42,11 +42,13 @@ export const DISTRICTS: District[] = [
       en: "The address most buyers picture first: the Burj Khalifa, the Dubai Mall and the Opera District on one masterplan.",
       ru: "Адрес, который большинство покупателей представляет первым: Бурдж-Халифа, Dubai Mall и Opera District в одном масштабном проекте.",
       uz: "Koʻpchilik xaridor birinchi tasavvur qiladigan manzil: Burj Khalifa, Dubai Mall va Opera District bitta masterplanda.",
+      ar: "المكان الذي يتخيله معظم المشترين أولًا: برج خليفة ودبي مول ومنطقة الأوبرا في مخطط رئيسي واحد.",
     },
     highlights: {
       en: ["Central location", "Strong short-let demand", "Tower and branded stock"],
       ru: ["Центральная локация", "Высокий спрос на краткосрочную аренду", "Башни и branded residences"],
       uz: ["Markaziy lokatsiya", "Qisqa muddatli ijaraga yuqori talab", "Minoralar va branded residences"],
+      ar: ["موقع مركزي", "طلب قوي على الإيجار قصير المدى", "أبراج وbranded residences"],
     },
   },
   {
@@ -59,11 +61,13 @@ export const DISTRICTS: District[] = [
       en: "Canal-side towers a bridge away from Downtown, with the widest spread of apartment stock in central Dubai.",
       ru: "Башни вдоль канала в шаге от Downtown, с самым широким выбором квартир в центральной части Дубая.",
       uz: "Downtown'dan bir koʻprik naridagi kanal boʻyidagi minoralar, markaziy Dubaydagi eng keng kvartira tanlovi.",
+      ar: "أبراج على القناة على بعد جسر واحد من Downtown، مع أوسع تشكيلة من الشقق في وسط دبي.",
     },
     highlights: {
       en: ["Walk to Downtown", "Business and professional tenants", "Entry to central Dubai"],
       ru: ["Пешком до Downtown", "Арендаторы из бизнес-среды", "Вход в центральный Дубай"],
       uz: ["Downtown'gacha piyoda", "Biznes muhitidagi ijarachilar", "Markaziy Dubayga kirish"],
+      ar: ["على مسافة سير من Downtown", "مستأجرون من قطاع الأعمال", "بوابة إلى وسط دبي"],
     },
   },
   {
@@ -76,11 +80,13 @@ export const DISTRICTS: District[] = [
       en: "A mature waterfront district with the marina walk, JBR beach and one of the deepest rental markets in the city.",
       ru: "Сформировавшийся район у воды: набережная марины, пляж JBR и один из самых ёмких рынков аренды в городе.",
       uz: "Shakllangan suv boʻyi tumani: marina sayilgohi, JBR plyaji va shahardagi eng sigʻimli ijara bozorlaridan biri.",
+      ar: "منطقة ساحلية راسخة تضم ممشى المارينا وشاطئ JBR وأحد أعمق أسواق الإيجار في المدينة.",
     },
     highlights: {
       en: ["Waterfront and beach", "Deep tenant pool", "Resale liquidity"],
       ru: ["Набережная и пляж", "Большой пул арендаторов", "Ликвидность при перепродаже"],
       uz: ["Suv boʻyi va plyaj", "Katta ijarachilar bazasi", "Qayta sotishda likvidlik"],
+      ar: ["واجهة بحرية وشاطئ", "قاعدة مستأجرين واسعة", "سيولة عند إعادة البيع"],
     },
   },
   {
@@ -93,11 +99,13 @@ export const DISTRICTS: District[] = [
       en: "The island itself: beachfront villas, branded residences and the strongest holiday-let demand in Dubai.",
       ru: "Сам остров: виллы на первой линии, branded residences и самый высокий спрос на краткосрочную аренду в Дубае.",
       uz: "Orolning oʻzi: plyaj boʻyidagi villalar, branded residences va Dubaydagi eng yuqori kunlik ijara talabi.",
+      ar: "الجزيرة نفسها: فلل على الشاطئ، وbranded residences، وأقوى طلب على الإيجار السياحي في دبي.",
     },
     highlights: {
       en: ["Private beach access", "Branded residence supply", "Holiday-let demand"],
       ru: ["Собственный выход к пляжу", "Предложение branded residences", "Спрос на посуточную аренду"],
       uz: ["Shaxsiy plyajga chiqish", "Branded residence taklifi", "Kunlik ijaraga talab"],
+      ar: ["وصول خاص إلى الشاطئ", "عروض من branded residences", "طلب قوي على الإيجار السياحي"],
     },
   },
   {
@@ -110,11 +118,13 @@ export const DISTRICTS: District[] = [
       en: "A masterplanned community built around a golf course, a park and its own mall, aimed squarely at families.",
       ru: "Масштабный комьюнити вокруг гольф-поля, парка и собственного молла, ориентированный прежде всего на семьи.",
       uz: "Golf maydoni, park va oʻz molli atrofida qurilgan, asosan oilalarga moʻljallangan masterplan jamoasi.",
+      ar: "مجتمع مخطط بالكامل حول ملعب غولف وحديقة ومول خاص به، موجّه مباشرة للعائلات.",
     },
     highlights: {
       en: ["Golf and parkland", "Schools nearby", "Villa and townhouse stock"],
       ru: ["Гольф и парк", "Школы рядом", "Виллы и таунхаусы"],
       uz: ["Golf va park", "Yaqinda maktablar", "Villa va taunxauslar"],
+      ar: ["غولف ومساحات خضراء", "مدارس قريبة", "فلل وtownhouses"],
     },
   },
   {
@@ -127,11 +137,13 @@ export const DISTRICTS: District[] = [
       en: "The usual entry point for a first Dubai purchase: mid-market pricing with both apartments and townhouses.",
       ru: "Обычная точка входа для первой покупки в Дубае: средний ценовой сегмент, квартиры и таунхаусы.",
       uz: "Dubaydagi birinchi xarid uchun odatiy kirish nuqtasi: oʻrta narx segmenti, kvartira va taunxauslar.",
+      ar: "نقطة الدخول المعتادة لأول عملية شراء في دبي: أسعار متوسطة مع شقق وtownhouses جنبًا إلى جنب.",
     },
     highlights: {
       en: ["Lower entry price", "Family tenants", "Steady rental demand"],
       ru: ["Низкий порог входа", "Семейные арендаторы", "Стабильный спрос на аренду"],
       uz: ["Past kirish narxi", "Oilaviy ijarachilar", "Barqaror ijara talabi"],
+      ar: ["سعر دخول أقل", "مستأجرون عائليون", "طلب إيجار مستقر"],
     },
   },
   {
@@ -144,11 +156,13 @@ export const DISTRICTS: District[] = [
       en: "An Emaar masterplan on the creek, sold mostly off-plan, for buyers working to a longer horizon.",
       ru: "Масштабный проект Emaar на крик, продаётся преимущественно off-plan, для покупателей с длинным горизонтом.",
       uz: "Emaar'ning krik boʻyidagi masterplani, asosan off-plan sotiladi, uzoq muddatli xaridorlar uchun.",
+      ar: "مخطط رئيسي لـEmaar على الخور، يُباع غالبًا off-plan، لمشترين يعملون على أفق زمني أطول.",
     },
     highlights: {
       en: ["Off-plan led", "Waterfront masterplan", "Longer build horizon"],
       ru: ["В основном off-plan", "Проект у воды", "Длительный срок строительства"],
       uz: ["Asosan off-plan", "Suv boʻyi masterplani", "Uzoq qurilish muddati"],
+      ar: ["يقوده off-plan", "مخطط رئيسي على الواجهة المائية", "أفق بناء أطول"],
     },
   },
   {
@@ -161,11 +175,13 @@ export const DISTRICTS: District[] = [
       en: "Marina berths, a cruise terminal and beachfront towers between Palm Jumeirah and Dubai Marina.",
       ru: "Марина, круизный терминал и башни на первой линии между Palm Jumeirah и Dubai Marina.",
       uz: "Palm Jumeirah va Dubai Marina oraligʻidagi marina, kruiz terminali va plyaj boʻyi minoralari.",
+      ar: "أرصفة مارينا ومحطة رحلات بحرية وأبراج على الشاطئ بين Palm Jumeirah وDubai Marina.",
     },
     highlights: {
       en: ["Beachfront position", "Marina and cruise port", "New-build supply"],
       ru: ["Первая линия у пляжа", "Марина и круизный порт", "Новое предложение"],
       uz: ["Plyaj boʻyi joylashuv", "Marina va kruiz porti", "Yangi qurilish taklifi"],
+      ar: ["موقع على الشاطئ", "مارينا وميناء رحلات بحرية", "عروض جديدة قيد الإنشاء"],
     },
   },
   {
@@ -178,11 +194,13 @@ export const DISTRICTS: District[] = [
       en: "The Deira waterfront redevelopment: beach frontage at an earlier stage than the established island districts.",
       ru: "Редевелопмент побережья Дейры: выход к пляжу на более ранней стадии, чем у сложившихся островных районов.",
       uz: "Deira sohilining qayta rivojlanishi: shakllangan orol tumanlariga nisbatan erta bosqichdagi plyaj chizigʻi.",
+      ar: "إعادة تطوير واجهة ديرة البحرية: امتداد شاطئي في مرحلة أبكر مقارنة بمناطق الجزر الراسخة.",
     },
     highlights: {
       en: ["Early-stage pricing", "Beach frontage", "Old Dubai proximity"],
       ru: ["Цены ранней стадии", "Выход к пляжу", "Рядом со старым Дубаем"],
       uz: ["Erta bosqich narxlari", "Plyaj chizigʻi", "Eski Dubay yaqinida"],
+      ar: ["أسعار المرحلة المبكرة", "امتداد شاطئي", "قرب من دبي القديمة"],
     },
   },
   {
@@ -195,11 +213,13 @@ export const DISTRICTS: District[] = [
       en: "The racecourse district inside MBR City, close to Downtown, with a mix of villas and new apartment towers.",
       ru: "Район ипподрома внутри MBR City, близко к Downtown, с сочетанием вилл и новых жилых башен.",
       uz: "MBR City ichidagi ippodrom tumani, Downtown'ga yaqin, villalar va yangi minoralar aralashmasi.",
+      ar: "منطقة حلبة السباق داخل MBR City، قريبة من Downtown، بمزيج من الفلل وأبراج الشقق الجديدة.",
     },
     highlights: {
       en: ["Close to Downtown", "Villa and apartment mix", "Active new supply"],
       ru: ["Близко к Downtown", "Виллы и квартиры", "Активное новое предложение"],
       uz: ["Downtown'ga yaqin", "Villa va kvartiralar", "Faol yangi taklif"],
+      ar: ["قريبة من Downtown", "مزيج فلل وشقق", "عروض جديدة نشطة"],
     },
   },
   {
@@ -212,11 +232,13 @@ export const DISTRICTS: District[] = [
       en: "A green, low-density pocket of MBR City with international schools on the masterplan itself.",
       ru: "Зелёный малоэтажный участок MBR City с международными школами внутри самого проекта.",
       uz: "MBR City'ning yashil, past zichlikdagi qismi, masterplan ichida xalqaro maktablar bilan.",
+      ar: "جزء أخضر منخفض الكثافة من MBR City يضم مدارس عالمية ضمن المخطط الرئيسي نفسه.",
     },
     highlights: {
       en: ["Schools on site", "Green, low density", "Single-developer quality"],
       ru: ["Школы внутри проекта", "Зелень, низкая плотность", "Единый застройщик"],
       uz: ["Loyiha ichida maktablar", "Yashillik, past zichlik", "Yagona quruvchi sifati"],
+      ar: ["مدارس داخل الموقع", "أخضر ومنخفض الكثافة", "جودة مطوّر واحد"],
     },
   },
   {
@@ -229,11 +251,13 @@ export const DISTRICTS: District[] = [
       en: "Around Al Maktoum airport and Expo City: the lowest entry prices on this list, on the longest horizon.",
       ru: "Вокруг аэропорта Аль-Мактум и Expo City: самый низкий порог входа в этом списке и самый длинный горизонт.",
       uz: "Al Maktoum aeroporti va Expo City atrofida: bu roʻyxatdagi eng past kirish narxi, eng uzoq muddat.",
+      ar: "حول مطار آل مكتوم وExpo City: أدنى أسعار دخول في هذه القائمة، على أطول أفق زمني.",
     },
     highlights: {
       en: ["Lowest entry price", "Airport and Expo City", "Long-horizon play"],
       ru: ["Самый низкий вход", "Аэропорт и Expo City", "Долгий горизонт"],
       uz: ["Eng past kirish", "Aeroport va Expo City", "Uzoq muddatli reja"],
+      ar: ["أدنى سعر دخول", "المطار وExpo City", "خطة طويلة الأفق"],
     },
   },
   {
@@ -246,11 +270,13 @@ export const DISTRICTS: District[] = [
       en: "A settled mid-market community on the metro, with townhouses and apartments side by side.",
       ru: "Устоявшийся комьюнити среднего сегмента у метро, где таунхаусы соседствуют с квартирами.",
       uz: "Metro yonidagi shakllangan oʻrta segment jamoasi, taunxaus va kvartiralar yonma-yon.",
+      ar: "مجتمع مستقر من الفئة المتوسطة على خط المترو، حيث تتجاور townhouses والشقق.",
     },
     highlights: {
       en: ["Metro connected", "Mid-market pricing", "Completed community"],
       ru: ["Метро рядом", "Средний сегмент", "Готовый район"],
       uz: ["Metro yaqin", "Oʻrta segment", "Tayyor jamoa"],
+      ar: ["متصل بالمترو", "أسعار متوسطة", "مجتمع مكتمل"],
     },
   },
   {
@@ -263,11 +289,13 @@ export const DISTRICTS: District[] = [
       en: "One of Dubai's original villa communities: low-rise, golf, and long-standing family tenants.",
       ru: "Один из первых вилловых районов Дубая: малоэтажная застройка, гольф и давние семейные арендаторы.",
       uz: "Dubayning ilk villa jamoalaridan biri: past qavatli qurilish, golf va koʻp yillik oilaviy ijarachilar.",
+      ar: "أحد أوائل مجتمعات الفلل في دبي: مبانٍ منخفضة، وغولف، ومستأجرون عائليون منذ سنوات طويلة.",
     },
     highlights: {
       en: ["Villas only", "Golf community", "Long tenancies"],
       ru: ["Только виллы", "Гольф-комьюнити", "Долгие сроки аренды"],
       uz: ["Faqat villalar", "Golf jamoasi", "Uzoq ijara muddatlari"],
+      ar: ["فلل فقط", "مجتمع غولف", "عقود إيجار طويلة"],
     },
   },
   {
@@ -280,11 +308,13 @@ export const DISTRICTS: District[] = [
       en: "Old coastal Dubai: low-rise villas a street or two from the beach, with very little new supply.",
       ru: "Старый прибрежный Дубай: малоэтажные виллы в паре улиц от пляжа, нового предложения почти нет.",
       uz: "Eski sohil Dubayi: plyajdan bir-ikki koʻcha naridagi past qavatli villalar, yangi taklif deyarli yoʻq.",
+      ar: "دبي الساحلية القديمة: فلل منخفضة على بعد شارع أو اثنين من الشاطئ، مع عروض جديدة محدودة جدًا.",
     },
     highlights: {
       en: ["Beach proximity", "Low-rise, low density", "Limited supply"],
       ru: ["Рядом с пляжем", "Малоэтажность", "Ограниченное предложение"],
       uz: ["Plyajga yaqin", "Past qavatlilik", "Cheklangan taklif"],
+      ar: ["قرب من الشاطئ", "مبانٍ منخفضة وكثافة قليلة", "عروض محدودة"],
     },
   },
   {
@@ -297,11 +327,13 @@ export const DISTRICTS: District[] = [
       en: "The creek-side area beside the wildlife sanctuary, moving from industrial use into new residential plots.",
       ru: "Территория у крика рядом с заповедником, переходящая из промышленного использования в новую жилую застройку.",
       uz: "Qoʻriqxona yonidagi krik boʻyi hududi, sanoat foydalanishidan yangi turar-joy qurilishiga oʻtmoqda.",
+      ar: "المنطقة المطلة على الخور بجانب محمية الحياة الفطرية، تنتقل من الاستخدام الصناعي إلى قطع سكنية جديدة.",
     },
     highlights: {
       en: ["Creek and sanctuary", "Early redevelopment", "Central position"],
       ru: ["Крик и заповедник", "Ранний редевелопмент", "Центральное расположение"],
       uz: ["Krik va qoʻriqxona", "Erta qayta rivojlanish", "Markaziy joylashuv"],
+      ar: ["الخور والمحمية", "إعادة تطوير مبكرة", "موقع مركزي"],
     },
   },
   {
@@ -314,11 +346,13 @@ export const DISTRICTS: District[] = [
       en: "A tech free zone with the most affordable apartment stock on this list and a built-in tenant base.",
       ru: "Технологическая свободная зона с самым доступным предложением квартир в этом списке и собственной базой арендаторов.",
       uz: "Bu roʻyxatdagi eng arzon kvartira taklifi va oʻz ijarachilar bazasiga ega texnologik erkin zona.",
+      ar: "منطقة حرة تقنية تضم أكثر عروض الشقق بأسعار معقولة في هذه القائمة وقاعدة مستأجرين جاهزة.",
     },
     highlights: {
       en: ["Affordable entry", "Free-zone tenants", "Established community"],
       ru: ["Доступный вход", "Арендаторы из свободной зоны", "Сложившийся район"],
       uz: ["Arzon kirish", "Erkin zona ijarachilari", "Shakllangan jamoa"],
+      ar: ["دخول بأسعار معقولة", "مستأجرون من المنطقة الحرة", "مجتمع راسخ"],
     },
   },
 ];

@@ -38,7 +38,7 @@ export function LegalPage({
               </li>
               <li className="flex items-center gap-2">
                 <span aria-hidden className="text-muted/40">
-                  <ChevronRight size={13} strokeWidth={1.6} />
+                  <ChevronRight size={13} strokeWidth={1.6} className="rtl:-scale-x-100" />
                 </span>
                 <span aria-current="page" className="text-cream/80">
                   {title}

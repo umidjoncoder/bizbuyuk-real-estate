@@ -15,7 +15,7 @@ export function Why() {
       {/* soft gold glow to set this dark block apart from the one above */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-32 right-[-12%] h-[460px] w-[460px] rounded-full bg-gold/10 blur-[130px]"
+        className="pointer-events-none absolute -top-32 end-[-12%] h-[460px] w-[460px] rounded-full bg-gold/10 blur-[130px]"
       />
 
       <div className="relative mx-auto grid max-w-[1280px] gap-14 px-5 sm:px-8 lg:grid-cols-2 lg:gap-20">

@@ -46,7 +46,7 @@ export function RenovationFaq() {
                       aria-expanded={isOpen}
                       aria-controls={`faq-panel-${i}`}
                       id={`faq-button-${i}`}
-                      className="flex w-full items-start justify-between gap-6 py-5 text-left"
+                      className="flex w-full items-start justify-between gap-6 py-5 text-start"
                     >
                       <span className={`text-[1.02rem] font-semibold transition-colors ${isOpen ? "text-champagne" : "text-cream"}`}>
                         {item.q}

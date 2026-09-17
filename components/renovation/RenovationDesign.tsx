@@ -62,7 +62,7 @@ export function RenovationDesign() {
                   className="h-full w-full object-cover transition-transform duration-1000 ease-lux group-hover:scale-[1.06]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-coal/80 via-coal/0 to-transparent" />
-                <span className="absolute bottom-3.5 left-3.5 text-[0.82rem] font-bold tracking-tight text-sand-2 sm:bottom-4 sm:left-4 sm:text-[0.92rem]">
+                <span className="absolute bottom-3.5 start-3.5 text-[0.82rem] font-bold tracking-tight text-sand-2 sm:bottom-4 sm:start-4 sm:text-[0.92rem]">
                   {s.label}
                 </span>
               </a>

@@ -186,7 +186,7 @@ export function PhoneField({ value, onChange, theme = "light", placeholder, requ
                   key={c.code}
                   type="button"
                   onClick={() => { setCountry(c); emit(c, national); setOpen(false); setQuery(""); }}
-                  className="flex items-center gap-2.5 w-full text-left cursor-pointer"
+                  className="flex items-center gap-2.5 w-full text-start cursor-pointer"
                   style={{
                     padding: "0.55rem 0.8rem",
                     color: t.text,

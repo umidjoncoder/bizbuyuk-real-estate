@@ -58,7 +58,7 @@ export function Services() {
                       loading="lazy"
                       className="h-full w-full object-cover"
                     />
-                    <span className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-ink/85 text-sm font-bold text-gold backdrop-blur">
+                    <span className="absolute start-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-ink/85 text-sm font-bold text-gold backdrop-blur">
                       {s.tag}
                     </span>
                   </div>
@@ -74,7 +74,7 @@ export function Services() {
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="2.4"
-                        className="transition-transform duration-500 group-hover:translate-x-1"
+                        className="rtl:-scale-x-100 transition-transform duration-500 group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
                       >
                         <path d="M5 12h14M13 6l6 6-6 6" />
                       </svg>

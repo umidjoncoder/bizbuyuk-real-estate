@@ -107,7 +107,7 @@ export function Districts() {
         </div>
 
         <Reveal>
-          <p className="mt-10 max-w-[60ch] border-l border-bronze/40 pl-4 text-[0.88rem] leading-relaxed text-muted-dark">
+          <p className="mt-10 max-w-[60ch] border-s border-bronze/40 ps-4 text-[0.88rem] leading-relaxed text-muted-dark">
             {d.note}
           </p>
         </Reveal>

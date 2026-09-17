@@ -62,7 +62,7 @@ export function ITGroupFooter({ slug }: { slug: string }) {
                 className="btn-gold"
               >
                 {s.askButton}
-                <ArrowRight size={16} strokeWidth={2.4} />
+                <ArrowRight size={16} strokeWidth={2.4} className="rtl:-scale-x-100" />
               </a>
               <a href={CONTACT.telegramIt} target="_blank" rel="noopener noreferrer" className="btn-outline text-cream">
                 <span>{t.itPage.hero.ctaSecondary}</span>

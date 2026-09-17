@@ -24,7 +24,7 @@ export function ServicesHero() {
                   </a>
                 </li>
                 <li aria-hidden className="text-muted/40">
-                  <ChevronRight size={13} strokeWidth={1.6} />
+                  <ChevronRight size={13} strokeWidth={1.6} className="rtl:-scale-x-100" />
                 </li>
                 <li aria-current="page" className="text-cream/80">
                   {s.current}
@@ -82,7 +82,7 @@ export function ServicesHero() {
         <div className="mx-auto grid max-w-[1280px] grid-cols-2 gap-x-6 px-5 sm:px-8 lg:grid-cols-4">
           {s.stats.map((st, i) => (
             <Reveal key={st.label} delay={i * 0.08}>
-              <div className="border-line py-9 lg:border-l lg:pl-7 lg:first:border-l-0 lg:first:pl-0">
+              <div className="border-line py-9 lg:border-s lg:ps-7 lg:first:border-s-0 lg:first:ps-0">
                 <Counter value={st.value} />
                 <p className="mt-2 max-w-[18ch] text-xs leading-snug tracking-wide text-muted">{st.label}</p>
               </div>

@@ -7,6 +7,7 @@ import { RealEstateSection } from "@/components/services/RealEstateSection";
 import { ProtectionSection } from "@/components/services/ProtectionSection";
 import { RelocationSection } from "@/components/services/RelocationSection";
 import { ManagementSection } from "@/components/services/ManagementSection";
+import { LegalSection } from "@/components/services/LegalSection";
 import { ServicesAlso } from "@/components/services/ServicesAlso";
 import { ServicesCta } from "@/components/services/ServicesCta";
 import { HashScroll } from "@/components/HashScroll";
@@ -48,6 +49,7 @@ export default function ServicesRoute() {
         <ProtectionSection />
         <RelocationSection />
         <ManagementSection />
+        <LegalSection />
         <ServicesAlso />
         <ServicesCta />
       </main>
