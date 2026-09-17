@@ -5,11 +5,8 @@ import { useLang } from "../LanguageProvider";
 import { Reveal } from "../Reveal";
 import { CONTACT } from "@/lib/i18n";
 
-/* The credibility problem with a services list like this one is that anyone
-   can write it — the words cost nothing. What's actually hard to fake is a
-   system in daily use. So instead of client logos or invented project stats,
-   this section names the two real, running platforms behind BIZBUYUK's own
-   businesses and offers a walkthrough of them. */
+/* Names the two real, running platforms behind BIZBUYUK's own businesses
+   instead of client logos or invented project stats. */
 export function ITProof() {
   const { t } = useLang();
   const p = t.itPage.proof;
