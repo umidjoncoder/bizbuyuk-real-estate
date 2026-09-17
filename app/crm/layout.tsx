@@ -29,6 +29,8 @@ import {
   Camera,
   KeyRound,
   Loader2,
+  Newspaper,
+  MessageSquareQuote,
 } from "lucide-react";
 
 function CrmLayoutContent({ children }: { children: React.ReactNode }) {
@@ -171,6 +173,18 @@ function CrmLayoutContent({ children }: { children: React.ReactNode }) {
       href: "/crm/finance",
       icon: Wallet,
       allowed: ["OWNER"],
+    },
+    {
+      name: t.sidebar.news,
+      href: "/crm/news",
+      icon: Newspaper,
+      allowed: ["OWNER", "ADMIN", "MARKETING_DIRECTOR"],
+    },
+    {
+      name: t.sidebar.testimonials,
+      href: "/crm/testimonials",
+      icon: MessageSquareQuote,
+      allowed: ["OWNER", "ADMIN", "MARKETING_DIRECTOR"],
     },
     {
       name: t.sidebar.settings,

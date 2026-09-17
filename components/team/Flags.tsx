@@ -110,6 +110,53 @@ export function FlagSprite() {
     <rect x="13.87" y="6.87" width="2.26" height="2.26" transform="rotate(45 15 8)"/>
     </g>
     </symbol>
+    <symbol id="f-ca" viewBox="0 0 24 16">
+    <rect width="24" height="16" fill="#fff"/>
+    <rect width="6" height="16" fill="#FF0000"/>
+    <rect x="18" width="6" height="16" fill="#FF0000"/>
+    <path d="M12 2.9 12.75 4.75 14.6 4.05 13.95 5.75 15.7 6.35 14 7 14.7 8.7 12.95 8.15 12.75 9.9 12 9.05 11.25 9.9 11.05 8.15 9.3 8.7 10 7 8.3 6.35 10.05 5.75 9.4 4.05 11.25 4.75Z" fill="#FF0000"/>
+    <rect x="11.55" y="9" width="0.9" height="2.3" fill="#FF0000"/>
+    </symbol>
+    <symbol id="f-sg" viewBox="0 0 24 16">
+    <rect width="24" height="16" fill="#fff"/>
+    <rect width="24" height="8" fill="#EF3340"/>
+    <circle cx="6.2" cy="4" r="2.7" fill="#fff"/>
+    <circle cx="7.2" cy="4" r="2.7" fill="#EF3340"/>
+    <g fill="#fff">
+    <use href="#star5" transform="translate(6.2 2.4) scale(.3)"/>
+    <use href="#star5" transform="translate(7.72 3.51) scale(.3)"/>
+    <use href="#star5" transform="translate(7.14 5.29) scale(.3)"/>
+    <use href="#star5" transform="translate(5.26 5.29) scale(.3)"/>
+    <use href="#star5" transform="translate(4.68 3.51) scale(.3)"/>
+    </g>
+    </symbol>
+    <symbol id="f-by" viewBox="0 0 24 16">
+    <rect width="24" height="16" fill="#D22730"/>
+    <rect y="10.67" width="24" height="5.33" fill="#00AF66"/>
+    <rect width="4" height="16" fill="#fff"/>
+    <g fill="#D22730">
+    <rect x="0.5" y="1" width="0.8" height="0.8" transform="rotate(45 0.9 1.4)"/>
+    <rect x="2.1" y="1" width="0.8" height="0.8" transform="rotate(45 2.5 1.4)"/>
+    <rect x="1.3" y="2.4" width="0.8" height="0.8" transform="rotate(45 1.7 2.8)"/>
+    <rect x="0.5" y="3.8" width="0.8" height="0.8" transform="rotate(45 0.9 4.2)"/>
+    <rect x="2.1" y="3.8" width="0.8" height="0.8" transform="rotate(45 2.5 4.2)"/>
+    <rect x="1.3" y="5.2" width="0.8" height="0.8" transform="rotate(45 1.7 5.6)"/>
+    <rect x="0.5" y="6.6" width="0.8" height="0.8" transform="rotate(45 0.9 7)"/>
+    <rect x="2.1" y="6.6" width="0.8" height="0.8" transform="rotate(45 2.5 7)"/>
+    <rect x="1.3" y="8" width="0.8" height="0.8" transform="rotate(45 1.7 8.4)"/>
+    <rect x="0.5" y="9.4" width="0.8" height="0.8" transform="rotate(45 0.9 9.8)"/>
+    <rect x="2.1" y="9.4" width="0.8" height="0.8" transform="rotate(45 2.5 9.8)"/>
+    <rect x="1.3" y="10.8" width="0.8" height="0.8" transform="rotate(45 1.7 11.2)"/>
+    <rect x="0.5" y="12.2" width="0.8" height="0.8" transform="rotate(45 0.9 12.6)"/>
+    <rect x="2.1" y="12.2" width="0.8" height="0.8" transform="rotate(45 2.5 12.6)"/>
+    <rect x="1.3" y="13.6" width="0.8" height="0.8" transform="rotate(45 1.7 14)"/>
+    </g>
+    </symbol>
+    <symbol id="f-ng" viewBox="0 0 24 16">
+    <rect width="24" height="16" fill="#fff"/>
+    <rect width="8" height="16" fill="#008751"/>
+    <rect x="16" width="8" height="16" fill="#008751"/>
+    </symbol>
       </defs>
     </svg>
   );

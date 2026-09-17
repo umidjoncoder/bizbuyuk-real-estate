@@ -11,7 +11,7 @@ const DIRECTIONS = [
   { href: "/services#real-estate", image: BRAND.dirRealEstate, alt: "Dubai Marina at night" },
   { href: "/services#protection", image: BRAND.dirProtection, alt: "Tower facade in evening light" },
   { href: "/services#relocation", image: BRAND.dirTourism, alt: "Waterfront villas in the UAE at sunset" },
-  { href: "/services#management", image: BRAND.dirManagement, alt: "Sheikh Zayed Road at dusk" },
+  { href: "/services#management", image: BRAND.dirManagement, alt: "Keys on a marble console in a managed Dubai apartment" },
   { href: "/renovation", image: BRAND.dirRenovation, alt: "A finished, furnished UAE apartment" },
   { href: "/it", image: BRAND.dirIt, alt: "A modern developer workspace at dusk" },
 ];

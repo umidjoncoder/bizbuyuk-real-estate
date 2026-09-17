@@ -23,9 +23,6 @@ export function ITProof() {
         <Reveal delay={0.06}>
           <h2 className="display max-w-[16ch] text-[clamp(1.9rem,4.6vw,3.2rem)]">{p.title}</h2>
         </Reveal>
-        <Reveal delay={0.12}>
-          <p className="mt-5 max-w-[62ch] text-[1.02rem] leading-relaxed text-muted-dark">{p.lead}</p>
-        </Reveal>
 
         <div className="mt-14 grid gap-5 sm:grid-cols-2">
           {p.items.map((item, i) => (

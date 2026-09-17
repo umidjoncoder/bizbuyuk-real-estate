@@ -34,7 +34,7 @@ export function RenovationCompare() {
                 <rect x="3" y="5" width="18" height="14" rx="2" />
                 <path d="M12 5v14M7 10.5l-2 2 2 2M17 10.5l2 2-2 2" />
               </svg>
-              <p className="mt-5 max-w-[42ch] text-[0.95rem] leading-relaxed text-muted">{c.hint}</p>
+              <p className="mt-5 max-w-[42ch] text-[0.95rem] leading-relaxed text-muted">{c.emptyBody}</p>
               <a
                 href={`${CONTACT.whatsapp}?text=${encodeURIComponent(c.title)}`}
                 target="_blank"

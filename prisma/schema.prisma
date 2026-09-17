@@ -53,6 +53,8 @@ model User {
   auditLogs     AuditLog[]
   reminders     Reminder[]    @relation("UserReminders")
   leadEdits     LeadHistory[] @relation("UserLeadEdits")
+  newsPosts     NewsPost[]    @relation("NewsAuthor")
+  reviewedTestimonials Testimonial[] @relation("TestimonialReviewer")
 }
 
 model Property {
@@ -206,6 +208,62 @@ model Reminder {
   createdAt DateTime @default(now())
 
   @@index([userId, done, remindAt])
+}
+
+enum NewsStatus {
+  DRAFT
+  PUBLISHED
+}
+
+// Site news/updates, posted from the CRM ("Content" admin) and shown on the
+// public /news pages. Title and body are stored per-locale rather than as a
+// JSON blob so a partially-translated draft still typechecks cleanly.
+model NewsPost {
+  id          String     @id @default(uuid())
+  slug        String     @unique
+  titleEn     String
+  titleRu     String
+  titleUz     String
+  bodyEn      String     @db.Text
+  bodyRu      String     @db.Text
+  bodyUz      String     @db.Text
+  coverImage  String?    @db.Text
+  status      NewsStatus @default(DRAFT)
+  publishedAt DateTime?
+  authorId    String?
+  author      User?      @relation("NewsAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([status, publishedAt])
+}
+
+enum TestimonialStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Visitor-submitted reviews, queued here for CRM moderation before they can
+// ever appear on the public site — the curated launch quotes stay as static
+// content in lib/testimonials.ts; this table is purely the organic feed of
+// reviews that come in after launch.
+model Testimonial {
+  id           String             @id @default(uuid())
+  name         String
+  city         String
+  flag         String // flag code, e.g. "kz", "ru", "ae" — matches components/team/Flags.tsx
+  lang         String // "ru" | "ar" | "uz" | "en" | "az" — language the quote is written in
+  rating       Int
+  service      String
+  quote        String             @db.Text
+  status       TestimonialStatus  @default(PENDING)
+  reviewedById String?
+  reviewedBy   User?              @relation("TestimonialReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([status, createdAt])
 }
 
 // Field-level edit history for leads. Every change records old -> new so an

@@ -1,7 +1,12 @@
 import type { MetadataRoute } from "next";
 import { IT_GROUPS } from "@/lib/itServices";
+import { prisma } from "@/lib/db";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const newsPosts = await prisma.newsPost
+    .findMany({ where: { status: "PUBLISHED" }, select: { slug: true, publishedAt: true } })
+    .catch(() => []);
+
   return [
     {
       url: "https://bizbuyuk.com",
@@ -69,5 +74,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: "https://bizbuyuk.com/news",
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.6,
+    },
+    ...newsPosts.map((p) => ({
+      url: `https://bizbuyuk.com/news/${p.slug}`,
+      lastModified: p.publishedAt || new Date(),
+      changeFrequency: "yearly" as const,
+      priority: 0.5,
+    })),
   ];
 }

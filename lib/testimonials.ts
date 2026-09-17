@@ -55,7 +55,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Елена В.",
     city: "Алматы",
     lang: "ru",
-    flag: "ru",
+    flag: "kz",
     rating: 5,
     service: "Relocation",
     quote:
@@ -154,7 +154,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Sarah L.",
     city: "Singapore",
     lang: "en",
-    flag: "gb",
+    flag: "sg",
     rating: 5,
     service: "Property management",
     quote:
@@ -165,7 +165,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Michael T.",
     city: "Toronto",
     lang: "en",
-    flag: "gb",
+    flag: "ca",
     rating: 5,
     service: "Off-plan purchase",
     quote:
@@ -204,8 +204,54 @@ export const TESTIMONIALS: Testimonial[] = [
     quote:
       "Bakıda yaşayaraq Dubaydakı mənzilimin təmirini onlara həvalə etdim. Həftəlik video ilə vəziyyəti göstərirdilər. Son mərhələdə balaca gecikmə oldu, amma vaxtında xəbərdar edildim.",
   },
+  {
+    id: "yerlan-b",
+    name: "Ерлан Б.",
+    city: "Астана",
+    lang: "ru",
+    flag: "kz",
+    rating: 5,
+    service: "Off-plan purchase",
+    quote:
+      "Сравнивал несколько агентств перед покупкой в Дубае. У BIZBUYUK — единственные, кто сразу прислал реестр DLD и статус эскроу-счёта, не дожидаясь, пока я сам спрошу.",
+  },
+  {
+    id: "natalya-p",
+    name: "Наталья П.",
+    city: "Минск",
+    lang: "ru",
+    flag: "by",
+    rating: 5,
+    service: "Investment protection",
+    quote:
+      "Переводить деньги из Беларуси в другую страну и без личного присутствия — было страшно. Юрист BIZBUYUK разобрал весь процесс по шагам ещё до перевода первого платежа, и я точно знала, за что плачу на каждом этапе.",
+  },
+  {
+    id: "chidi-o",
+    name: "Chidi O.",
+    city: "Lagos",
+    lang: "en",
+    flag: "ng",
+    rating: 5,
+    service: "Relocation",
+    quote:
+      "Moving a family business footprint to Dubai meant visas, a bank account and a lease before we'd even landed. They sequenced it so each step was ready before we needed it — no waiting around in a foreign city for paperwork.",
+  },
 ];
 
-export function testimonialsByLang(lang: TestimonialLang | "all"): Testimonial[] {
-  return lang === "all" ? TESTIMONIALS : TESTIMONIALS.filter((t) => t.lang === lang);
-}
+/** Countries visitors can pick from when leaving their own review — limited
+ *  to flags actually drawn in components/team/Flags.tsx. */
+export const REVIEW_COUNTRIES: { flag: string; label: string }[] = [
+  { flag: "ae", label: "United Arab Emirates" },
+  { flag: "ru", label: "Russia" },
+  { flag: "kz", label: "Kazakhstan" },
+  { flag: "uz", label: "Uzbekistan" },
+  { flag: "az", label: "Azerbaijan" },
+  { flag: "by", label: "Belarus" },
+  { flag: "gb", label: "United Kingdom" },
+  { flag: "ca", label: "Canada" },
+  { flag: "sg", label: "Singapore" },
+  { flag: "ng", label: "Nigeria" },
+];
+
+export const REVIEW_SERVICES = ["Off-plan purchase", "Investment protection", "Relocation", "Renovation", "Property management"];

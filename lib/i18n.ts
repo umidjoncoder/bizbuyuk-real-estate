@@ -27,7 +27,7 @@ type ListGroup = { title: string; items: string[] };
 type FaqItem = { q: string; a: string };
 
 export type Dict = {
-  nav: { realEstate: string; services: string; renovation: string; it: string; team: string; partners: string; why: string; contact: string; cta: string };
+  nav: { realEstate: string; services: string; renovation: string; it: string; team: string; partners: string; why: string; contact: string; cta: string; news: string };
   hero: {
     eyebrow: string;
     titleA: string;
@@ -53,7 +53,27 @@ export type Dict = {
     cards: Step[];
   };
   partners: { eyebrow: string; title: string };
-  testimonials: { eyebrow: string; title: string; lead: string; allLabel: string; ratingSuffix: string };
+  testimonials: {
+    eyebrow: string; title: string; lead: string; allLabel: string; ratingSuffix: string;
+    writeReview: string;
+    form: {
+      title: string;
+      name: string;
+      city: string;
+      country: string;
+      language: string;
+      service: string;
+      rating: string;
+      quote: string;
+      quotePlaceholder: string;
+      submit: string;
+      submitting: string;
+      success: string;
+      error: string;
+      note: string;
+      close: string;
+    };
+  };
   lead: {
     eyebrow: string;
     title: string;
@@ -90,6 +110,18 @@ export type Dict = {
     privacy: { title: string };
     terms: { title: string };
   };
+  newsPage: {
+    metaTitle: string;
+    metaDescription: string;
+    home: string;
+    current: string;
+    eyebrow: string;
+    title: string;
+    lead: string;
+    empty: string;
+    readMore: string;
+    back: string;
+  };
   servicesPage: {
     metaTitle: string;
     metaDescription: string;
@@ -121,7 +153,7 @@ export type Dict = {
     home: string;
     current: string;
     hero: { eyebrow: string; title: string; sub: string; ctaPrimary: string; ctaSecondary: string };
-    proof: { eyebrow: string; title: string; lead: string; items: { title: string; body: string; cta: string }[] };
+    proof: { eyebrow: string; title: string; items: { title: string; body: string; cta: string }[] };
     groupsIntro: { eyebrow: string; title: string; lead: string; viewLabel: string };
     process: { eyebrow: string; title: string; steps: Step[] };
     cta: { title: string; body: string; ctaPrimary: string; ctaSecondary: string };
@@ -143,7 +175,7 @@ export type Dict = {
       disclaimer: string;
       items: { slug: string; label: string }[];
     };
-    beforeAfter: { title: string; lead: string; before: string; after: string; hint: string; empty: string };
+    beforeAfter: { title: string; lead: string; before: string; after: string; hint: string; empty: string; emptyBody: string };
     fullService: { title: string; lead: string; cards: NamedCard[] };
     furniture: { title: string; lead: string; groups: ListGroup[]; cta: string };
     investor: { title: string; lead: string; items: string[]; cta: string };
@@ -247,7 +279,7 @@ export type Dict = {
 
 export const dictionary: Record<Locale, Dict> = {
   en: {
-    nav: { realEstate: "Real Estate", services: "Services", renovation: "Renovation", it: "Technology", team: "Team", partners: "Developers", why: "Why Us", contact: "Contact", cta: "Get a consultation" },
+    nav: { realEstate: "Real Estate", services: "Services", renovation: "Renovation", it: "Technology", team: "Team", partners: "Developers", why: "Why Us", contact: "Contact", cta: "Get a consultation", news: "News" },
     teamPage: {
       metaTitle: "Our team in Dubai",
       metaDescription:
@@ -364,6 +396,24 @@ export const dictionary: Record<Locale, Dict> = {
       lead: "Unedited, in the language they were written in.",
       allLabel: "All",
       ratingSuffix: "/5",
+      writeReview: "Leave a review",
+      form: {
+        title: "Leave a review",
+        name: "Your name",
+        city: "Your city",
+        country: "Your country",
+        language: "Language you're writing in",
+        service: "Which service was this about?",
+        rating: "Rating",
+        quote: "Your review",
+        quotePlaceholder: "What was the one thing that went right — or wrong?",
+        submit: "Submit review",
+        submitting: "Sending…",
+        success: "Thank you. Your review is checked by our team before it goes live.",
+        error: "Something went wrong. Please try again.",
+        note: "Reviews are checked before they appear on the site.",
+        close: "Close",
+      },
     },
     lead: {
       eyebrow: "Free consultation",
@@ -404,6 +454,18 @@ export const dictionary: Record<Locale, Dict> = {
       },
       privacy: { title: "Privacy Policy" },
       terms: { title: "Terms of Use" },
+    },
+    newsPage: {
+      metaTitle: "News",
+      metaDescription: "Updates from BIZBUYUK Real Estate and BIZBUYUK GROUP.",
+      home: "Home",
+      current: "News",
+      eyebrow: "Updates",
+      title: "News from BIZBUYUK",
+      lead: "What we're working on, shipping and learning.",
+      empty: "No news yet — check back soon.",
+      readMore: "Read more",
+      back: "All news",
     },
     servicesPage: {
       metaTitle: "Services",
@@ -537,7 +599,6 @@ export const dictionary: Record<Locale, Dict> = {
       proof: {
         eyebrow: "Not a slide deck",
         title: "We run what we build",
-        lead: "Before this was a service we offered, it was a system we needed. Both of the platforms below are live, in daily use, right now.",
         items: [
           {
             title: "BIZBUYUK CRM",
@@ -713,6 +774,7 @@ export const dictionary: Record<Locale, Dict> = {
         after: "After",
         hint: "Drag to compare",
         empty: "Project comparisons are being prepared.",
+        emptyBody: "We only publish a before/after once it is a real, finished BIZBUYUK project — no mockups. The first pair goes live as soon as a current renovation is handed over.",
       },
       fullService: {
         title: "One team. One contract. One result.",
@@ -1076,7 +1138,7 @@ export const dictionary: Record<Locale, Dict> = {
     },
   },
   ru: {
-    nav: { realEstate: "Недвижимость", services: "Услуги", renovation: "Ремонт", it: "Технологии", team: "Команда", partners: "Застройщики", why: "Почему мы", contact: "Контакты", cta: "Консультация" },
+    nav: { realEstate: "Недвижимость", services: "Услуги", renovation: "Ремонт", it: "Технологии", team: "Команда", partners: "Застройщики", why: "Почему мы", contact: "Контакты", cta: "Консультация", news: "Новости" },
     teamPage: {
       metaTitle: "\u041d\u0430\u0448\u0430 \u043a\u043e\u043c\u0430\u043d\u0434\u0430 \u0432 \u0414\u0443\u0431\u0430\u0435",
       metaDescription:
@@ -1193,6 +1255,24 @@ export const dictionary: Record<Locale, Dict> = {
       lead: "Без редактуры, на языке оригинала.",
       allLabel: "Все",
       ratingSuffix: "/5",
+      writeReview: "Оставить отзыв",
+      form: {
+        title: "Оставить отзыв",
+        name: "Ваше имя",
+        city: "Ваш город",
+        country: "Ваша страна",
+        language: "Язык, на котором вы пишете",
+        service: "По какой услуге отзыв?",
+        rating: "Оценка",
+        quote: "Ваш отзыв",
+        quotePlaceholder: "Что прошло особенно хорошо — или не очень?",
+        submit: "Отправить отзыв",
+        submitting: "Отправляем…",
+        success: "Спасибо. Наша команда проверит отзыв перед публикацией.",
+        error: "Что-то пошло не так. Попробуйте ещё раз.",
+        note: "Отзывы проверяются перед публикацией на сайте.",
+        close: "Закрыть",
+      },
     },
     lead: {
       eyebrow: "Бесплатная консультация",
@@ -1233,6 +1313,18 @@ export const dictionary: Record<Locale, Dict> = {
       },
       privacy: { title: "Политика конфиденциальности" },
       terms: { title: "Условия использования" },
+    },
+    newsPage: {
+      metaTitle: "Новости",
+      metaDescription: "Новости BIZBUYUK Real Estate и BIZBUYUK GROUP.",
+      home: "Главная",
+      current: "Новости",
+      eyebrow: "Обновления",
+      title: "Новости BIZBUYUK",
+      lead: "Над чем мы работаем, что запускаем и чему учимся.",
+      empty: "Новостей пока нет — загляните позже.",
+      readMore: "Читать",
+      back: "Все новости",
     },
     servicesPage: {
       metaTitle: "Услуги",
@@ -1366,7 +1458,6 @@ export const dictionary: Record<Locale, Dict> = {
       proof: {
         eyebrow: "Не презентация",
         title: "Мы пользуемся тем, что строим",
-        lead: "Прежде чем это стало услугой, это было системой, которая нам самим была нужна. Обе платформы ниже — живые, в ежедневном использовании прямо сейчас.",
         items: [
           {
             title: "BIZBUYUK CRM",
@@ -1542,6 +1633,7 @@ export const dictionary: Record<Locale, Dict> = {
         after: "После",
         hint: "Потяните для сравнения",
         empty: "Сравнения по проектам готовятся.",
+        emptyBody: "Мы публикуем «до/после» только по реальному завершённому проекту BIZBUYUK — без макетов. Первая пара появится сразу после сдачи текущего ремонта.",
       },
       fullService: {
         title: "Одна команда. Один договор. Один результат.",
@@ -1905,7 +1997,7 @@ export const dictionary: Record<Locale, Dict> = {
     },
   },
   uz: {
-    nav: { realEstate: "Koʻchmas mulk", services: "Xizmatlar", renovation: "Taʼmir", it: "Texnologiyalar", team: "Jamoa", partners: "Quruvchilar", why: "Nega biz", contact: "Aloqa", cta: "Konsultatsiya" },
+    nav: { realEstate: "Koʻchmas mulk", services: "Xizmatlar", renovation: "Taʼmir", it: "Texnologiyalar", team: "Jamoa", partners: "Quruvchilar", why: "Nega biz", contact: "Aloqa", cta: "Konsultatsiya", news: "Yangiliklar" },
     teamPage: {
       metaTitle: "Dubaydagi jamoamiz",
       metaDescription:
@@ -2022,6 +2114,24 @@ export const dictionary: Record<Locale, Dict> = {
       lead: "Tahrirsiz, original tilida.",
       allLabel: "Barchasi",
       ratingSuffix: "/5",
+      writeReview: "Fikr qoldirish",
+      form: {
+        title: "Fikr qoldirish",
+        name: "Ismingiz",
+        city: "Shahringiz",
+        country: "Mamlakatingiz",
+        language: "Yozayotgan tilingiz",
+        service: "Qaysi xizmat boʻyicha?",
+        rating: "Baho",
+        quote: "Fikringiz",
+        quotePlaceholder: "Nima yaxshi ketdi — yoki yaxshi ketmadi?",
+        submit: "Fikrni yuborish",
+        submitting: "Yuborilmoqda…",
+        success: "Rahmat. Jamoamiz fikringizni sayt uchun tekshiradi.",
+        error: "Nimadir xato ketdi. Qayta urinib koʻring.",
+        note: "Fikrlar saytda chop etilishidan oldin tekshiriladi.",
+        close: "Yopish",
+      },
     },
     lead: {
       eyebrow: "Bepul konsultatsiya",
@@ -2062,6 +2172,18 @@ export const dictionary: Record<Locale, Dict> = {
       },
       privacy: { title: "Maxfiylik siyosati" },
       terms: { title: "Foydalanish shartlari" },
+    },
+    newsPage: {
+      metaTitle: "Yangiliklar",
+      metaDescription: "BIZBUYUK Real Estate va BIZBUYUK GROUP yangiliklari.",
+      home: "Bosh sahifa",
+      current: "Yangiliklar",
+      eyebrow: "Yangilanishlar",
+      title: "BIZBUYUK yangiliklari",
+      lead: "Biz nima ustida ishlayotganimiz va nimalarni joriy qilayotganimiz.",
+      empty: "Hozircha yangiliklar yoʻq — keyinroq qayta tekshiring.",
+      readMore: "Batafsil",
+      back: "Barcha yangiliklar",
     },
     servicesPage: {
       metaTitle: "Xizmatlar",
@@ -2195,7 +2317,6 @@ export const dictionary: Record<Locale, Dict> = {
       proof: {
         eyebrow: "Taqdimot emas",
         title: "Biz oʻzimiz qurgan narsadan foydalanamiz",
-        lead: "Bu xizmatga aylanishidan oldin, bizga oʻzimizga kerak boʻlgan tizim edi. Quyidagi ikkala platforma ham hozir jonli va har kuni ishlatiladi.",
         items: [
           {
             title: "BIZBUYUK CRM",
@@ -2371,6 +2492,7 @@ export const dictionary: Record<Locale, Dict> = {
         after: "Keyin",
         hint: "Solishtirish uchun suring",
         empty: "Loyihalar boʻyicha taqqoslashlar tayyorlanmoqda.",
+        emptyBody: "Bizda faqat real, yakunlangan BIZBUYUK loyihasining \u201coldin/keyin\u201d surati chop etiladi — maket emas. Birinchi juft rasm joriy taʼmir topshirilgach qoʻyiladi.",
       },
       fullService: {
         title: "Bitta jamoa. Bitta shartnoma. Bitta natija.",

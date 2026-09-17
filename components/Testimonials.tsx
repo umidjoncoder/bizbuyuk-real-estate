@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, MessageSquarePlus } from "lucide-react";
 import { useLang } from "./LanguageProvider";
 import { Reveal } from "./Reveal";
 import { Flag, FlagSprite } from "./team/Flags";
-import { TESTIMONIALS, TESTIMONIAL_LANGS, testimonialsByLang, type TestimonialLang } from "@/lib/testimonials";
+import { TestimonialForm } from "./TestimonialForm";
+import { TESTIMONIALS, TESTIMONIAL_LANGS, type TestimonialLang, type Testimonial } from "@/lib/testimonials";
 
 /* Each quote stays in the language it was written in — a Russian client's
    words don't get run through translation just because the visitor is
@@ -22,9 +23,23 @@ export function Testimonials() {
   const { t } = useLang();
   const c = t.testimonials;
   const [active, setActive] = useState<TestimonialLang | "all">("all");
-  const shown = testimonialsByLang(active);
+  const [submitted, setSubmitted] = useState<Testimonial[]>([]);
+  const [showForm, setShowForm] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
   const drag = useRef<{ startX: number; startScroll: number; moved: boolean } | null>(null);
+
+  // Visitor-submitted reviews, approved via the CRM — merged on top of the
+  // curated launch quotes rather than replacing them.
+  useEffect(() => {
+    fetch("/api/testimonials")
+      .then((r) => r.json())
+      .then((d) => setSubmitted((d.testimonials || []) as Testimonial[]))
+      .catch(() => {});
+  }, []);
+
+  const all = [...submitted, ...TESTIMONIALS];
+  const shown = active === "all" ? all : all.filter((x) => x.lang === active);
+  const countFor = (id: TestimonialLang) => all.filter((x) => x.lang === id).length;
 
   const scrollByCards = (dir: 1 | -1) => {
     const el = trackRef.current;
@@ -88,7 +103,7 @@ export function Testimonials() {
               </button>
               {TESTIMONIAL_LANGS.map((l) => {
                 const on = active === l.id;
-                const count = TESTIMONIALS.filter((x) => x.lang === l.id).length;
+                const count = countFor(l.id);
                 return (
                   <button
                     key={l.id}
@@ -150,27 +165,39 @@ export function Testimonials() {
 
             <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-16 bg-gradient-to-l from-ink-2 to-transparent sm:block" />
 
-            <div className="mt-6 flex items-center justify-end gap-2">
+            <div className="mt-6 flex items-center justify-between gap-3">
               <button
                 type="button"
-                onClick={() => scrollByCards(-1)}
-                aria-label="Previous"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-cream transition-colors duration-300 hover:border-gold/50 hover:text-gold"
+                onClick={() => setShowForm(true)}
+                className="inline-flex items-center gap-2 text-[0.82rem] font-bold text-gold transition-colors duration-300 hover:text-cream"
               >
-                <ChevronLeft size={18} strokeWidth={2.2} />
+                <MessageSquarePlus size={16} strokeWidth={2.2} />
+                {c.writeReview}
               </button>
-              <button
-                type="button"
-                onClick={() => scrollByCards(1)}
-                aria-label="Next"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-cream transition-colors duration-300 hover:border-gold/50 hover:text-gold"
-              >
-                <ChevronRight size={18} strokeWidth={2.2} />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => scrollByCards(-1)}
+                  aria-label="Previous"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-cream transition-colors duration-300 hover:border-gold/50 hover:text-gold"
+                >
+                  <ChevronLeft size={18} strokeWidth={2.2} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollByCards(1)}
+                  aria-label="Next"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-cream transition-colors duration-300 hover:border-gold/50 hover:text-gold"
+                >
+                  <ChevronRight size={18} strokeWidth={2.2} />
+                </button>
+              </div>
             </div>
           </div>
         </Reveal>
       </div>
+
+      {showForm && <TestimonialForm onClose={() => setShowForm(false)} onSubmitted={() => {}} />}
     </section>
   );
 }
