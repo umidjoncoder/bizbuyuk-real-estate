@@ -26,7 +26,7 @@ export function ITGroupFooter({ slug }: { slug: string }) {
             <Reveal delay={0}>
               <a
                 href="/it"
-                className="rounded-full border border-gold/40 px-4 py-2 text-[0.82rem] font-semibold text-gold transition-colors duration-300 hover:border-gold hover:text-champagne"
+                className="inline-flex items-center rounded-full border border-gold/40 px-4 py-2 text-[0.82rem] font-semibold text-gold transition-colors duration-300 hover:border-gold hover:text-champagne"
               >
                 {s.backLabel}
               </a>
@@ -35,7 +35,7 @@ export function ITGroupFooter({ slug }: { slug: string }) {
               <Reveal key={g.slug} delay={0.02 * i}>
                 <a
                   href={`/it/${g.slug}`}
-                  className="rounded-full border border-line px-4 py-2 text-[0.82rem] font-medium text-muted transition-colors duration-300 hover:border-gold/50 hover:text-cream"
+                  className="inline-flex items-center rounded-full border border-line px-4 py-2 text-[0.82rem] font-medium text-muted transition-colors duration-300 hover:border-gold/50 hover:text-cream"
                 >
                   {g.title[loc]}
                 </a>
