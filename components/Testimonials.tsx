@@ -7,6 +7,7 @@ import { Reveal } from "./Reveal";
 import { Flag, FlagSprite } from "./team/Flags";
 import { TestimonialForm } from "./TestimonialForm";
 import { TESTIMONIALS, TESTIMONIAL_LANGS, type TestimonialLang, type Testimonial } from "@/lib/testimonials";
+import { flagEmoji } from "@/lib/countries";
 
 /* Each quote stays in the language it was written in — a Russian client's
    words don't get run through translation just because the visitor is
@@ -155,7 +156,9 @@ export function Testimonials() {
                     &ldquo;{item.quote}&rdquo;
                   </blockquote>
                   <figcaption className="mt-5 flex items-center gap-2.5 border-t border-line pt-4">
-                    <Flag code={item.flag} className="h-[15px] w-[22px] shrink-0" />
+                    <span className="shrink-0 text-[1.15rem] leading-none" aria-hidden>
+                      {flagEmoji(item.flag)}
+                    </span>
                     <div className="min-w-0">
                       <p className="truncate text-[0.86rem] font-bold text-cream">{item.name}</p>
                       <p className="truncate text-[0.74rem] text-muted">

@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { COUNTRIES, flagEmoji } from "@/lib/countries";
 
 const VALID_LANGS = ["ru", "ar", "uz", "en", "az"];
-// Flag codes actually drawn in components/team/Flags.tsx.
-const VALID_FLAGS = ["ru", "gb", "uz", "kz", "tj", "ae", "cn", "af", "az", "ca", "sg", "by", "ng"];
 
 // GET: approved, visitor-submitted reviews — merged client-side with the
 // curated launch quotes in lib/testimonials.ts.
@@ -39,7 +38,8 @@ export async function POST(req: Request) {
     if (!VALID_LANGS.includes(lang)) {
       return NextResponse.json({ error: "Invalid language" }, { status: 400 });
     }
-    if (!VALID_FLAGS.includes(flag)) {
+    const country = COUNTRIES.find((c) => c.code === String(flag || "").toUpperCase());
+    if (!country) {
       return NextResponse.json({ error: "Invalid country" }, { status: 400 });
     }
     const ratingNum = Number(rating);
@@ -53,22 +53,78 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Review is too long" }, { status: 400 });
     }
 
+    const cleanName = String(name).trim().slice(0, 80);
+    const cleanCity = String(city).trim().slice(0, 80);
+    const cleanService = String(service).trim().slice(0, 80);
+    const cleanQuote = String(quote).trim().slice(0, 1200);
+
     await prisma.testimonial.create({
       data: {
-        name: String(name).trim().slice(0, 80),
-        city: String(city).trim().slice(0, 80),
-        flag,
+        name: cleanName,
+        city: cleanCity,
+        flag: country.code,
         lang,
         rating: ratingNum,
-        service: String(service).trim().slice(0, 80),
-        quote: String(quote).trim().slice(0, 1200),
+        service: cleanService,
+        quote: cleanQuote,
         status: "PENDING",
       },
     });
+
+    await notifyTelegram({ name: cleanName, city: cleanCity, country: country.name, flag: country.code, lang, rating: ratingNum, service: cleanService, quote: cleanQuote });
 
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("POST Testimonial error:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
+}
+
+const SITE = "https://bizbuyuk.com";
+
+// A pending review only exists in the moderation queue — without a nudge,
+// nobody knows to go look. Reuses the same bot/channel as lead alerts.
+async function notifyTelegram(r: {
+  name: string;
+  city: string;
+  country: string;
+  flag: string;
+  lang: string;
+  rating: number;
+  service: string;
+  quote: string;
+}) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatIds = (process.env.TELEGRAM_CHAT_ID || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!token || chatIds.length === 0) return;
+
+  const stars = "⭐".repeat(r.rating);
+  const text =
+    `📝 <b>New review — awaiting approval</b>\n\n` +
+    `${flagEmoji(r.flag)} <b>${escapeHtml(r.name)}</b> — ${escapeHtml(r.city)}, ${escapeHtml(r.country)}\n` +
+    `${stars} · ${escapeHtml(r.service)} · ${r.lang.toUpperCase()}\n\n` +
+    `“${escapeHtml(r.quote)}”\n\n` +
+    `Review it in the CRM: ${SITE}/crm/testimonials`;
+
+  const sends = await Promise.allSettled(
+    chatIds.map((chatId) =>
+      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML", disable_web_page_preview: true }),
+      }).then((res) => {
+        if (!res.ok) throw new Error(`telegram ${chatId} ${res.status}`);
+      })
+    )
+  );
+  for (const s of sends) {
+    if (s.status === "rejected") console.error("[testimonial][telegram]", s.reason?.message || s.reason);
+  }
+}
+
+function escapeHtml(s: string) {
+  return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string));
 }

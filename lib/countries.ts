@@ -248,8 +248,9 @@ export const COUNTRIES: Country[] = [
   { code: "ZW", name: "Zimbabwe", dial: "+263" },
 ];
 
-// Default selection — the agency is UAE-based but most clients are Uzbek.
-export const DEFAULT_COUNTRY = COUNTRIES.find((c) => c.code === "UZ")!;
+// Default selection — the agency is UAE-based, so the example/placeholder
+// number a visitor sees first should read as a UAE number (+971).
+export const DEFAULT_COUNTRY = COUNTRIES.find((c) => c.code === "AE")!;
 
 // Several countries share one calling code. When a stored number only carries
 // the shared code we can't know the exact country, so pick the dominant one.

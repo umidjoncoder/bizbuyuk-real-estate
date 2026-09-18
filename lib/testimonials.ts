@@ -13,8 +13,12 @@
    shape (short, specific, one thing that went right) is exactly what
    should replace them. No portrait photos: a flag is an honest way to
    show who's talking without needing a picture of someone who didn't
-   sit for one. Add a flag symbol to components/team/Flags.tsx for any
-   new `flag` code you introduce here.
+   sit for one.
+
+   `flag` is an ISO 3166-1 alpha-2 code (e.g. "KZ") from lib/countries.ts —
+   any of ~195 countries, rendered as an emoji via flagEmoji() rather than
+   the small hand-drawn SVG set in components/team/Flags.tsx (which only
+   covers the handful of languages/countries the team page itself needs).
    ============================================================ */
 
 export type TestimonialLang = "ru" | "ar" | "uz" | "en" | "az";
@@ -44,7 +48,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Дмитрий К.",
     city: "Москва",
     lang: "ru",
-    flag: "ru",
+    flag: "RU",
     rating: 5,
     service: "Off-plan purchase",
     quote:
@@ -55,7 +59,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Елена В.",
     city: "Алматы",
     lang: "ru",
-    flag: "kz",
+    flag: "KZ",
     rating: 5,
     service: "Relocation",
     quote:
@@ -66,7 +70,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Андрей С.",
     city: "Москва",
     lang: "ru",
-    flag: "ru",
+    flag: "RU",
     rating: 4,
     service: "Renovation",
     quote:
@@ -77,7 +81,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "خالد ر.",
     city: "دبي",
     lang: "ar",
-    flag: "ae",
+    flag: "AE",
     rating: 5,
     service: "Off-plan purchase",
     quote:
@@ -88,7 +92,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "فيصل آل م.",
     city: "الشارقة",
     lang: "ar",
-    flag: "ae",
+    flag: "AE",
     rating: 5,
     service: "Property management",
     quote:
@@ -99,7 +103,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "عمر س.",
     city: "دبي",
     lang: "ar",
-    flag: "ae",
+    flag: "AE",
     rating: 5,
     service: "Investment protection",
     quote:
@@ -110,7 +114,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Sardor T.",
     city: "Toshkent",
     lang: "uz",
-    flag: "uz",
+    flag: "UZ",
     rating: 5,
     service: "Relocation",
     quote:
@@ -121,7 +125,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Shahnoza M.",
     city: "Buxoro",
     lang: "uz",
-    flag: "uz",
+    flag: "UZ",
     rating: 5,
     service: "Renovation",
     quote:
@@ -132,7 +136,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Jasur N.",
     city: "Toshkent",
     lang: "uz",
-    flag: "uz",
+    flag: "UZ",
     rating: 4,
     service: "Off-plan purchase",
     quote:
@@ -143,7 +147,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "James H.",
     city: "London",
     lang: "en",
-    flag: "gb",
+    flag: "GB",
     rating: 5,
     service: "Investment protection",
     quote:
@@ -154,7 +158,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Sarah L.",
     city: "Singapore",
     lang: "en",
-    flag: "sg",
+    flag: "SG",
     rating: 5,
     service: "Property management",
     quote:
@@ -165,7 +169,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Michael T.",
     city: "Toronto",
     lang: "en",
-    flag: "ca",
+    flag: "CA",
     rating: 5,
     service: "Off-plan purchase",
     quote:
@@ -176,7 +180,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Elvin M.",
     city: "Bakı",
     lang: "az",
-    flag: "az",
+    flag: "AZ",
     rating: 5,
     service: "Off-plan purchase",
     quote:
@@ -187,7 +191,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Aygün H.",
     city: "Bakı",
     lang: "az",
-    flag: "az",
+    flag: "AZ",
     rating: 5,
     service: "Relocation",
     quote:
@@ -198,7 +202,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Tural K.",
     city: "Bakı",
     lang: "az",
-    flag: "az",
+    flag: "AZ",
     rating: 4,
     service: "Renovation",
     quote:
@@ -209,7 +213,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Ерлан Б.",
     city: "Астана",
     lang: "ru",
-    flag: "kz",
+    flag: "KZ",
     rating: 5,
     service: "Off-plan purchase",
     quote:
@@ -220,7 +224,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Наталья П.",
     city: "Минск",
     lang: "ru",
-    flag: "by",
+    flag: "BY",
     rating: 5,
     service: "Investment protection",
     quote:
@@ -231,27 +235,12 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Chidi O.",
     city: "Lagos",
     lang: "en",
-    flag: "ng",
+    flag: "NG",
     rating: 5,
     service: "Relocation",
     quote:
       "Moving a family business footprint to Dubai meant visas, a bank account and a lease before we'd even landed. They sequenced it so each step was ready before we needed it — no waiting around in a foreign city for paperwork.",
   },
-];
-
-/** Countries visitors can pick from when leaving their own review — limited
- *  to flags actually drawn in components/team/Flags.tsx. */
-export const REVIEW_COUNTRIES: { flag: string; label: string }[] = [
-  { flag: "ae", label: "United Arab Emirates" },
-  { flag: "ru", label: "Russia" },
-  { flag: "kz", label: "Kazakhstan" },
-  { flag: "uz", label: "Uzbekistan" },
-  { flag: "az", label: "Azerbaijan" },
-  { flag: "by", label: "Belarus" },
-  { flag: "gb", label: "United Kingdom" },
-  { flag: "ca", label: "Canada" },
-  { flag: "sg", label: "Singapore" },
-  { flag: "ng", label: "Nigeria" },
 ];
 
 export const REVIEW_SERVICES = ["Off-plan purchase", "Investment protection", "Relocation", "Renovation", "Property management"];

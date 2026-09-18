@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Star, X, Loader2 } from "lucide-react";
 import { useLang } from "./LanguageProvider";
-import { TESTIMONIAL_LANGS, REVIEW_COUNTRIES, REVIEW_SERVICES, type TestimonialLang } from "@/lib/testimonials";
+import { TESTIMONIAL_LANGS, REVIEW_SERVICES, type TestimonialLang } from "@/lib/testimonials";
+import { COUNTRIES, DEFAULT_COUNTRY, flagEmoji } from "@/lib/countries";
 
 export function TestimonialForm({ onClose, onSubmitted }: { onClose: () => void; onSubmitted: () => void }) {
   const { t, locale } = useLang();
@@ -11,7 +12,7 @@ export function TestimonialForm({ onClose, onSubmitted }: { onClose: () => void;
 
   const [name, setName] = useState("");
   const [city, setCity] = useState("");
-  const [flag, setFlag] = useState(REVIEW_COUNTRIES[0].flag);
+  const [flag, setFlag] = useState(DEFAULT_COUNTRY.code);
   const [lang, setLang] = useState<TestimonialLang>((["ru", "en", "uz", "ar"].includes(locale) ? locale : "en") as TestimonialLang);
   const [service, setService] = useState(REVIEW_SERVICES[0]);
   const [rating, setRating] = useState(5);
@@ -77,9 +78,9 @@ export function TestimonialForm({ onClose, onSubmitted }: { onClose: () => void;
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={f.country}>
                 <select value={flag} onChange={(e) => setFlag(e.target.value)} className="testi-input">
-                  {REVIEW_COUNTRIES.map((c) => (
-                    <option key={c.flag} value={c.flag}>
-                      {c.label}
+                  {COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {flagEmoji(c.code)} {c.name}
                     </option>
                   ))}
                 </select>

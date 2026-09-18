@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useCrm } from "@/components/CrmSecurityWrapper";
 import { MessageSquareQuote, Loader2, Check, X, Trash2, Star } from "lucide-react";
+import { flagEmoji } from "@/lib/countries";
 
 type Testimonial = {
   id: string;
@@ -128,7 +129,7 @@ export default function TestimonialsAdminPage() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="font-semibold crm-text">
-                  {t.name} <span className="crm-faint font-normal">· {t.city}</span>
+                  <span aria-hidden>{flagEmoji(t.flag)}</span> {t.name} <span className="crm-faint font-normal">· {t.city}</span>
                 </p>
                 <p className="text-xs crm-muted mt-0.5">
                   {t.service} · {t.lang.toUpperCase()} · {new Date(t.createdAt).toLocaleDateString(en ? "en-GB" : "ru-RU")}
