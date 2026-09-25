@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
+import { TESTIMONIALS_TAG } from "@/lib/publicContent";
 import { Role } from "@prisma/client";
 
 async function getSessionUser() {
@@ -35,6 +37,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       where: { id },
       data: { status, reviewedById: user.id },
     });
+    revalidateTag(TESTIMONIALS_TAG);
 
     await prisma.auditLog.create({
       data: { userId: user.id, action: "MODERATE_TESTIMONIAL", details: JSON.stringify({ name: existing.name, status }) },
@@ -60,6 +63,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     await prisma.testimonial.delete({ where: { id } });
+    revalidateTag(TESTIMONIALS_TAG);
     await prisma.auditLog.create({
       data: { userId: user.id, action: "DELETE_TESTIMONIAL", details: JSON.stringify({ name: existing.name }) },
     });

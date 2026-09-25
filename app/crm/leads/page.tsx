@@ -83,11 +83,15 @@ type Lead = {
   broker: { fullName: string; id: string } | null;
   createdAt: string;
   updatedAt: string;
-  comments: Comment[];
   properties: { property: Property }[];
-  history: LeadHistory[];
   reminders?: Reminder[];
+  // The list sends only these counts; the comments and history themselves are
+  // loaded per lead when its drawer opens (see loadLead).
+  commentCount: number;
+  unseenHistory: number;
 };
+
+type LeadDetail = { comments: Comment[]; history: LeadHistory[] };
 
 type UserType = { id: string; fullName: string; role: string; isActive?: boolean };
 
@@ -138,6 +142,7 @@ export default function LeadsPage() {
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [details, setDetails] = useState<Record<string, LeadDetail>>({});
   const [commentText, setCommentText] = useState("");
   const [isNewLeadOpen, setIsNewLeadOpen] = useState(false);
   const [savingLead, setSavingLead] = useState(false);
@@ -214,7 +219,7 @@ export default function LeadsPage() {
       const [leadsRes, propsRes, usersRes, setRes] = await Promise.all([
         fetch(leadsUrl()),
         fetch("/api/crm/properties"),
-        fetch("/api/crm/users"),
+        fetch("/api/crm/users?lite=1"),
         fetch("/api/crm/settings"),
       ]);
       if (leadsRes.ok) setLeads((await leadsRes.json()).leads);
@@ -232,8 +237,9 @@ export default function LeadsPage() {
     }
   };
 
-  // Lightweight refresh after a mutation — only leads change, so don't re-pull
-  // properties + users every time (that triple-fetch made drag/drop feel janky).
+  // Reloads the whole list without re-pulling properties + users. Only needed
+  // when switching between active and archive; after a change to one lead,
+  // loadLead re-reads just that lead.
   const fetchLeads = async () => {
     try {
       const res = await fetch(leadsUrl());
@@ -242,6 +248,36 @@ export default function LeadsPage() {
       console.error("Error refreshing leads:", err);
     }
   };
+
+  // Re-reads one lead after a change and caches its comments + history for the
+  // drawer. Re-pulling the whole list after every click was ~2.7 MB each time
+  // and ran the database's monthly transfer allowance out. A lead this view no
+  // longer shows (archived, restored, reassigned away) just leaves the list.
+  const loadLead = async (id: string) => {
+    try {
+      const res = await fetch(`/api/crm/leads/${id}`);
+      if (res.status === 404) return dropLead(id);
+      if (!res.ok) return;
+      const { lead } = (await res.json()) as { lead: Lead & LeadDetail & { archived: boolean } };
+      if (lead.archived !== archiveView) return dropLead(id);
+      const { comments, history, ...card } = lead;
+      setLeads((prev) => (prev.some((l) => l.id === id) ? prev.map((l) => (l.id === id ? card : l)) : [card, ...prev]));
+      setDetails((prev) => ({ ...prev, [id]: { comments, history } }));
+    } catch (err) {
+      console.error("Error refreshing lead:", err);
+    }
+  };
+
+  const dropLead = (id: string) => {
+    setLeads((prev) => prev.filter((l) => l.id !== id));
+    setSelectedLead((cur) => (cur?.id === id ? null : cur));
+  };
+
+  // Opening a lead loads (or refreshes) its comments and history.
+  useEffect(() => {
+    if (selectedLead) loadLead(selectedLead.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLead?.id]);
 
   // Re-load when switching between active and archive views.
   useEffect(() => {
@@ -256,7 +292,7 @@ export default function LeadsPage() {
     return true;
   };
 
-  const unseenCount = (lead: Lead) => (isManager ? lead.history.filter((h) => !h.seen).length : 0);
+  const unseenCount = (lead: Lead) => (isManager ? lead.unseenHistory : 0);
 
   // Quick-add a custom lead source (admin/owner) — "Add Agent"-style.
   const addSource = async (setSelected?: (v: string) => void) => {
@@ -318,7 +354,8 @@ export default function LeadsPage() {
       if (!res.ok) throw new Error(data.error || "Error saving lead");
       setIsNewLeadOpen(false);
       resetNewLeadForm();
-      fetchLeads();
+      if (data.lead?.id) loadLead(data.lead.id);
+      else fetchLeads();
     } catch (err: any) {
       setErrorMsg(err.message || "An error occurred");
     } finally {
@@ -348,7 +385,7 @@ export default function LeadsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus, lostReason: newStatus === "LOST" ? lostReason : undefined }),
       });
-      if (res.ok) fetchLeads();
+      if (res.ok) loadLead(leadId);
       else {
         const err = await res.json();
         alert(err.error || "Could not update status");
@@ -375,7 +412,7 @@ export default function LeadsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ brokerId }),
       });
-      if (res.ok) fetchLeads();
+      if (res.ok) loadLead(leadId);
     } catch (err) {
       console.error(err);
     }
@@ -407,7 +444,7 @@ export default function LeadsPage() {
       });
       if (res.ok) {
         setEditMode(false);
-        fetchLeads();
+        loadLead(selectedLead.id);
       } else {
         const err = await res.json();
         alert(err.error || "Could not save");
@@ -423,7 +460,7 @@ export default function LeadsPage() {
   const acknowledgeHistory = async (leadId: string) => {
     try {
       const res = await fetch(`/api/crm/leads/${leadId}/history`, { method: "PUT" });
-      if (res.ok) fetchLeads();
+      if (res.ok) loadLead(leadId);
     } catch (err) {
       console.error(err);
     }
@@ -456,7 +493,7 @@ export default function LeadsPage() {
         setRemindDays(null);
         setRemindDate("");
         setRemindNote("");
-        fetchLeads();
+        loadLead(selectedLead.id);
         if (remindAt) refreshNotifs();
       } else {
         const err = await res.json();
@@ -473,7 +510,7 @@ export default function LeadsPage() {
     if (!confirm(lang === "en" ? "Move this lead to Archive?" : "Переместить лида в архив?")) return;
     try {
       const res = await fetch(`/api/crm/leads/${leadId}`, { method: "DELETE" });
-      if (res.ok) { setSelectedLead(null); fetchLeads(); }
+      if (res.ok) dropLead(leadId);
       else alert((await res.json()).error || "Error");
     } catch (err) { console.error(err); }
   };
@@ -483,7 +520,7 @@ export default function LeadsPage() {
       const res = await fetch(`/api/crm/leads/${leadId}`, {
         method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ archived: false }),
       });
-      if (res.ok) { setSelectedLead(null); fetchLeads(); }
+      if (res.ok) dropLead(leadId);
       else alert((await res.json()).error || "Error");
     } catch (err) { console.error(err); }
   };
@@ -492,7 +529,7 @@ export default function LeadsPage() {
     if (!confirm(lang === "en" ? "Permanently delete? This cannot be undone." : "Удалить навсегда? Это необратимо.")) return;
     try {
       const res = await fetch(`/api/crm/leads/${leadId}?hard=1`, { method: "DELETE" });
-      if (res.ok) { setSelectedLead(null); fetchLeads(); }
+      if (res.ok) dropLead(leadId);
       else alert((await res.json()).error || "Error");
     } catch (err) { console.error(err); }
   };
@@ -544,6 +581,10 @@ export default function LeadsPage() {
   const kanbanColumns = statusOptions.map((s) => ({ title: statusLabel(s), status: s }));
 
   const fieldLabel = (f: string) => (t.leads.fields as Record<string, string>)[f] || f;
+
+  // Comments + history of the open lead; undefined until its first load.
+  const detail = selectedLead ? details[selectedLead.id] : undefined;
+  const detailLoading = <Loader2 className="w-4 h-4 animate-spin crm-faint" />;
 
   return (
     <div className="space-y-7">
@@ -672,8 +713,8 @@ export default function LeadsPage() {
                         <div className="mt-3 pt-2.5 border-t crm-bd flex items-center justify-between gap-2">
                           <span className="text-[9px] crm-faint uppercase font-semibold">{lead.source}</span>
                           <div className="flex items-center gap-1.5">
-                            {lead.comments.length > 0 && (
-                              <span className="text-[9px] crm-faint flex items-center gap-0.5"><MessageSquare className="w-3 h-3" />{lead.comments.length}</span>
+                            {lead.commentCount > 0 && (
+                              <span className="text-[9px] crm-faint flex items-center gap-0.5"><MessageSquare className="w-3 h-3" />{lead.commentCount}</span>
                             )}
                             <span className="text-[9px] bg-[#c8a15a]/10 crm-gold px-2 py-0.5 rounded-full font-medium max-w-[90px] truncate">
                               {lead.broker?.fullName || "—"}
@@ -973,8 +1014,9 @@ export default function LeadsPage() {
                     )}
                   </div>
                   <div className="space-y-2 max-h-56 overflow-y-auto crm-scroll pr-1">
-                    {selectedLead.history.length === 0 && <p className="text-xs crm-faint italic">{t.leads.noHistory}</p>}
-                    {selectedLead.history.map((h) => {
+                    {!detail && detailLoading}
+                    {detail?.history.length === 0 && <p className="text-xs crm-faint italic">{t.leads.noHistory}</p>}
+                    {detail?.history.map((h) => {
                       const hot = isManager && !h.seen;
                       return (
                         <div key={h.id} className={`rounded-xl p-3 border text-xs ${hot ? "bg-red-500/8 border-red-500/30" : "crm-bd"}`} style={hot ? {} : { background: "var(--crm-surface-2)" }}>
@@ -1032,7 +1074,8 @@ export default function LeadsPage() {
                   </form>
 
                   <div className="space-y-2 max-h-72 overflow-y-auto crm-scroll pr-1">
-                    {selectedLead.comments.map((c) => {
+                    {!detail && detailLoading}
+                    {detail?.comments.map((c) => {
                       const rem = (selectedLead.reminders || []).find((r) => r.commentId === c.id && !r.done);
                       return (
                         <div key={c.id} className="rounded-xl p-3 border crm-bd" style={{ background: "var(--crm-surface-2)" }}>
@@ -1049,7 +1092,7 @@ export default function LeadsPage() {
                         </div>
                       );
                     })}
-                    {selectedLead.comments.length === 0 && <p className="text-xs crm-faint italic">{t.leads.noComments}</p>}
+                    {detail?.comments.length === 0 && <p className="text-xs crm-faint italic">{t.leads.noComments}</p>}
                   </div>
                 </div>
               )}

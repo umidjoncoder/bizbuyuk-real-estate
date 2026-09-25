@@ -15,6 +15,51 @@ async function getSessionUser() {
 
 const fmt = (v: unknown) => (v === null || v === undefined || v === "" ? "—" : String(v));
 
+// GET: one lead with its comments and edit history, for the drawer and for
+// refreshing a single card after a change. Same visibility as the list:
+// brokers only their own active leads, archived leads only for the Owner, and
+// Marketing never gets comments or history.
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const user = await getSessionUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (user.role === Role.DRIVER) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const { id } = await params;
+    const includePrivate = user.role !== Role.MARKETING_DIRECTOR;
+    const lead = await prisma.lead.findUnique({
+      where: { id },
+      include: {
+        broker: { select: { fullName: true, id: true } },
+        properties: { include: { property: true } },
+        reminders: { where: { userId: user.id, done: false } },
+        comments: includePrivate ? { orderBy: { createdAt: "desc" } } : false,
+        history: includePrivate ? { orderBy: { createdAt: "desc" } } : false,
+      },
+    });
+    if (!lead) return NextResponse.json({ error: "Lead not found" }, { status: 404 });
+    const hidden =
+      (lead.archived && user.role !== Role.OWNER) ||
+      (user.role === Role.BROKER && lead.brokerId !== user.id);
+    if (hidden) return NextResponse.json({ error: "Lead not found" }, { status: 404 });
+
+    const comments = lead.comments ?? [];
+    const history = lead.history ?? [];
+    return NextResponse.json({
+      lead: {
+        ...lead,
+        comments,
+        history,
+        commentCount: comments.length,
+        unseenHistory: history.filter((h) => !h.seen).length,
+      },
+    });
+  } catch (err) {
+    console.error("GET Lead detail Error:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getSessionUser();

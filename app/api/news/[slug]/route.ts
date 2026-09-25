@@ -1,26 +1,10 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getNewsPost } from "@/lib/publicContent";
 
 export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
-    const post = await prisma.newsPost.findUnique({
-      where: { slug },
-      select: {
-        slug: true,
-        titleEn: true,
-        titleRu: true,
-        titleUz: true,
-        titleAr: true,
-        bodyEn: true,
-        bodyRu: true,
-        bodyUz: true,
-        bodyAr: true,
-        coverImage: true,
-        status: true,
-        publishedAt: true,
-      },
-    });
+    const post = await getNewsPost(slug);
     if (!post || post.status !== "PUBLISHED") {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }

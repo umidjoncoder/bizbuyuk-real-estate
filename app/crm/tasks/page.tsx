@@ -70,7 +70,7 @@ export default function TasksPage() {
   const fetchData = async (showLoading = false) => {
     if (showLoading) setLoading(true);
     try {
-      const [tasksRes, usersRes] = await Promise.all([fetch("/api/crm/tasks"), fetch("/api/crm/users")]);
+      const [tasksRes, usersRes] = await Promise.all([fetch("/api/crm/tasks"), fetch("/api/crm/users?lite=1")]);
       if (tasksRes.ok) setTasks((await tasksRes.json()).tasks);
       if (usersRes.ok) setUsers((await usersRes.json()).users);
     } catch (err) {

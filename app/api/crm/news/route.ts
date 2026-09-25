@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
+import { NEWS_TAG } from "@/lib/publicContent";
 import { Role } from "@prisma/client";
 
 async function getSessionUser() {
@@ -83,6 +85,7 @@ export async function POST(req: Request) {
         authorId: user.id,
       },
     });
+    revalidateTag(NEWS_TAG);
 
     await prisma.auditLog.create({
       data: { userId: user.id, action: "CREATE_NEWS", details: JSON.stringify({ slug, status: post.status }) },

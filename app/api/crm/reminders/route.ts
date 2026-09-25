@@ -11,11 +11,21 @@ async function getSessionUser() {
 }
 
 // GET: all reminders for the current user (own reminders only), newest-due first.
-// Read-only — the notification bell polls this.
-export async function GET() {
+// Read-only — the notification bell polls this. Polls send ?v=<version> from
+// the previous answer; while nothing changed they get { unchanged: true } back
+// instead of the whole list (some users have hundreds of pending reminders, and
+// re-sending them every poll used up the database's transfer allowance).
+export async function GET(req: Request) {
   try {
     const user = await getSessionUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const [{ v }] = await prisma.$queryRaw<{ v: string | null }[]>`
+      select md5(coalesce(string_agg(id || '|' || "remindAt"::text || '|' || message, ',' order by id), '')) as v
+      from "Reminder" where "userId" = ${user.id} and done = false`;
+    if (new URL(req.url).searchParams.get("v") === v) {
+      return NextResponse.json({ unchanged: true, v });
+    }
 
     const reminders = await prisma.reminder.findMany({
       where: { userId: user.id, done: false },
@@ -27,7 +37,7 @@ export async function GET() {
       orderBy: { remindAt: "asc" },
     });
 
-    return NextResponse.json({ reminders });
+    return NextResponse.json({ reminders, v });
   } catch (err) {
     console.error("GET Reminders error:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

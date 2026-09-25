@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
 import { phoneKey } from "@/lib/format";
 import { normalizePref } from "@/lib/contact";
-import { Role } from "@prisma/client";
+import { Prisma, Role } from "@prisma/client";
 
 // Get current session helper
 async function getSessionUser() {
@@ -32,46 +32,33 @@ export async function GET(req: Request) {
     // each comment can show its own ⏰ badge.
     const myReminders = { where: { userId: user.id, done: false } } as const;
 
-    let leads;
-    if (user.role === Role.BROKER) {
-      // Brokers only see their own assigned, non-archived leads
-      leads = await prisma.lead.findMany({
-        where: { brokerId: user.id, archived: false },
-        include: {
-          broker: { select: { fullName: true, id: true } },
-          comments: { orderBy: { createdAt: "desc" } },
-          properties: { include: { property: true } },
-          history: { orderBy: { createdAt: "desc" } },
-          reminders: myReminders,
-        },
-        orderBy: { updatedAt: "desc" },
-      });
-    } else {
-      // Owners, Admins, Sales Directors, Marketing Directors see all leads.
-      // Marketing only needs sources/analytics — it must NOT read brokers'
-      // private client comments or the edit history, so we omit those relations.
-      const includePrivate = user.role !== Role.MARKETING_DIRECTOR;
-      leads = await prisma.lead.findMany({
-        where: { archived },
-        include: {
-          broker: { select: { fullName: true, id: true } },
-          properties: { include: { property: true } },
-          reminders: myReminders,
-          ...(includePrivate
-            ? {
-                comments: { orderBy: { createdAt: "desc" } },
-                history: { orderBy: { createdAt: "desc" } },
-              }
-            : {}),
-        },
-        orderBy: { updatedAt: "desc" },
-      });
+    // The list carries only counts of comments and unreviewed edits; the texts
+    // load per lead from GET /api/crm/leads/[id] when its drawer opens. Sending
+    // every comment and every edit ever made on each load was ~2.7 MB a click
+    // and ran the database's monthly transfer allowance out.
+    const include = {
+      broker: { select: { fullName: true, id: true } },
+      properties: { include: { property: true } },
+      reminders: myReminders,
+      _count: { select: { comments: true, history: { where: { seen: false } } } },
+    } satisfies Prisma.LeadInclude;
 
-      // Ensure the client always receives the arrays (empty for Marketing).
-      if (!includePrivate) {
-        leads = leads.map((l) => ({ ...l, comments: [], history: [] }));
-      }
-    }
+    // Brokers only see their own assigned, non-archived leads. Owners, Admins,
+    // Sales and Marketing Directors see all leads.
+    const rows = await prisma.lead.findMany({
+      where: user.role === Role.BROKER ? { brokerId: user.id, archived: false } : { archived },
+      include,
+      orderBy: { updatedAt: "desc" },
+    });
+
+    // Marketing only needs sources/analytics — it must NOT learn anything about
+    // brokers' private client comments or the edit history, not even counts.
+    const includePrivate = user.role !== Role.MARKETING_DIRECTOR;
+    const leads = rows.map(({ _count, ...lead }) => ({
+      ...lead,
+      commentCount: includePrivate ? _count.comments : 0,
+      unseenHistory: includePrivate ? _count.history : 0,
+    }));
 
     return NextResponse.json({ leads });
   } catch (err: any) {

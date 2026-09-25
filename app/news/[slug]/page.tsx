@@ -3,13 +3,13 @@ import { notFound } from "next/navigation";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { NewsDetail } from "@/components/news/NewsDetail";
-import { prisma } from "@/lib/db";
+import { getNewsPost } from "@/lib/publicContent";
 
 const SITE = "https://bizbuyuk.com";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await prisma.newsPost.findUnique({ where: { slug } });
+  const post = await getNewsPost(slug);
   if (!post || post.status !== "PUBLISHED") return {};
 
   const url = `${SITE}/news/${slug}`;
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function NewsDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = await prisma.newsPost.findUnique({ where: { slug } });
+  const post = await getNewsPost(slug);
   if (!post || post.status !== "PUBLISHED") notFound();
 
   return (

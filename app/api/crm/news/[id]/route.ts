@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
+import { NEWS_TAG } from "@/lib/publicContent";
 import { Role } from "@prisma/client";
 
 async function getSessionUser() {
@@ -47,6 +49,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         ...(willPublish && !wasPublished ? { publishedAt: new Date() } : {}),
       },
     });
+    revalidateTag(NEWS_TAG);
 
     await prisma.auditLog.create({
       data: { userId: user.id, action: "UPDATE_NEWS", details: JSON.stringify({ slug: post.slug, status: post.status }) },
@@ -72,6 +75,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     await prisma.newsPost.delete({ where: { id } });
+    revalidateTag(NEWS_TAG);
     await prisma.auditLog.create({
       data: { userId: user.id, action: "DELETE_NEWS", details: JSON.stringify({ slug: existing.slug }) },
     });

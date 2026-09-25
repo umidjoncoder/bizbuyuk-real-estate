@@ -1,18 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { COUNTRIES, flagEmoji } from "@/lib/countries";
+import { getApprovedTestimonials } from "@/lib/publicContent";
 
 const VALID_LANGS = ["ru", "ar", "uz", "en", "az"];
 
 // GET: approved, visitor-submitted reviews — merged client-side with the
-// curated launch quotes in lib/testimonials.ts.
+// curated launch quotes in lib/testimonials.ts. The home page calls this on
+// every visit, so it reads from the cache, not the database.
 export async function GET() {
   try {
-    const rows = await prisma.testimonial.findMany({
-      where: { status: "APPROVED" },
-      orderBy: { createdAt: "desc" },
-      select: { id: true, name: true, city: true, flag: true, lang: true, rating: true, service: true, quote: true },
-    });
+    const rows = await getApprovedTestimonials();
     return NextResponse.json({ testimonials: rows });
   } catch (err) {
     console.error("GET Testimonials error:", err);

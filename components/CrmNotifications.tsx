@@ -35,7 +35,16 @@ const Ctx = createContext<NotifContext>({
 
 export const useNotifications = () => useContext(Ctx);
 
-const POLL_MS = 30_000;
+// Which reminders are due is worked out locally every 30 s (the `clock` tick),
+// so the poll only has to notice reminders added or changed elsewhere, and it
+// sends back the version it has so an unchanged list costs almost nothing.
+const POLL_MS = 60_000;
+// Polling stops while the tab is hidden or nobody has touched it for IDLE_MS,
+// and catches up the moment someone is back. Every poll is a database query,
+// and Neon only lets the compute sleep after 5 quiet minutes, so a CRM tab
+// left open overnight kept the database running (and billing) around the clock.
+const IDLE_MS = 10 * 60_000;
+const INPUT_EVENTS = ["pointerdown", "pointermove", "keydown", "wheel"] as const;
 
 export function CrmNotificationsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useCrm();
@@ -43,13 +52,16 @@ export function CrmNotificationsProvider({ children }: { children: React.ReactNo
   const [now, setNow] = useState<number>(() => 0); // 0 until mounted (avoids SSR mismatch)
   const [toasts, setToasts] = useState<CrmReminder[]>([]);
   const toastedIds = useRef<Set<string>>(new Set());
+  const version = useRef<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (!user) return;
     try {
-      const res = await fetch("/api/crm/reminders");
+      const res = await fetch(`/api/crm/reminders${version.current ? `?v=${version.current}` : ""}`);
       if (res.ok) {
         const data = await res.json();
+        if (data.unchanged) return;
+        version.current = data.v ?? null;
         setReminders(data.reminders || []);
       }
     } catch {
@@ -60,16 +72,35 @@ export function CrmNotificationsProvider({ children }: { children: React.ReactNo
   // poll + clock tick
   useEffect(() => {
     if (!user) {
+      version.current = null;
       setReminders([]);
       return;
     }
+    let lastInput = Date.now();
+    let paused = false;
+    const tick = () => {
+      if (document.visibilityState === "visible" && Date.now() - lastInput < IDLE_MS) refresh();
+      else paused = true;
+    };
+    const wake = () => {
+      lastInput = Date.now();
+      if (paused && document.visibilityState === "visible") {
+        paused = false;
+        setNow(Date.now());
+        refresh();
+      }
+    };
     setNow(Date.now());
     refresh();
-    const poll = setInterval(refresh, POLL_MS);
+    const poll = setInterval(tick, POLL_MS);
     const clock = setInterval(() => setNow(Date.now()), 30_000);
+    INPUT_EVENTS.forEach((e) => window.addEventListener(e, wake, { passive: true }));
+    document.addEventListener("visibilitychange", wake);
     return () => {
       clearInterval(poll);
       clearInterval(clock);
+      INPUT_EVENTS.forEach((e) => window.removeEventListener(e, wake));
+      document.removeEventListener("visibilitychange", wake);
     };
   }, [user, refresh]);
 

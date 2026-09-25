@@ -13,10 +13,14 @@ async function getSessionUser() {
   return verifyJWT(token);
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const user = await getSessionUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // ?lite=1 leaves out the profile photos (base64, ~180 KB for the whole
+    // team) for pages that only need names for their dropdowns.
+    const lite = new URL(req.url).searchParams.get("lite") === "1";
 
     // Brokers and Drivers have no need for the staff directory (they cannot
     // assign leads/tasks). Return an empty list to avoid leaking colleagues' data.
@@ -33,7 +37,7 @@ export async function GET() {
         email: true,
         role: true,
         isActive: true,
-        avatarUrl: true,
+        avatarUrl: !lite,
         position: true,
         phone: true,
         telegramChatId: true,
