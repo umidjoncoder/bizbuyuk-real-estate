@@ -125,3 +125,24 @@ export function leadAssignedMessage(opts: {
     `🔗 ${escapeHtml(link)}`
   );
 }
+
+// Build the body for a bulk assignment: one message per broker instead of one
+// per lead, so handing over fifty leads doesn't flood their chat.
+export function leadsBulkAssignedMessage(opts: {
+  brokerName: string;
+  leads: { name: string; phone: string }[];
+  assignedBy: string;
+  appUrl?: string;
+}): string {
+  const link = `${opts.appUrl || ""}/crm/leads`;
+  const shown = opts.leads.slice(0, 15);
+  const more = opts.leads.length - shown.length;
+  return (
+    `🎯 <b>Yangi mijozlar / New Leads: ${opts.leads.length}</b>\n\n` +
+    `👤 <b>Broker:</b> ${escapeHtml(opts.brokerName)}\n` +
+    shown.map((l) => `• ${escapeHtml(l.name)} — ${escapeHtml(l.phone)}`).join("\n") +
+    (more > 0 ? `\n… +${more}` : "") +
+    `\n\n🧑‍💼 <b>Biriktirgan:</b> ${escapeHtml(opts.assignedBy)}\n\n` +
+    `🔗 ${escapeHtml(link)}`
+  );
+}

@@ -200,18 +200,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       }
     }
 
-    // Notify the broker a lead was assigned to them (shows in their bell instantly).
+    // Tell the broker on Telegram (their own chat if set, else the company
+    // channel). No in-CRM reminder: a "New lead assigned" pop-up for every
+    // assignment buried the reminders brokers set themselves.
     if (notifyBrokerId) {
-      await prisma.reminder.create({
-        data: {
-          userId: notifyBrokerId,
-          message: `New lead assigned to you: ${updatedLead.name} (${updatedLead.phone})`,
-          remindAt: new Date(),
-          leadId: id,
-        },
-      });
-
-      // Also push a Telegram alert (broker's own chat if set, else the company channel).
       await notifyUserTelegram(
         notifyBroker,
         leadAssignedMessage({

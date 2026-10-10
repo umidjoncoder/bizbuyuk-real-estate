@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useCrm } from "@/components/CrmSecurityWrapper";
 import { useNotifications } from "@/components/CrmNotifications";
 import { useRouter } from "next/navigation";
@@ -38,6 +38,8 @@ import {
   PhoneCall,
   Users2,
   Hotel,
+  ListChecks,
+  Minus,
 } from "lucide-react";
 
 type Comment = {
@@ -194,6 +196,20 @@ export default function LeadsPage() {
 
   const isManager = user?.role === "OWNER" || user?.role === "ADMIN";
 
+  // Bulk selection (Owner): pick many leads, then hand them to one broker
+  // and/or move them to one status in a single request.
+  const canBulk = user?.role === "OWNER" && !archiveView;
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [lastPickedId, setLastPickedId] = useState<string | null>(null);
+  const [bulkBroker, setBulkBroker] = useState("");
+  const [bulkStatus, setBulkStatus] = useState("");
+  const [bulkSaving, setBulkSaving] = useState(false);
+  const [bulkNotice, setBulkNotice] = useState("");
+  const [bulkLostOpen, setBulkLostOpen] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+  const [barBox, setBarBox] = useState<{ x: number; w: number } | null>(null);
+
   useEffect(() => {
     if (user?.role === "DRIVER") {
       router.replace("/crm/tasks");
@@ -284,6 +300,110 @@ export default function LeadsPage() {
     if (user && user.role !== "DRIVER") fetchLeads();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [archiveView]);
+
+  const exitSelectMode = () => {
+    setSelectMode(false);
+    setSelectedIds(new Set());
+    setLastPickedId(null);
+    setBulkBroker("");
+    setBulkStatus("");
+  };
+
+  useEffect(() => {
+    if (!canBulk && selectMode) exitSelectMode();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canBulk]);
+
+  // Track the page column so the fixed action bar centres on it, not on the
+  // window (the sidebar's width changes when it collapses).
+  useEffect(() => {
+    if (!selectMode || !pageRef.current) return;
+    const el = pageRef.current;
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      setBarBox({ x: r.left + r.width / 2, w: r.width });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener("resize", measure);
+    return () => { ro.disconnect(); window.removeEventListener("resize", measure); };
+  }, [selectMode]);
+
+  useEffect(() => {
+    if (!selectMode) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || selectedLead || bulkLostOpen) return;
+      if (selectedIds.size > 0) setSelectedIds(new Set());
+      else exitSelectMode();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectMode, selectedIds, selectedLead, bulkLostOpen]);
+
+  // Click toggles one lead; Shift-click selects everything between it and the
+  // last lead picked, within the same visible order (a column or the list).
+  const togglePick = (id: string, shift: boolean, order: string[]) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      const from = lastPickedId ? order.indexOf(lastPickedId) : -1;
+      const to = order.indexOf(id);
+      if (shift && from !== -1 && to !== -1) {
+        const [a, b] = from < to ? [from, to] : [to, from];
+        order.slice(a, b + 1).forEach((x) => next.add(x));
+      } else if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+    setLastPickedId(id);
+  };
+
+  const setGroup = (ids: string[], on: boolean) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((x) => (on ? next.add(x) : next.delete(x)));
+      return next;
+    });
+  };
+
+  const applyBulk = async (lostReason = "") => {
+    const ids = [...selectedIds];
+    if (ids.length === 0 || (!bulkBroker && !bulkStatus)) return;
+    if (bulkStatus === "LOST" && !lostReason) {
+      setBulkLostOpen(true);
+      return;
+    }
+    setBulkSaving(true);
+    try {
+      const res = await fetch("/api/crm/leads/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ids,
+          ...(bulkBroker ? { brokerId: bulkBroker === "__none" ? null : bulkBroker } : {}),
+          ...(bulkStatus ? { status: bulkStatus, lostReason: bulkStatus === "LOST" ? lostReason : undefined } : {}),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Error");
+        return;
+      }
+      const touched = new Set<string>(data.ids);
+      setLeads((prev) => prev.map((l) => (touched.has(l.id) ? { ...l, ...data.patch } : l)));
+      setSelectedIds(new Set());
+      setLastPickedId(null);
+      setBulkBroker("");
+      setBulkStatus("");
+      setBulkNotice(`${data.updated} ${t.leads.bulkUpdated}`);
+      setTimeout(() => setBulkNotice(""), 2600);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setBulkSaving(false);
+    }
+  };
 
   const canEditLead = (lead: Lead) => {
     if (!user) return false;
@@ -397,6 +517,14 @@ export default function LeadsPage() {
   };
 
   const submitLostReason = async () => {
+    if (bulkLostOpen) {
+      if (!lostReasonText.trim()) return;
+      setBulkLostOpen(false);
+      const reason = lostReasonText;
+      setLostReasonText("");
+      await applyBulk(reason);
+      return;
+    }
     if (!lostReasonText.trim() || !targetLostLeadId) return;
     await handleUpdateStatus(targetLostLeadId, "LOST", lostReasonText);
     setIsLostModalOpen(false);
@@ -587,7 +715,7 @@ export default function LeadsPage() {
   const detailLoading = <Loader2 className="w-4 h-4 animate-spin crm-faint" />;
 
   return (
-    <div className="space-y-7">
+    <div ref={pageRef} className={`space-y-7 ${selectMode ? "pb-28" : ""}`}>
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -641,13 +769,24 @@ export default function LeadsPage() {
             </select>
           </div>
         )}
-        <div className="flex items-center rounded-xl p-1 md:ml-auto border crm-bd" style={{ background: "var(--crm-input-bg)" }}>
+        <div className="flex items-center gap-2 md:ml-auto">
+        {canBulk && (
+          <button
+            onClick={() => (selectMode ? exitSelectMode() : setSelectMode(true))}
+            aria-pressed={selectMode}
+            className={`crm-btn-ghost py-2 ${selectMode ? "!border-[#c8a15a] crm-gold" : ""}`}
+          >
+            <ListChecks className="w-4 h-4" /> {selectMode ? t.leads.bulkDone : t.leads.bulkSelect}
+          </button>
+        )}
+        <div className="flex items-center rounded-xl p-1 border crm-bd" style={{ background: "var(--crm-input-bg)" }}>
           <button onClick={() => setViewMode("kanban")} className={`p-2 rounded-lg transition-all cursor-pointer ${viewMode === "kanban" ? "bg-[#c8a15a] text-[#08080a]" : "crm-muted"}`}>
             <KanbanSquare className="w-4 h-4" />
           </button>
           <button onClick={() => setViewMode("list")} className={`p-2 rounded-lg transition-all cursor-pointer ${viewMode === "list" ? "bg-[#c8a15a] text-[#08080a]" : "crm-muted"}`}>
             <List className="w-4 h-4" />
           </button>
+        </div>
         </div>
       </div>
 
@@ -658,6 +797,8 @@ export default function LeadsPage() {
         <div className="flex gap-4 overflow-x-auto pb-4 items-start crm-scroll">
           {kanbanColumns.map((col) => {
             const colLeads = filteredLeads.filter((l) => l.status === col.status);
+            const colIds = colLeads.map((l) => l.id);
+            const colPicked = colIds.filter((id) => selectedIds.has(id)).length;
             const isOver = dragOverCol === col.status;
             const meta = sMeta(col.status);
             return (
@@ -670,25 +811,44 @@ export default function LeadsPage() {
                 className={`crm-panel flex flex-col w-[280px] flex-shrink-0 p-3 h-[72vh] ${isOver ? "crm-col-over" : ""}`}
               >
                 <div className="flex items-center justify-between mb-3 pb-2 border-b crm-bd">
-                  <span className="text-xs font-bold crm-text flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${meta.dot}`} /> {col.title}
-                  </span>
-                  <span className="crm-chip">{colLeads.length}</span>
+                  {selectMode && colLeads.length > 0 ? (
+                    <button
+                      onClick={() => setGroup(colIds, colPicked < colIds.length)}
+                      className="text-xs font-bold crm-text flex items-center gap-2 cursor-pointer"
+                      title={t.leads.bulkAll}
+                    >
+                      <Checkbox on={colPicked === 0 ? false : colPicked === colIds.length ? true : "mixed"} />
+                      <span className={`w-2 h-2 rounded-full ${meta.dot}`} /> {col.title}
+                    </button>
+                  ) : (
+                    <span className="text-xs font-bold crm-text flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${meta.dot}`} /> {col.title}
+                    </span>
+                  )}
+                  <span className="crm-chip crm-tabular">{selectMode && colPicked > 0 ? `${colPicked}/${colLeads.length}` : colLeads.length}</span>
                 </div>
                 <div className="space-y-2.5 flex-1 overflow-y-auto crm-scroll pr-1">
                   {colLeads.map((lead) => {
                     const unseen = unseenCount(lead);
+                    const picked = selectMode && selectedIds.has(lead.id);
                     return (
                       <div
                         key={lead.id}
-                        draggable
+                        draggable={!selectMode}
                         onDragStart={(e) => handleDragStart(e, lead.id)}
                         onDragEnd={() => setDraggingId(null)}
-                        onClick={() => { setSelectedLead(lead); setEditMode(false); }}
-                        className={`crm-card crm-lift p-3.5 cursor-pointer ${draggingId === lead.id ? "crm-dragging" : ""} ${unseen ? "ring-1 ring-red-500/50" : ""}`}
+                        onClick={(e) => {
+                          if (selectMode) togglePick(lead.id, e.shiftKey, colIds);
+                          else { setSelectedLead(lead); setEditMode(false); }
+                        }}
+                        aria-selected={selectMode ? picked : undefined}
+                        className={`crm-card crm-lift p-3.5 cursor-pointer select-none ${draggingId === lead.id ? "crm-dragging" : ""} ${unseen && !picked ? "ring-1 ring-red-500/50" : ""} ${picked ? "crm-card-selected" : ""}`}
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <h4 className="font-semibold text-sm crm-text leading-tight">{lead.name}</h4>
+                          <h4 className="font-semibold text-sm crm-text leading-tight flex items-start gap-2">
+                            {selectMode && <Checkbox on={picked} />}
+                            {lead.name}
+                          </h4>
                           {unseen > 0 && (
                             <span className="flex items-center gap-1 text-[9px] font-bold uppercase text-red-500 bg-red-500/12 px-1.5 py-0.5 rounded-full flex-shrink-0">
                               <ShieldAlert className="w-3 h-3" /> {t.leads.unreviewedBadge}
@@ -741,6 +901,17 @@ export default function LeadsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b crm-bd text-xs uppercase font-semibold crm-muted">
+                  {selectMode && (() => {
+                    const ids = filteredLeads.map((l) => l.id);
+                    const n = ids.filter((id) => selectedIds.has(id)).length;
+                    return (
+                      <th className="p-4 w-10">
+                        <button onClick={() => setGroup(ids, n < ids.length)} className="flex cursor-pointer" title={t.leads.bulkAll}>
+                          <Checkbox on={n === 0 ? false : n === ids.length ? true : "mixed"} />
+                        </button>
+                      </th>
+                    );
+                  })()}
                   <th className="p-4">{lang === "en" ? "Lead" : "Клиент"}</th>
                   <th className="p-4">{lang === "en" ? "Phone" : "Телефон"}</th>
                   <th className="p-4">{t.leads.fields.hotel}</th>
@@ -756,9 +927,16 @@ export default function LeadsPage() {
                 {filteredLeads.map((lead) => {
                   const meta = sMeta(lead.status);
                   const unseen = unseenCount(lead);
+                  const picked = selectMode && selectedIds.has(lead.id);
                   return (
-                    <tr key={lead.id} onClick={() => { setSelectedLead(lead); setEditMode(false); }}
-                        className="border-b crm-bd hover:bg-[var(--crm-surface-hover)] transition-colors cursor-pointer">
+                    <tr key={lead.id}
+                        onClick={(e) => {
+                          if (selectMode) togglePick(lead.id, e.shiftKey, filteredLeads.map((l) => l.id));
+                          else { setSelectedLead(lead); setEditMode(false); }
+                        }}
+                        aria-selected={selectMode ? picked : undefined}
+                        className={`border-b crm-bd hover:bg-[var(--crm-surface-hover)] transition-colors cursor-pointer ${picked ? "bg-[var(--crm-surface-hover)] select-none" : selectMode ? "select-none" : ""}`}>
+                      {selectMode && <td className="p-4 w-10"><Checkbox on={picked} /></td>}
                       <td className="p-4 font-semibold crm-text">
                         <div className="flex items-center gap-2">
                           {lead.name}
@@ -777,7 +955,7 @@ export default function LeadsPage() {
                           : <span className="text-xs crm-faint">—</span>}
                       </td>
                       <td className="p-4 text-right">
-                        <button onClick={(e) => { e.stopPropagation(); setSelectedLead(lead); setEditMode(false); }}
+                        <button disabled={selectMode} onClick={(e) => { e.stopPropagation(); setSelectedLead(lead); setEditMode(false); }}
                                 className="text-xs crm-gold border crm-bd hover:bg-[#c8a15a] hover:text-[#08080a] px-3 py-1 rounded-lg transition-all">
                           {t.leads.btnDetails}
                         </button>
@@ -786,12 +964,60 @@ export default function LeadsPage() {
                   );
                 })}
                 {filteredLeads.length === 0 && (
-                  <tr><td colSpan={9} className="p-10 text-center crm-muted">{t.leads.noLeads}</td></tr>
+                  <tr><td colSpan={selectMode ? 10 : 9} className="p-10 text-center crm-muted">{t.leads.noLeads}</td></tr>
                 )}
               </tbody>
             </table>
           </div>
         </div>
+      )}
+
+      {/* Bulk action bar (Owner, select mode) */}
+      {selectMode && (
+        <>
+          <div
+            style={barBox ? ({ "--bar-x": `${barBox.x}px`, "--bar-w": `${barBox.w}px` } as React.CSSProperties) : undefined}
+            className="crm-bulkbar p-2.5 flex flex-col md:flex-row md:items-center gap-2.5" role="toolbar" aria-label={t.leads.bulkSelect}>
+            <div className="flex items-center justify-between md:justify-start gap-3 pl-2 pr-1 md:min-w-[170px]">
+              <div className="leading-tight">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-2xl font-bold crm-gold crm-tabular tracking-tight">{selectedIds.size}</span>
+                  <span className="text-xs font-semibold crm-muted">{t.leads.bulkSelected}</span>
+                </div>
+                <p className="text-[10px] crm-faint hidden md:block" aria-live="polite">{bulkNotice || t.leads.bulkHint}</p>
+                {bulkNotice && <p className="text-[10px] crm-gold md:hidden" aria-live="polite">{bulkNotice}</p>}
+              </div>
+              <button onClick={exitSelectMode} className="md:hidden crm-muted p-1.5" aria-label={t.leads.bulkDone}><X className="w-4 h-4" /></button>
+            </div>
+            <div className="hidden md:block w-px self-stretch my-1" style={{ background: "var(--crm-border)" }} />
+            <div className="grid grid-cols-2 gap-2 flex-1">
+              <select value={bulkBroker} onChange={(e) => setBulkBroker(e.target.value)} className="crm-input crm-select text-sm py-2" aria-label={t.leads.bulkBroker}>
+                <option value="">{t.leads.bulkBroker}</option>
+                <option value="__none">{t.leads.bulkUnassign}</option>
+                {users.filter((u) => u.role === "BROKER" && u.isActive !== false)
+                  .sort((a, b) => a.fullName.localeCompare(b.fullName))
+                  .map((u) => <option key={u.id} value={u.id}>{u.fullName}</option>)}
+              </select>
+              <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value)} className="crm-input crm-select text-sm py-2" aria-label={t.leads.bulkStatus}>
+                <option value="">{t.leads.bulkStatus}</option>
+                {statusOptions.map((s) => <option key={s} value={s}>{statusLabel(s)}</option>)}
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setSelectedIds(new Set())} disabled={selectedIds.size === 0} className="crm-btn-ghost py-2 flex-1 md:flex-none disabled:opacity-40 disabled:cursor-not-allowed">
+                {t.leads.bulkClear}
+              </button>
+              <button
+                onClick={() => applyBulk()}
+                disabled={bulkSaving || selectedIds.size === 0 || (!bulkBroker && !bulkStatus)}
+                className="crm-btn-primary py-2 flex-1 md:flex-none md:min-w-[120px]"
+              >
+                {bulkSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} {t.leads.bulkApply}
+              </button>
+              <button onClick={exitSelectMode} className="hidden md:inline-flex crm-muted hover:crm-text p-2" aria-label={t.leads.bulkDone}><X className="w-4 h-4" /></button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* New Lead Modal */}
@@ -857,12 +1083,14 @@ export default function LeadsPage() {
       )}
 
       {/* Lost Reason Modal */}
-      {isLostModalOpen && (
+      {(isLostModalOpen || bulkLostOpen) && (
         <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 animate-backdrop">
           <div className="crm-card w-full max-w-md p-6 relative animate-modal">
-            <button onClick={() => { setIsLostModalOpen(false); setLostReasonText(""); setTargetLostLeadId(null); }} className="absolute top-4 right-4 crm-muted hover:crm-text"><X className="w-5 h-5" /></button>
+            <button onClick={() => { setIsLostModalOpen(false); setBulkLostOpen(false); setLostReasonText(""); setTargetLostLeadId(null); }} className="absolute top-4 right-4 crm-muted hover:crm-text"><X className="w-5 h-5" /></button>
             <h3 className="text-lg font-bold border-b crm-bd pb-3 mb-4 flex items-center gap-2 crm-text"><AlertCircle className="w-5 h-5 text-red-500" />{t.leads.lostReasonPromptTitle}</h3>
-            <p className="text-xs mb-4 crm-muted">{t.leads.lostReasonSub}</p>
+            <p className="text-xs mb-4 crm-muted">
+              {bulkLostOpen ? `${selectedIds.size} ${t.leads.bulkSelected} — ` : ""}{t.leads.lostReasonSub}
+            </p>
             <textarea required rows={3} value={lostReasonText} onChange={(e) => setLostReasonText(e.target.value)} placeholder={t.leads.lostReasonPlaceholder} className="crm-input mb-4" />
             <button onClick={submitLostReason} className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-sm transition-all">{t.leads.btnConfirm}</button>
           </div>
@@ -1105,6 +1333,14 @@ export default function LeadsPage() {
 }
 
 /* ---------- small presentational helpers ---------- */
+function Checkbox({ on }: { on: boolean | "mixed" }) {
+  return (
+    <span className="crm-check mt-px" data-on={String(on)} aria-hidden>
+      {on === true && <Check className="w-3 h-3" strokeWidth={3.5} />}
+      {on === "mixed" && <Minus className="w-3 h-3" strokeWidth={3.5} />}
+    </span>
+  );
+}
 function prefIcon(v: string | null) {
   switch ((v || "").toLowerCase()) {
     case "call": return <PhoneCall className="w-4 h-4 crm-gold" />;

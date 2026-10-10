@@ -446,3 +446,46 @@ html.light {
 .crm-scroll::-webkit-scrollbar-track { background: transparent; }
 .crm-scroll::-webkit-scrollbar-thumb { background: var(--crm-border-strong); border-radius: 999px; }
 
+
+/* Lead bulk selection (Owner) */
+.crm-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+  border-radius: 0.3rem;
+  border: 1.5px solid var(--crm-border-strong);
+  background: var(--crm-input-bg);
+  color: #08080a;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s var(--ease-lux);
+}
+.crm-check[data-on="true"] { background: var(--crm-gold); border-color: var(--crm-gold); }
+.crm-check[data-on="mixed"] { background: var(--crm-gold); border-color: var(--crm-gold); }
+.crm-card-selected {
+  border-color: var(--crm-gold) !important;
+  background: linear-gradient(0deg, var(--crm-surface-hover), var(--crm-surface-hover)), var(--crm-surface);
+  box-shadow: 0 0 0 1px var(--crm-gold), var(--crm-shadow);
+}
+.crm-card-selected .crm-check { transform: scale(1.06); }
+@keyframes bulkBarIn {
+  from { opacity: 0; transform: translate(-50%, 18px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+/* Fixed to the window but centred on the page column: the page sets --bar-x
+   and --bar-w from its own box, so the sidebar's width never pushes it off. */
+.crm-bulkbar {
+  position: fixed;
+  left: var(--bar-x, 50%);
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 40;
+  width: min(var(--bar-w, calc(100vw - 2rem)), 880px);
+  background: var(--crm-surface);
+  border: 1px solid var(--crm-border-strong);
+  border-radius: 1rem;
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(200, 161, 90, 0.06);
+  animation: bulkBarIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.crm-tabular { font-variant-numeric: tabular-nums; }
