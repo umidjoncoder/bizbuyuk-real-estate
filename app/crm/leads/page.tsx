@@ -692,7 +692,8 @@ export default function LeadsPage() {
     const q = searchQuery.toLowerCase();
     const matchesSearch =
       l.name.toLowerCase().includes(q) || l.phone.includes(searchQuery) ||
-      (l.email && l.email.toLowerCase().includes(q));
+      (l.email && l.email.toLowerCase().includes(q)) ||
+      (l.hotel && l.hotel.toLowerCase().includes(q));
     const matchesSource = sourceFilter === "ALL" || l.source === sourceFilter;
     const matchesBroker =
       brokerFilter === "ALL" ||
