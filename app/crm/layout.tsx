@@ -31,6 +31,7 @@ import {
   Loader2,
   Newspaper,
   MessageSquareQuote,
+  ReceiptText,
 } from "lucide-react";
 
 function CrmLayoutContent({ children }: { children: React.ReactNode }) {
@@ -172,6 +173,12 @@ function CrmLayoutContent({ children }: { children: React.ReactNode }) {
       name: t.sidebar.finance,
       href: "/crm/finance",
       icon: Wallet,
+      allowed: ["OWNER"],
+    },
+    {
+      name: t.sidebar.invoices,
+      href: "/crm/invoices",
+      icon: ReceiptText,
       allowed: ["OWNER"],
     },
     {

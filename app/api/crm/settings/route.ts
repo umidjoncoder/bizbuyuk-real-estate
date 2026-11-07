@@ -20,7 +20,12 @@ export async function GET() {
     const user = await getSessionUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const rows = await prisma.setting.findMany({ orderBy: { sortOrder: "asc" } });
+    // Only the dropdown lists + logo. The Setting table also holds Owner-only
+    // rows (invoices, the signed invoice template) that must never reach here.
+    const rows = await prisma.setting.findMany({
+      where: { category: { in: [...LIST_CATEGORIES, "branding"] } },
+      orderBy: { sortOrder: "asc" },
+    });
     const grouped: Record<string, { id: string; value: string }[]> = { leadSource: [], developer: [], propertyType: [], leadStatus: [], position: [] };
     let logo: string | null = null;
     for (const r of rows) {

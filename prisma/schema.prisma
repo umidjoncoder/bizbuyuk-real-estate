@@ -81,7 +81,7 @@ model Property {
 // singletons like the company logo — so new options don't need code changes.
 model Setting {
   id        String   @id @default(uuid())
-  category  String // "leadSource" | "developer" | "propertyType" | "branding"
+  category  String // "leadSource" | "developer" | "propertyType" | "leadStatus" | "position" | "branding" | "invoice" (JSON, Owner only, see lib/invoices.ts) | "invoiceTemplate"
   value     String   @db.Text // option label, or logo data URL for branding
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())

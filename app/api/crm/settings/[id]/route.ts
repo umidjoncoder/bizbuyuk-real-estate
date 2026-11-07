@@ -21,7 +21,11 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { id } = await params;
-    await prisma.setting.delete({ where: { id } }).catch(() => {});
+    // Dropdown options and the logo only — invoice rows are removed (Owner
+    // only) through /api/crm/invoices.
+    await prisma.setting.deleteMany({
+      where: { id, category: { in: ["leadSource", "developer", "propertyType", "leadStatus", "position", "branding"] } },
+    });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("DELETE Setting error:", err);

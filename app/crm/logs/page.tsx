@@ -36,6 +36,10 @@ function actionMeta(action: string, lang: "en" | "ru") {
     DELETE_TASK: { label: en ? "Task deleted" : "Задача удалена", tone: "red" },
     ARCHIVE_LEAD: { label: en ? "Lead archived" : "Лид в архив", tone: "gold" },
     CREATE_REMINDER: { label: en ? "Reminder set" : "Напоминание", tone: "gold" },
+    CREATE_INVOICE: { label: en ? "Invoice issued" : "Инвойс выписан", tone: "green" },
+    UPDATE_INVOICE: { label: en ? "Invoice edited" : "Инвойс изменён", tone: "gold" },
+    DELETE_INVOICE: { label: en ? "Invoice deleted" : "Инвойс удалён", tone: "red" },
+    UPDATE_INVOICE_TEMPLATE: { label: en ? "Invoice template" : "Шаблон инвойса", tone: "gold" },
   };
   return map[action] || { label: action.replace(/_/g, " ").toLowerCase(), tone: "gold" as const };
 }
@@ -167,6 +171,15 @@ export default function LogsPage() {
           + (Array.isArray(d.changed) && d.changed.length ? ` (${d.changed.join(", ")})` : "");
       case "DELETE_USER":
         return en ? `Deleted employee @${d.username} (${d.role})` : `Удалён сотрудник @${d.username} (${d.role})`;
+      case "CREATE_INVOICE":
+        return en ? `Invoice ${d.number} to ${d.billToName}` : `Инвойс ${d.number} для ${d.billToName}`;
+      case "UPDATE_INVOICE":
+        return (en ? `Edited invoice ${d.number}` : `Изменён инвойс ${d.number}`)
+          + (Array.isArray(d.changed) && d.changed.length ? ` (${d.changed.join(", ")})` : "");
+      case "DELETE_INVOICE":
+        return en ? `Deleted invoice ${d.number} (${d.billToName})` : `Удалён инвойс ${d.number} (${d.billToName})`;
+      case "UPDATE_INVOICE_TEMPLATE":
+        return en ? "Uploaded a new blank invoice template" : "Загружен новый шаблон инвойса";
       case "CREATE_PROPERTY":
         return en ? `Added property “${d.title}”` : `Добавлен объект «${d.title}»`;
       case "CREATE_REMINDER": {
