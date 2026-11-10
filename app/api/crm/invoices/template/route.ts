@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
 import { Role } from "@prisma/client";
 import { INVOICE_TEMPLATE_CATEGORY, MAX_TEMPLATE_BYTES } from "@/lib/invoices";
+import { checkTemplate } from "@/lib/invoicePdf";
 
 // The blank invoice page carries the founder's signature and the company
 // stamp, so it never lives in the (public) repo or under /public. The Owner
@@ -57,7 +58,19 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "The PDF is too large (max 3 MB)" }, { status: 400 });
     }
     if (bytes.subarray(0, 5).toString("latin1") !== "%PDF-") {
-      return NextResponse.json({ error: "This file is not a PDF" }, { status: 400 });
+      return NextResponse.json({ error: "This file is not a PDF", code: "unreadable" }, { status: 400 });
+    }
+    // An invoice that already carries details would get new ones printed on
+    // top of the old — only the blank template is accepted.
+    const problem = await checkTemplate(new Uint8Array(bytes));
+    if (problem) {
+      const error =
+        problem === "filled"
+          ? "This PDF is an invoice that is already filled in. Upload the blank template (bizbuyuk-invoice-template.pdf)."
+          : problem === "pageSize"
+            ? "This PDF is not the A4 invoice template."
+            : "This PDF could not be read.";
+      return NextResponse.json({ error, code: problem }, { status: 400 });
     }
 
     // Singleton: replace whatever was there, in one transaction.

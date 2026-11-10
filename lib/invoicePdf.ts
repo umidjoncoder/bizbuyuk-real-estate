@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import { PDFDict, PDFDocument, PDFName, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 
 /*
  * Fills the BIZBUYUK commission invoice in the browser. The template is the
@@ -124,6 +124,43 @@ function putRight(page: PDFPage, text: string, font: PDFFont, spot: { right: num
   const size = fitSize(clean, font, spot.size, spot.maxWidth);
   const width = font.widthOfTextAtSize(clean, size);
   page.drawText(clean, { x: spot.right - width, y: PAGE_HEIGHT - spot.base, size, font, color: INK });
+}
+
+/**
+ * Is this PDF usable as the blank template? The fields are drawn straight onto
+ * the page, so a PDF that already carries invoice details (one downloaded from
+ * the CRM, or an issued invoice) would print the new details on top of the old
+ * ones. Returns null when the PDF is a clean blank, else why it is not.
+ *
+ * Tells a filled page apart by what filling adds: the CRM signs its PDFs as
+ * "BIZBUYUK CRM" and draws with the standard Times-Bold / Helvetica-Bold fonts
+ * the blank never uses; an issued invoice has its address in Aptos Bold, which
+ * the blank no longer has.
+ */
+export type TemplateProblem = "unreadable" | "pageSize" | "filled";
+
+export async function checkTemplate(bytes: Uint8Array | ArrayBuffer): Promise<TemplateProblem | null> {
+  let doc: PDFDocument;
+  try {
+    doc = await PDFDocument.load(bytes, { updateMetadata: false });
+  } catch {
+    return "unreadable";
+  }
+  if (doc.getPageCount() < 1) return "unreadable";
+
+  const page = doc.getPage(0);
+  const { width, height } = page.getSize();
+  // Every position above was measured on this A4 page.
+  if (Math.abs(width - 595.2) > 3 || Math.abs(height - PAGE_HEIGHT) > 3) return "pageSize";
+
+  if (/BIZBUYUK CRM|LaWEra CRM/i.test(`${doc.getProducer() ?? ""} ${doc.getCreator() ?? ""}`)) return "filled";
+
+  const fonts = page.node.Resources()?.lookupMaybe(PDFName.of("Font"), PDFDict);
+  for (const [, ref] of fonts?.entries() ?? []) {
+    const base = doc.context.lookupMaybe(ref, PDFDict)?.get(PDFName.of("BaseFont"))?.toString() ?? "";
+    if (/^\/(Times-Bold|Helvetica-Bold)$/.test(base) || /Aptos-Bold/i.test(base)) return "filled";
+  }
+  return null;
 }
 
 export async function fillInvoice(template: Uint8Array | ArrayBuffer, fields: InvoiceFields) {

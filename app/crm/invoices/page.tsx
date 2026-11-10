@@ -71,14 +71,24 @@ const formFields = (f: Form): InvoiceFields => ({
   commissionAmount: commissionOf(f.propertyValue, f.commissionRate),
 });
 
-/* The template (~430 KB) is fetched once per tab, only when a PDF is made. */
+/** The stored template is not a clean blank (see checkTemplate). */
+class TemplateIssue extends Error {
+  constructor(public code: string) { super(code); }
+}
+
+/* The template (~430 KB) is fetched once per tab (the browser keeps a private
+ * copy per template id), and checked before anything is drawn on it. */
 let templateCache: { id: string; bytes: Promise<Uint8Array> } | null = null;
 function loadTemplate(id: string) {
   if (templateCache?.id !== id) {
     const bytes = fetch(`/api/crm/invoices/template?v=${encodeURIComponent(id)}`).then(async (r) => {
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || "Could not load the invoice template");
-      return Uint8Array.from(atob(d.pdf), (c) => c.charCodeAt(0));
+      const pdf = Uint8Array.from(atob(d.pdf), (c) => c.charCodeAt(0));
+      const { checkTemplate } = await import("@/lib/invoicePdf");
+      const problem = await checkTemplate(pdf);
+      if (problem) throw new TemplateIssue(problem);
+      return pdf;
     });
     bytes.catch(() => { if (templateCache?.id === id) templateCache = null; });
     templateCache = { id, bytes };
@@ -133,7 +143,41 @@ export default function InvoicesPage() {
   const [busy, setBusy] = useState<"save" | "preview" | null>(null);
   const [downloading, setDownloading] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  // The saved template turned out to be a filled invoice: new details would
+  // print over old ones, so PDFs stay blocked until the blank is uploaded.
+  const [templateBroken, setTemplateBroken] = useState(false);
   const templateInput = useRef<HTMLInputElement>(null);
+  const ready = !!template && !templateBroken;
+
+  const problemText = (code: string) =>
+    code === "filled"
+      ? en
+        ? "This PDF already has invoice details on it (it is a filled invoice), so new details would print on top of the old ones. Upload the blank template: bizbuyuk-invoice-template.pdf."
+        : "В этом PDF уже есть данные инвойса (это заполненный инвойс), и новые данные легли бы поверх старых. Загрузите пустой шаблон: bizbuyuk-invoice-template.pdf."
+      : code === "pageSize"
+        ? en ? "This PDF is not the A4 invoice template." : "Этот PDF — не A4-шаблон инвойса."
+        : en ? "This file could not be read as a PDF." : "Не удалось прочитать файл как PDF.";
+
+  /** Shows a PDF error; a bad stored template also switches the page to "upload the blank". */
+  const pdfError = (e: any) => {
+    if (e instanceof TemplateIssue) {
+      setTemplateBroken(true);
+      setNotice({ tone: "err", text: problemText(e.code) });
+    } else {
+      setNotice({ tone: "err", text: e?.message || "PDF error" });
+    }
+  };
+
+  // Check the stored template as soon as the page knows of one, so a bad one
+  // is flagged before anyone fills in an invoice.
+  useEffect(() => {
+    if (!template) return;
+    let live = true;
+    setTemplateBroken(false);
+    loadTemplate(template.id).catch((e) => { if (live && e instanceof TemplateIssue) setTemplateBroken(true); });
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [template?.id]);
 
   useEffect(() => {
     if (!user) return;
@@ -215,7 +259,7 @@ export default function InvoicesPage() {
   };
 
   const preview = async () => {
-    if (!template || !validate()) return;
+    if (!template || !ready || !validate()) return;
     // Open the tab inside the click, or the browser treats it as a pop-up.
     const tab = window.open("", "_blank");
     setBusy("preview");
@@ -228,7 +272,7 @@ export default function InvoicesPage() {
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
     } catch (e: any) {
       tab?.close();
-      setNotice({ tone: "err", text: e.message || "PDF error" });
+      pdfError(e);
     } finally {
       setBusy(null);
     }
@@ -260,7 +304,7 @@ export default function InvoicesPage() {
       if (res.status === 409) { setErrors({ number: en ? "This number is already used" : "Этот номер уже занят" }); return; }
       if (!res.ok) throw new Error(d.error || "Error");
       setOpen(false);
-      if (template) await download(d.invoice as Invoice);
+      if (ready) await download(d.invoice as Invoice);
       setNotice({ tone: "ok", text: en ? `Invoice ${d.invoice.number} saved` : `Инвойс ${d.invoice.number} сохранён` });
       await load();
     } catch (e: any) {
@@ -271,13 +315,13 @@ export default function InvoicesPage() {
   };
 
   const download = async (inv: Invoice) => {
-    if (!template) return;
+    if (!template || !ready) return;
     setDownloading(inv.id);
     try {
       const fields: InvoiceFields = { ...inv };
       saveBlob(await renderPdf(template.id, fields), await fileName(fields));
     } catch (e: any) {
-      setNotice({ tone: "err", text: e.message || "PDF error" });
+      pdfError(e);
     } finally {
       setDownloading(null);
     }
@@ -300,13 +344,18 @@ export default function InvoicesPage() {
     }
     setUploading(true);
     try {
+      const buf = await file.arrayBuffer();
+      const { checkTemplate } = await import("@/lib/invoicePdf");
+      const problem = await checkTemplate(buf.slice(0));
+      if (problem) { setNotice({ tone: "err", text: problemText(problem) }); return; }
       const res = await fetch("/api/crm/invoices/template", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pdf: toBase64(await file.arrayBuffer()) }),
+        body: JSON.stringify({ pdf: toBase64(buf) }),
       });
       const d = await res.json();
-      if (!res.ok) throw new Error(d.error || "Upload failed");
+      if (!res.ok) throw new Error(d.code ? problemText(d.code) : d.error || "Upload failed");
+      setTemplateBroken(false);
       setTemplate(d.template);
       setNotice({ tone: "ok", text: en ? "Invoice template saved" : "Шаблон инвойса сохранён" });
     } catch (err: any) {
@@ -314,6 +363,17 @@ export default function InvoicesPage() {
     } finally {
       setUploading(false);
     }
+  };
+
+  // Replacing is rare (a new company template, e.g. new bank details), and
+  // picking a downloaded invoice by mistake is exactly what broke PDFs once.
+  const replaceTemplate = () => {
+    const ok = confirm(
+      en
+        ? "Replace the blank invoice template?\n\nChoose the BLANK template (bizbuyuk-invoice-template.pdf). Do not choose an invoice downloaded from this page."
+        : "Заменить пустой шаблон инвойса?\n\nВыберите ПУСТОЙ шаблон (bizbuyuk-invoice-template.pdf). Не выбирайте инвойс, скачанный с этой страницы.",
+    );
+    if (ok) templateInput.current?.click();
   };
 
   const total = commissionOf(form.propertyValue, form.commissionRate);
@@ -335,12 +395,12 @@ export default function InvoicesPage() {
         </div>
         <div className="flex items-center gap-2">
           {template && (
-            <button onClick={() => templateInput.current?.click()} disabled={uploading} className="crm-btn-ghost whitespace-nowrap" title={en ? "Replace the blank template PDF" : "Заменить шаблон PDF"}>
+            <button onClick={replaceTemplate} disabled={uploading} className="crm-btn-ghost whitespace-nowrap" title={en ? "Replace the blank template PDF" : "Заменить шаблон PDF"}>
               {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileUp className="w-4 h-4" />}
               {en ? "Template" : "Шаблон"}
             </button>
           )}
-          <button onClick={openCreate} disabled={loading || !template} className="crm-btn-primary whitespace-nowrap">
+          <button onClick={openCreate} disabled={loading || !ready} className="crm-btn-primary whitespace-nowrap">
             <Plus className="w-4 h-4" />{en ? "New invoice" : "Новый инвойс"}
           </button>
         </div>
@@ -353,18 +413,27 @@ export default function InvoicesPage() {
         </div>
       )}
 
-      {/* One-time setup: the signed blank template lives in the DB, not in the code. */}
-      {!loading && !template && (
-        <div className="crm-card p-6 flex flex-col md:flex-row md:items-center gap-5">
-          <div className="w-12 h-12 rounded-xl bg-[#c8a15a]/10 flex items-center justify-center flex-shrink-0">
-            <ShieldCheck className="w-6 h-6 crm-gold" />
+      {/* One-time setup: the signed blank template lives in the DB, not in the code.
+          Also shown when the stored one turns out to be a filled invoice. */}
+      {!loading && !ready && (
+        <div className={`crm-card p-6 flex flex-col md:flex-row md:items-center gap-5 ${templateBroken ? "border-red-500/40" : ""}`}>
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${templateBroken ? "bg-red-500/10" : "bg-[#c8a15a]/10"}`}>
+            <ShieldCheck className={`w-6 h-6 ${templateBroken ? "text-red-500" : "crm-gold"}`} />
           </div>
           <div className="flex-1">
-            <h4 className="font-semibold crm-text">{en ? "Upload the invoice template once" : "Загрузите шаблон инвойса (один раз)"}</h4>
+            <h4 className="font-semibold crm-text">
+              {templateBroken
+                ? (en ? "The saved template is a filled invoice — upload the blank one" : "Сохранённый шаблон — это заполненный инвойс. Загрузите пустой")
+                : (en ? "Upload the invoice template once" : "Загрузите шаблон инвойса (один раз)")}
+            </h4>
             <p className="text-sm crm-muted mt-1">
-              {en
-                ? "Choose the blank BIZBUYUK invoice PDF (bizbuyuk-invoice-template.pdf). It carries the signature and stamp, so it is kept privately in the CRM and only the Owner can use it."
-                : "Выберите пустой PDF-шаблон инвойса BIZBUYUK (bizbuyuk-invoice-template.pdf). На нём подпись и печать, поэтому он хранится закрыто в CRM и доступен только владельцу."}
+              {templateBroken
+                ? (en
+                  ? "A filled invoice was uploaded instead of the blank template, so new details printed on top of its old ones. Upload the blank template again: bizbuyuk-invoice-template.pdf. Saved invoices are kept and will download correctly afterwards."
+                  : "Вместо пустого шаблона был загружен заполненный инвойс, поэтому новые данные печатались поверх старых. Загрузите пустой шаблон заново: bizbuyuk-invoice-template.pdf. Сохранённые инвойсы останутся и после этого скачаются правильно.")
+                : (en
+                  ? "Choose the blank BIZBUYUK invoice PDF (bizbuyuk-invoice-template.pdf), not an invoice downloaded from here. It carries the signature and stamp, so it is kept privately in the CRM and only the Owner can use it."
+                  : "Выберите пустой PDF-шаблон инвойса BIZBUYUK (bizbuyuk-invoice-template.pdf), а не скачанный отсюда инвойс. На нём подпись и печать, поэтому он хранится закрыто в CRM и доступен только владельцу.")}
             </p>
           </div>
           <button onClick={() => templateInput.current?.click()} disabled={uploading} className="crm-btn-primary">
@@ -409,7 +478,7 @@ export default function InvoicesPage() {
                   </td>
                   <td className="pl-1 pr-3 py-3.5 text-right whitespace-nowrap">
                     <div className="inline-flex items-center">
-                      <button onClick={() => download(inv)} disabled={!template || downloading === inv.id} title={en ? "Download PDF" : "Скачать PDF"} className="p-1.5 rounded-lg crm-gold hover:bg-[var(--crm-surface-hover)] disabled:opacity-40">
+                      <button onClick={() => download(inv)} disabled={!ready || downloading === inv.id} title={en ? "Download PDF" : "Скачать PDF"} className="p-1.5 rounded-lg crm-gold hover:bg-[var(--crm-surface-hover)] disabled:opacity-40">
                         {downloading === inv.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                       </button>
                       <button onClick={() => openEdit(inv)} title={en ? "Edit" : "Изменить"} className="p-1.5 rounded-lg crm-faint hover:crm-text hover:bg-[var(--crm-surface-hover)]">
@@ -511,7 +580,7 @@ export default function InvoicesPage() {
             <div className="p-6 pt-4 border-t crm-bd flex items-center gap-2">
               <button onClick={() => setOpen(false)} className="crm-btn-ghost hidden sm:inline-flex">{en ? "Cancel" : "Отмена"}</button>
               <span className="grow" />
-              <button onClick={preview} disabled={!template || busy !== null} className="crm-btn-ghost" title={en ? "Open the PDF in a new tab" : "Открыть PDF в новой вкладке"}>
+              <button onClick={preview} disabled={!ready || busy !== null} className="crm-btn-ghost" title={en ? "Open the PDF in a new tab" : "Открыть PDF в новой вкладке"}>
                 {busy === "preview" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />}
                 <span className="hidden sm:inline">{en ? "Preview PDF" : "Просмотр PDF"}</span>
               </button>
